@@ -338,6 +338,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.56,151.95],12)">Toowoomba</button>
       <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.7,153.0],11)">Logan/Flagstone</button>
       <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.6,152.75],12)">Ripley</button>
+      <button class="btn btn-p btn-sm" id="radarToggle" onclick="toggleRadar()" style="margin-left:8px">📡 Radar ON</button>
     </span>
   </div>
   <div style="position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)">
@@ -1064,16 +1065,50 @@ const markers = [
 function mColor(t){return({competitor:'#ef4444',identified:'var(--identified)',prospecting:'var(--prospecting)',option:'var(--option)',develop:'var(--develop)',novate:'var(--novate)'})[t]||'#fff'}
 function mkIcon(c,s){return L.divIcon({className:'',html:`<div style="width:${s}px;height:${s}px;background:${c};border-radius:50%;border:2px solid rgba(255,255,255,.25);box-shadow:0 0 10px ${c}55"></div>`,iconSize:[s,s],iconAnchor:[s/2,s/2]})}
 
+// Radar ring layer groups
+let radarLayers = {};
+
 function addMarkers(mi){
+  const radarGroup = L.layerGroup().addTo(mi);
+  radarLayers[mi._leaflet_id] = radarGroup;
+
   markers.forEach(m => {
     const sz = m.t==='competitor'?13:11;
     const mk = L.marker([m.lat,m.lng],{icon:mkIcon(mColor(m.t),sz)}).addTo(mi);
-    let pp = `<div style="font-size:12px;min-width:180px"><strong>${m.n}</strong><br><span style="color:#9ca3af">${m.d}</span>`;
+    let pp = `<div style="font-size:12px;min-width:200px"><strong>${m.n}</strong><br><span style="color:#9ca3af">${m.d}</span>`;
     if(m.dev) pp += `<br><span style="color:#ef4444">Developer: ${m.dev}</span>`;
     if(m.stage) pp += `<br><span style="color:${mColor(m.t)}">Stage: ${m.stage}</span>`;
     pp += '</div>';
     mk.bindPopup(pp);
+
+    // RADAR PROXIMITY RINGS — competitor estates only
+    if(m.t === 'competitor') {
+      // 5km ring — outer (faintest)
+      L.circle([m.lat,m.lng],{
+        radius:5000, color:'#ef4444', weight:0.8, opacity:0.3,
+        fillColor:'#ef4444', fillOpacity:0.03, dashArray:'8 6',
+        interactive:false
+      }).addTo(radarGroup);
+      // 3km ring — mid
+      L.circle([m.lat,m.lng],{
+        radius:3000, color:'#f59e0b', weight:0.8, opacity:0.4,
+        fillColor:'#f59e0b', fillOpacity:0.04, dashArray:'6 4',
+        interactive:false
+      }).addTo(radarGroup);
+      // 1km ring — inner (strongest)
+      L.circle([m.lat,m.lng],{
+        radius:1000, color:'#00d4aa', weight:1.2, opacity:0.6,
+        fillColor:'#00d4aa', fillOpacity:0.08,
+        interactive:false
+      }).addTo(radarGroup);
+      // Centre pulse dot
+      L.circleMarker([m.lat,m.lng],{
+        radius:3, color:'#ef4444', weight:0, fillColor:'#ef4444', fillOpacity:0.8,
+        interactive:false
+      }).addTo(radarGroup);
+    }
   });
+
   // Growth corridors
   [{n:'Ripley Valley',c:[[-27.58,152.72],[-27.58,152.82],[-27.65,152.82],[-27.65,152.72]]},
    {n:'Flagstone PDA',c:[[-27.72,152.92],[-27.72,153.02],[-27.78,153.02],[-27.78,152.92]]},
@@ -1083,8 +1118,39 @@ function addMarkers(mi){
     L.polygon(co.c,{color:'#22c55e',weight:1,fillColor:'#22c55e',fillOpacity:.07}).addTo(mi)
       .bindPopup(`<strong>${co.n} Growth Corridor</strong>`);
   });
+
+  // RADAR LEGEND
+  const radarLegend = L.control({position:'bottomright'});
+  radarLegend.onAdd = function(){
+    const d = L.DomUtil.create('div');
+    d.style.cssText = 'background:rgba(20,23,34,.92);border:1px solid #232840;border-radius:8px;padding:10px 14px;font-size:11px;color:#e8e8ed;line-height:1.8;backdrop-filter:blur(8px)';
+    d.innerHTML = `<div style="font-weight:700;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7a8194">Proximity Radar</div>
+      <div><span style="display:inline-block;width:10px;height:2px;background:#00d4aa;margin-right:6px;vertical-align:middle"></span>1 km — Prime zone</div>
+      <div><span style="display:inline-block;width:10px;height:2px;background:#f59e0b;margin-right:6px;vertical-align:middle;opacity:.7"></span>3 km — Strong demand</div>
+      <div><span style="display:inline-block;width:10px;height:2px;background:#ef4444;margin-right:6px;vertical-align:middle;opacity:.5"></span>5 km — Catchment area</div>`;
+    return d;
+  };
+  radarLegend.addTo(mi);
 }
 addMarkers(map);
+
+// Radar toggle
+let radarVisible = true;
+function toggleRadar(){
+  radarVisible = !radarVisible;
+  const btn = document.getElementById('radarToggle');
+  Object.values(radarLayers).forEach(lg => {
+    if(radarVisible) lg.addTo(lg._map || mapFull);
+    else lg.remove();
+  });
+  if(radarVisible){
+    btn.textContent = '📡 Radar ON';
+    btn.classList.remove('btn-o'); btn.classList.add('btn-p');
+  } else {
+    btn.textContent = '📡 Radar OFF';
+    btn.classList.remove('btn-p'); btn.classList.add('btn-o');
+  }
+}
 
 /* ── LOGIN LOGIC ── */
 const users = {
