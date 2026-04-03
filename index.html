@@ -18,6 +18,22 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
 
+/* ── LOGIN SCREEN ── */
+.login-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
+.login-overlay.hidden{display:none}
+.login-box{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:40px;width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-logo{display:flex;align-items:center;justify-content:center;gap:10px;font-size:24px;font-weight:700;margin-bottom:8px}
+.login-logo .ico{width:38px;height:38px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--bg)}
+.login-logo em{color:var(--accent);font-style:normal}
+.login-sub{color:var(--dim);font-size:13px;margin-bottom:28px}
+.login-field{margin-bottom:16px;text-align:left}
+.login-field label{display:block;font-size:12px;font-weight:600;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.login-field input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;transition:border .2s}
+.login-field input:focus{border-color:var(--accent)}
+.login-btn{width:100%;padding:12px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s}
+.login-btn:hover{background:var(--accent2)}
+.login-error{color:var(--danger);font-size:12px;margin-top:12px;display:none}
+
 /* ── LAYOUT ── */
 .shell{display:flex;height:100vh}
 .sidebar{width:240px;background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
@@ -172,7 +188,25 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </style>
 </head>
 <body>
-<div class="shell">
+
+<!-- LOGIN SCREEN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo"><div class="ico">DV</div> Deal <em>Vault</em></div>
+    <div class="login-sub">QLD Land Subdivision Portal</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Enter password">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="loginError">Invalid username or password</div>
+  </div>
+</div>
+<div class="shell" id="appShell" style="display:none">
 
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar">
@@ -883,6 +917,66 @@ function addMarkers(mi){
   });
 }
 addMarkers(map);
+
+/* ── LOGIN LOGIC ── */
+const users = {
+  james: { pass: 'deal2026', name: 'James' },
+  roel:  { pass: 'deal2026', name: 'Roel' }
+};
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if (users[u] && users[u].pass === p) {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('appShell').style.display = 'flex';
+    sessionStorage.setItem('dv_user', u);
+    // Update top bar with user name
+    const tb = document.querySelector('.top-bar');
+    if (tb) {
+      let badge = document.createElement('div');
+      badge.style.cssText = 'display:flex;align-items:center;gap:8px;';
+      badge.innerHTML = `<span style="font-size:12px;color:var(--dim)">Logged in as</span><span style="background:var(--accent);color:var(--bg);padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">${users[u].name}</span><button onclick="doLogout()" style="background:rgba(239,68,68,.15);color:#ef4444;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Logout</button>`;
+      document.querySelector('.top-actions').prepend(badge);
+    }
+    // Fix map rendering after unhide
+    setTimeout(() => { map.invalidateSize(); }, 200);
+  } else {
+    err.style.display = 'block';
+    document.getElementById('loginPass').value = '';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('dv_user');
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+// Auto-login if session exists
+(function(){
+  const saved = sessionStorage.getItem('dv_user');
+  if (saved && users[saved]) {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('appShell').style.display = 'flex';
+    const tb = document.querySelector('.top-bar');
+    if (tb) {
+      let badge = document.createElement('div');
+      badge.style.cssText = 'display:flex;align-items:center;gap:8px;';
+      badge.innerHTML = `<span style="font-size:12px;color:var(--dim)">Logged in as</span><span style="background:var(--accent);color:var(--bg);padding:4px 12px;border-radius:6px;font-size:12px;font-weight:700">${users[saved].name}</span><button onclick="doLogout()" style="background:rgba(239,68,68,.15);color:#ef4444;border:none;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Logout</button>`;
+      document.querySelector('.top-actions').prepend(badge);
+    }
+    setTimeout(() => { map.invalidateSize(); }, 200);
+  }
+})();
+
+// Enter key triggers login
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('loginPass').focus(); });
 </script>
 </body>
 </html>
