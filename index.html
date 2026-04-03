@@ -6,6 +6,7 @@
 <title>Deal Vault — QLD Land Subdivision Portal</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
   --bg: #0b0d14; --bg-card: #141722; --bg-card2: #1a1e2e;
@@ -170,7 +171,29 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .notif-time{font-size:10px;color:var(--dim);margin-top:3px}
 
 /* ── ANALYTICS ── */
-.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bb-full{grid-column:1/-1}
+.bb-ticker{display:flex;gap:0;overflow-x:auto;padding:0;margin-bottom:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r)}
+.bb-tick{flex:1;min-width:130px;padding:12px 16px;border-right:1px solid var(--border);position:relative}
+.bb-tick:last-child{border-right:none}
+.bb-tick-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);font-weight:600;margin-bottom:4px}
+.bb-tick-val{font-size:22px;font-weight:700;font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;letter-spacing:-.5px}
+.bb-tick-delta{font-size:11px;font-weight:600;margin-top:2px}
+.bb-tick-delta.up{color:#22c55e}
+.bb-tick-delta.down{color:#ef4444}
+.bb-chart-wrap{position:relative;padding:8px 0}
+.bb-chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.bb-chart-title{font-size:13px;font-weight:700;color:var(--text)}
+.bb-chart-pills{display:flex;gap:4px}
+.bb-pill{padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.05);color:var(--dim);border:1px solid transparent;transition:all .15s}
+.bb-pill.active{background:rgba(0,212,170,.12);color:var(--accent);border-color:rgba(0,212,170,.3)}
+.bb-pill:hover{color:var(--text)}
+.bb-table{width:100%;border-collapse:collapse;font-size:12px;font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace}
+.bb-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);font-weight:600;padding:6px 10px;border-bottom:1px solid var(--border)}
+.bb-table td{padding:7px 10px;border-bottom:1px solid rgba(35,40,64,.4);white-space:nowrap}
+.bb-table tr:hover td{background:rgba(255,255,255,.02)}
+.bb-table .bb-pos{color:#22c55e}.bb-table .bb-neg{color:#ef4444}
+.bb-spark{display:inline-block;width:60px;height:20px;vertical-align:middle}
 .bar-chart{display:flex;align-items:flex-end;gap:10px;height:180px;padding-top:8px}
 .bar-g{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .bar{width:100%;border-radius:5px 5px 0 0;min-height:6px}
@@ -468,34 +491,121 @@ tr:hover td{background:rgba(255,255,255,.015)}
 
 <!-- ═══════════════════ ANALYTICS ═══════════════════ -->
 <div class="page" id="analytics">
+
+  <!-- BLOOMBERG TICKER BAR -->
+  <div class="bb-ticker">
+    <div class="bb-tick"><div class="bb-tick-label">Portfolio Value</div><div class="bb-tick-val" style="color:var(--accent)">$18.6M</div><div class="bb-tick-delta up">+12.4% YTD</div></div>
+    <div class="bb-tick"><div class="bb-tick-label">Sites Reviewed</div><div class="bb-tick-val">84</div><div class="bb-tick-delta up">+14 this month</div></div>
+    <div class="bb-tick"><div class="bb-tick-label">Conversion Rate</div><div class="bb-tick-val" style="color:#22c55e">4.8%</div><div class="bb-tick-delta up">+0.6% vs Q3</div></div>
+    <div class="bb-tick"><div class="bb-tick-label">Avg Option Fee</div><div class="bb-tick-val">$25K</div><div class="bb-tick-delta down">-$2K vs avg</div></div>
+    <div class="bb-tick"><div class="bb-tick-label">Avg Novation Margin</div><div class="bb-tick-val" style="color:var(--novate)">$310K</div><div class="bb-tick-delta up">+$45K vs Q3</div></div>
+    <div class="bb-tick"><div class="bb-tick-label">Letters / Response</div><div class="bb-tick-val">142 <span style="font-size:13px;color:var(--prospecting)">18%</span></div><div class="bb-tick-delta up">+3% response rate</div></div>
+  </div>
+
   <div class="analytics-grid">
-    <div class="card"><div class="card-head"><h4>Median Land Value ($/m²) by Area</h4></div><div class="card-body"><div class="bar-chart" id="bar-chart"></div></div></div>
-    <div class="card"><div class="card-head"><h4>Growth Corridors — YoY Change</h4></div><div class="card-body" id="growth-list"></div></div>
-    <div class="card">
-      <div class="card-head"><h4>Deal Flow Summary</h4></div>
+
+    <!-- LAND VALUE AREA CHART (FULL WIDTH) -->
+    <div class="card bb-full">
       <div class="card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div><div style="font-size:11px;color:var(--dim)">Sites Reviewed (total)</div><div style="font-size:26px;font-weight:700;color:var(--identified)">84</div></div>
-          <div><div style="font-size:11px;color:var(--dim)">Conversion Rate</div><div style="font-size:26px;font-weight:700;color:var(--accent)">4.8%</div></div>
-          <div><div style="font-size:11px;color:var(--dim)">Avg Option Fee Paid</div><div style="font-size:26px;font-weight:700">$25K</div></div>
-          <div><div style="font-size:11px;color:var(--dim)">Avg Novation Margin</div><div style="font-size:26px;font-weight:700;color:var(--novate)">$310K</div></div>
-          <div><div style="font-size:11px;color:var(--dim)">Letters Sent</div><div style="font-size:26px;font-weight:700">142</div></div>
-          <div><div style="font-size:11px;color:var(--dim)">Response Rate</div><div style="font-size:26px;font-weight:700;color:var(--prospecting)">18%</div></div>
+        <div class="bb-chart-header">
+          <div class="bb-chart-title">SEQ MEDIAN LAND VALUE — $/M² BY CORRIDOR</div>
+          <div class="bb-chart-pills">
+            <div class="bb-pill active">Current</div>
+            <div class="bb-pill">12M Ago</div>
+            <div class="bb-pill">3Y Trend</div>
+          </div>
+        </div>
+        <div class="bb-chart-wrap"><canvas id="bbLandChart" height="260"></canvas></div>
+      </div>
+    </div>
+
+    <!-- GROWTH CORRIDORS LINE CHART -->
+    <div class="card">
+      <div class="card-body">
+        <div class="bb-chart-header">
+          <div class="bb-chart-title">YOY GROWTH BY CORRIDOR (%)</div>
+          <div class="bb-chart-pills">
+            <div class="bb-pill active">1Y</div>
+            <div class="bb-pill">3Y</div>
+          </div>
+        </div>
+        <div class="bb-chart-wrap"><canvas id="bbGrowthChart" height="240"></canvas></div>
+      </div>
+    </div>
+
+    <!-- DEAL PIPELINE DOUGHNUT -->
+    <div class="card">
+      <div class="card-body">
+        <div class="bb-chart-header">
+          <div class="bb-chart-title">PIPELINE COMPOSITION</div>
+          <div class="bb-chart-pills">
+            <div class="bb-pill active">By Stage</div>
+            <div class="bb-pill">By Value</div>
+          </div>
+        </div>
+        <div class="bb-chart-wrap" style="display:flex;align-items:center;gap:20px">
+          <div style="flex:1"><canvas id="bbPipeChart" height="220"></canvas></div>
+          <div style="font-size:11px;line-height:2;min-width:120px">
+            <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#8b5cf6;margin-right:6px"></span>Identified <strong>3</strong></div>
+            <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#f59e0b;margin-right:6px"></span>Prospecting <strong>3</strong></div>
+            <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#3b82f6;margin-right:6px"></span>Under Option <strong>3</strong></div>
+            <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#22c55e;margin-right:6px"></span>Develop <strong>2</strong></div>
+            <div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#ec4899;margin-right:6px"></span>Novated <strong>4</strong></div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- OPTION FEE vs PROFIT SCATTER-STYLE BAR -->
     <div class="card">
-      <div class="card-head"><h4>Lot Yield — Active Option Sites</h4></div>
       <div class="card-body">
-        <div class="growth-item"><span>Ripley Valley 14ha</span><span style="font-weight:700;color:var(--option)">~45 lots</span></div>
-        <div class="growth-item"><span>Flagstone 18ha</span><span style="font-weight:700;color:var(--option)">~60 lots</span></div>
-        <div class="growth-item"><span>Highfields 8.5ha</span><span style="font-weight:700;color:var(--option)">~28 lots</span></div>
-        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
-          <span style="font-weight:600">Total Estimated Yield</span>
-          <span style="font-weight:700;color:var(--develop)">~133 lots</span>
+        <div class="bb-chart-header">
+          <div class="bb-chart-title">OPTION FEE vs NOVATION PROFIT ($K)</div>
         </div>
+        <div class="bb-chart-wrap"><canvas id="bbProfitChart" height="240"></canvas></div>
       </div>
     </div>
+
+    <!-- LOT YIELD BAR -->
+    <div class="card">
+      <div class="card-body">
+        <div class="bb-chart-header">
+          <div class="bb-chart-title">LOT YIELD — ACTIVE OPTION SITES</div>
+        </div>
+        <div class="bb-chart-wrap"><canvas id="bbYieldChart" height="240"></canvas></div>
+      </div>
+    </div>
+
+    <!-- BLOOMBERG-STYLE DATA TABLE (FULL WIDTH) -->
+    <div class="card bb-full">
+      <div class="card-body">
+        <div class="bb-chart-header">
+          <div class="bb-chart-title">CORRIDOR MARKET DATA — SEQ + TOOWOOMBA</div>
+          <div class="bb-chart-pills">
+            <div class="bb-pill active">All</div>
+            <div class="bb-pill">Growth &gt;18%</div>
+            <div class="bb-pill">Value &lt;$400</div>
+          </div>
+        </div>
+        <table class="bb-table">
+          <thead>
+            <tr><th>Corridor</th><th>Median $/m²</th><th>YoY Growth</th><th>12M Prior</th><th>Lots Pipeline</th><th>Key Developer</th><th>Risk</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="color:var(--accent);font-weight:600">Ripley Valley</td><td>$420</td><td class="bb-pos">+24.3%</td><td>$338</td><td>3,500+</td><td>Stockland</td><td style="color:#22c55e">LOW</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Flagstone PDA</td><td>$380</td><td class="bb-pos">+21.7%</td><td>$312</td><td>12,000+</td><td>Peet Limited</td><td style="color:#22c55e">LOW</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Pimpama / Coomera</td><td>$510</td><td class="bb-pos">+19.8%</td><td>$426</td><td>1,500+</td><td>Frasers</td><td style="color:#f59e0b">MED</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Highfields</td><td>$290</td><td class="bb-pos">+18.2%</td><td>$245</td><td>2,000+</td><td>QM Properties</td><td style="color:#22c55e">LOW</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Palmview</td><td>$580</td><td class="bb-pos">+17.5%</td><td>$494</td><td>800+</td><td>Stockland Aura</td><td style="color:#f59e0b">MED</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Park Ridge</td><td>$350</td><td class="bb-pos">+16.1%</td><td>$301</td><td>1,800+</td><td>AVID</td><td style="color:#22c55e">LOW</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Caloundra South</td><td>$490</td><td class="bb-pos">+15.8%</td><td>$423</td><td>3,500+</td><td>Stockland Aura</td><td style="color:#f59e0b">MED</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Fernvale</td><td>$220</td><td class="bb-pos">+14.2%</td><td>$193</td><td>—</td><td>Emerging</td><td style="color:#22c55e">LOW</td></tr>
+            <tr><td style="color:var(--accent);font-weight:600">Gatton</td><td>$180</td><td class="bb-pos">+12.6%</td><td>$160</td><td>—</td><td>Emerging</td><td style="color:#22c55e">LOW</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -832,15 +942,73 @@ comps.forEach(c => {
   </div>`;
 });
 
-// ─── ANALYTICS ───
-const barData = [{l:'Ripley',v:420,c:'var(--accent)'},{l:'Flagstone',v:380,c:'var(--option)'},{l:'Pimpama',v:510,c:'var(--prospecting)'},{l:'Park Ridge',v:350,c:'var(--develop)'},{l:'Highfields',v:290,c:'var(--identified)'},{l:'Fernvale',v:220,c:'#06b6d4'},{l:'Gatton',v:180,c:'var(--novate)'},{l:'Palmview',v:580,c:'#f97316'},{l:'Aura',v:490,c:'#ef4444'}];
-const maxV = Math.max(...barData.map(b=>b.v));
-const bcEl = document.getElementById('bar-chart');
-barData.forEach(b => { bcEl.innerHTML += `<div class="bar-g"><div class="bar-val">$${b.v}</div><div class="bar" style="height:${(b.v/maxV)*160}px;background:${b.c}"></div><div class="bar-lbl">${b.l}</div></div>`; });
+// ─── BLOOMBERG CHARTS ───
+const bbFont = {family:"'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace",size:10};
+const bbGrid = {color:'rgba(255,255,255,.06)',drawBorder:false};
+const bbTick = {color:'#7a8194',font:bbFont};
+Chart.defaults.color = '#7a8194';
+Chart.defaults.font.family = bbFont.family;
+Chart.defaults.font.size = 10;
 
-const growthData = [{n:'Ripley Valley',g:'+24.3%'},{n:'Flagstone PDA',g:'+21.7%'},{n:'Pimpama / Coomera',g:'+19.8%'},{n:'Highfields (Toowoomba)',g:'+18.2%'},{n:'Palmview (Sunshine Coast)',g:'+17.5%'},{n:'Park Ridge / Logan',g:'+16.1%'},{n:'Caloundra South / Aura',g:'+15.8%'},{n:'Fernvale / Somerset',g:'+14.2%'},{n:'Gatton (Lockyer)',g:'+12.6%'}];
-const glEl = document.getElementById('growth-list');
-growthData.forEach(g => { glEl.innerHTML += `<div class="growth-item"><span>${g.n}</span><span style="font-weight:700;color:#22c55e">${g.g}</span></div>`; });
+// 1. LAND VALUE AREA CHART
+(function(){
+  const ctx = document.getElementById('bbLandChart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,260);
+  grad.addColorStop(0,'rgba(0,212,170,.25)');
+  grad.addColorStop(1,'rgba(0,212,170,.0)');
+  const grad2 = ctx.createLinearGradient(0,0,0,260);
+  grad2.addColorStop(0,'rgba(59,130,246,.15)');
+  grad2.addColorStop(1,'rgba(59,130,246,.0)');
+  new Chart(ctx,{type:'bar',data:{
+    labels:['Ripley','Flagstone','Pimpama','Park Ridge','Highfields','Fernvale','Gatton','Palmview','Aura'],
+    datasets:[
+      {label:'Current $/m²',data:[420,380,510,350,290,220,180,580,490],backgroundColor:grad,borderColor:'#00d4aa',borderWidth:2,borderRadius:4,borderSkipped:false},
+      {label:'12M Ago',data:[338,312,426,301,245,193,160,494,423],backgroundColor:grad2,borderColor:'#3b82f6',borderWidth:1,borderRadius:4,borderSkipped:false}
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:12,boxHeight:3,color:'#7a8194',font:bbFont,padding:16}},tooltip:{backgroundColor:'#1a1e2e',borderColor:'#232840',borderWidth:1,titleFont:{...bbFont,weight:'bold'},bodyFont:bbFont,padding:10,displayColors:true,callbacks:{label:function(c){return c.dataset.label+': $'+c.parsed.y+'/m²'}}}},scales:{x:{grid:{display:false},ticks:bbTick},y:{grid:bbGrid,ticks:{...bbTick,callback:v=>'$'+v}}}}});
+})();
+
+// 2. GROWTH CORRIDORS HORIZONTAL BAR
+(function(){
+  const ctx = document.getElementById('bbGrowthChart').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{
+    labels:['Ripley Valley','Flagstone PDA','Pimpama','Highfields','Palmview','Park Ridge','Caloundra Sth','Fernvale','Gatton'],
+    datasets:[{data:[24.3,21.7,19.8,18.2,17.5,16.1,15.8,14.2,12.6],
+      backgroundColor:function(ctx){const v=ctx.raw;return v>20?'rgba(0,212,170,.7)':v>16?'rgba(0,212,170,.45)':'rgba(0,212,170,.25)'},
+      borderColor:'#00d4aa',borderWidth:1,borderRadius:3,borderSkipped:false}]
+  },options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1e2e',borderColor:'#232840',borderWidth:1,callbacks:{label:c=>'+'+c.parsed.x+'% YoY'}}},scales:{x:{grid:bbGrid,ticks:{...bbTick,callback:v=>v+'%'}},y:{grid:{display:false},ticks:{...bbTick,font:{...bbFont,size:11}}}}}});
+})();
+
+// 3. PIPELINE DOUGHNUT
+(function(){
+  const ctx = document.getElementById('bbPipeChart').getContext('2d');
+  new Chart(ctx,{type:'doughnut',data:{
+    labels:['Identified','Prospecting','Under Option','Develop','Novated'],
+    datasets:[{data:[3,3,3,2,4],backgroundColor:['#8b5cf6','#f59e0b','#3b82f6','#22c55e','#ec4899'],borderColor:'#141722',borderWidth:3,hoverBorderColor:'#141722'}]
+  },options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1e2e',borderColor:'#232840',borderWidth:1}}}});
+})();
+
+// 4. OPTION FEE vs PROFIT
+(function(){
+  const ctx = document.getElementById('bbProfitChart').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{
+    labels:['Coomera 2.8ha','Logan Reserve','Park Ridge','Burpengary','Ripley (proj)','Flagstone (proj)'],
+    datasets:[
+      {label:'Option Fee ($K)',data:[15,10,20,25,30,35],backgroundColor:'rgba(59,130,246,.6)',borderColor:'#3b82f6',borderWidth:1,borderRadius:3},
+      {label:'Novation Profit ($K)',data:[285,112,190,180,320,280],backgroundColor:'rgba(0,212,170,.5)',borderColor:'#00d4aa',borderWidth:1,borderRadius:3}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',align:'end',labels:{boxWidth:12,boxHeight:3,color:'#7a8194',font:bbFont,padding:16}},tooltip:{backgroundColor:'#1a1e2e',borderColor:'#232840',borderWidth:1,callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y+'K'}}},scales:{x:{grid:{display:false},ticks:bbTick},y:{grid:bbGrid,ticks:{...bbTick,callback:v=>'$'+v+'K'}}}}});
+})();
+
+// 5. LOT YIELD
+(function(){
+  const ctx = document.getElementById('bbYieldChart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,240);
+  grad.addColorStop(0,'rgba(59,130,246,.6)');
+  grad.addColorStop(1,'rgba(59,130,246,.1)');
+  new Chart(ctx,{type:'bar',data:{
+    labels:['Ripley 14ha','Flagstone 18ha','Highfields 8.5ha','Springfield 7ha','Nth Lakes 4ha'],
+    datasets:[{label:'Estimated Lots',data:[45,60,28,28,18],backgroundColor:grad,borderColor:'#3b82f6',borderWidth:2,borderRadius:4,borderSkipped:false}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1e2e',borderColor:'#232840',borderWidth:1,callbacks:{label:c=>'~'+c.parsed.y+' lots'}}},scales:{x:{grid:{display:false},ticks:bbTick},y:{grid:bbGrid,ticks:{...bbTick,callback:v=>v+' lots'},beginAtZero:true}}}});
+})();
 
 // ─── MAP ───
 const tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
