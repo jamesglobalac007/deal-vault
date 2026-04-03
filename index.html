@@ -47,7 +47,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--dim);transition:all .15s}
 .nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .nav-item.active{color:var(--accent);background:rgba(0,212,170,.08)}
-.nav-item .nav-icon{font-size:16px;width:22px;text-align:center}
+.nav-item .nav-icon{font-size:12px;width:22px;text-align:center;display:inline-flex;align-items:center;justify-content:center}
+.nav-item .nav-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .nav-item .badge{margin-left:auto;background:var(--accent);color:var(--bg);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
 
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
@@ -132,8 +133,8 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .council-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:18px}
 .council-card h4{font-size:15px;font-weight:700;margin-bottom:4px}
 .council-card .region{font-size:11px;color:var(--dim);margin-bottom:12px}
-.council-link{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:var(--accent);text-decoration:none;transition:all .15s}
-.council-link:hover{color:var(--text)}
+.council-link{display:flex;align-items:center;gap:6px;padding:6px 0;font-size:12px;color:var(--accent);text-decoration:none;transition:all .15s;letter-spacing:.2px}
+.council-link:hover{color:var(--text);padding-left:4px}
 
 /* ── COMPETITOR CARDS ── */
 .comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -237,24 +238,24 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <nav class="sidebar-nav">
     <div class="nav-group">
       <div class="nav-group-label">Overview</div>
-      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span>Dashboard</div>
-      <div class="nav-item" data-page="map-page"><span class="nav-icon">🗺️</span>Map</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="4" rx="1"/><rect x="14" y="11" width="7" height="10" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</div>
+      <div class="nav-item" data-page="map-page"><span class="nav-icon"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>Map</div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">Deal Flow</div>
-      <div class="nav-item" data-page="pipeline"><span class="nav-icon">📋</span>Pipeline<span class="badge">15</span></div>
-      <div class="nav-item" data-page="prospecting"><span class="nav-icon">🔍</span>Site Finder</div>
-      <div class="nav-item" data-page="letters"><span class="nav-icon">✉️</span>Prospecting Letters</div>
+      <div class="nav-item" data-page="pipeline"><span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>Pipeline<span class="badge">15</span></div>
+      <div class="nav-item" data-page="prospecting"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>Site Finder</div>
+      <div class="nav-item" data-page="letters"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span>Prospecting Letters</div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">Data</div>
-      <div class="nav-item" data-page="council-hub"><span class="nav-icon">🏛️</span>Council Hub</div>
-      <div class="nav-item" data-page="competitors"><span class="nav-icon">🏗️</span>Competitors</div>
-      <div class="nav-item" data-page="analytics"><span class="nav-icon">📈</span>Analytics</div>
+      <div class="nav-item" data-page="council-hub"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg></span>Council Hub</div>
+      <div class="nav-item" data-page="competitors"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Competitors</div>
+      <div class="nav-item" data-page="analytics"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">Buyers</div>
-      <div class="nav-item" data-page="buyers"><span class="nav-icon">👥</span>Buyer Network<span class="badge">28</span></div>
+      <div class="nav-item" data-page="buyers"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>Buyer Network<span class="badge">28</span></div>
     </div>
   </nav>
 </aside>
@@ -338,7 +339,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.56,151.95],12)">Toowoomba</button>
       <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.7,153.0],11)">Logan/Flagstone</button>
       <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.6,152.75],12)">Ripley</button>
-      <button class="btn btn-p btn-sm" id="radarToggle" onclick="toggleRadar()" style="margin-left:8px">📡 Radar ON</button>
+      <button class="btn btn-p btn-sm" id="radarToggle" onclick="toggleRadar()" style="margin-left:8px">Radar ON</button>
     </span>
   </div>
   <div style="position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)">
@@ -463,20 +464,20 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <div class="council-card" style="border-left:3px solid var(--accent)">
       <h4>QLD Globe</h4>
       <div class="region">State-wide interactive mapping — zoning, land use, overlays</div>
-      <a class="council-link" href="https://qldglobe.information.qld.gov.au/" target="_blank">🌐 Open QLD Globe</a>
-      <a class="council-link" href="https://www.planning.qld.gov.au/planning-framework/plan-making/local-planning/zoning-information" target="_blank">📋 QLD Zoning Guide</a>
+      <a class="council-link" href="https://qldglobe.information.qld.gov.au/" target="_blank">Open QLD Globe &#8599;</a>
+      <a class="council-link" href="https://www.planning.qld.gov.au/planning-framework/plan-making/local-planning/zoning-information" target="_blank">QLD Zoning Guide &#8599;</a>
     </div>
     <div class="council-card" style="border-left:3px solid var(--option)">
       <h4>FloodCheck QLD</h4>
       <div class="region">State-wide flood mapping — floodplain overlays, historic floods</div>
-      <a class="council-link" href="https://floodcheck.information.qld.gov.au/" target="_blank">🌊 Open FloodCheck</a>
-      <a class="council-link" href="https://www.qra.qld.gov.au/publications-and-maps/maps/flood-mapping" target="_blank">📊 QRA Flood Mapping</a>
+      <a class="council-link" href="https://floodcheck.information.qld.gov.au/" target="_blank">Open FloodCheck &#8599;</a>
+      <a class="council-link" href="https://www.qra.qld.gov.au/publications-and-maps/maps/flood-mapping" target="_blank">QRA Flood Mapping &#8599;</a>
     </div>
     <div class="council-card" style="border-left:3px solid var(--prospecting)">
       <h4>QLD Open Data</h4>
       <div class="region">Government datasets — land use, regional plans, statistics</div>
-      <a class="council-link" href="https://www.data.qld.gov.au/dataset/regional-land-use-categories-regional-plans-series" target="_blank">🗂️ Regional Land Use Data</a>
-      <a class="council-link" href="https://www.qgso.qld.gov.au/statistics/theme/industry-development/residential-land-supply-development/residential-development" target="_blank">📈 Residential Development Stats</a>
+      <a class="council-link" href="https://www.data.qld.gov.au/dataset/regional-land-use-categories-regional-plans-series" target="_blank">Regional Land Use Data &#8599;</a>
+      <a class="council-link" href="https://www.qgso.qld.gov.au/statistics/theme/industry-development/residential-land-supply-development/residential-development" target="_blank">Residential Development Stats &#8599;</a>
     </div>
   </div>
 
@@ -636,21 +637,21 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="card-head"><h4>Novation Queue</h4><button class="btn btn-p btn-sm">Notify All</button></div>
         <div class="card-body">
           <div class="notif-item">
-            <div class="notif-ico" style="background:rgba(59,130,246,.15);color:var(--option)">📱</div>
+            <div class="notif-ico" style="background:rgba(59,130,246,.15);color:var(--option)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
             <div>
               <div class="notif-text"><strong>Ripley Valley 14ha</strong> — Under option. 6 matching buyers to notify for novation.</div>
               <div class="notif-time">Budget match: $3M–$8M · Region: Ipswich</div>
             </div>
           </div>
           <div class="notif-item">
-            <div class="notif-ico" style="background:rgba(236,72,153,.15);color:var(--novate)">✅</div>
+            <div class="notif-ico" style="background:rgba(236,72,153,.15);color:var(--novate)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <div>
               <div class="notif-text"><strong>Highfields 8.5ha</strong> — 3 buyers expressed interest. Tom Bradley committed.</div>
               <div class="notif-time">Novation in progress · $310K margin</div>
             </div>
           </div>
           <div class="notif-item">
-            <div class="notif-ico" style="background:rgba(34,197,94,.15);color:#22c55e">🤝</div>
+            <div class="notif-ico" style="background:rgba(34,197,94,.15);color:#22c55e"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
             <div>
               <div class="notif-text"><strong>Coomera 2.8ha</strong> — Novated to M. Chen. Option fee recovered + $285K profit.</div>
               <div class="notif-time">Settled 2 days ago</div>
@@ -871,51 +872,51 @@ prospects.forEach(p => {
 // ─── COUNCIL DATA ───
 const councils = [
   {name:'Brisbane City',region:'Brisbane Metro',links:[
-    {label:'City Plan Interactive Map',url:'https://cityplan.brisbane.qld.gov.au/eplan/',icon:'🗺️'},
-    {label:'Flood Awareness Map',url:'https://fam.brisbane.qld.gov.au/',icon:'🌊'},
-    {label:'Planning & Building Portal',url:'https://www.brisbane.qld.gov.au/building-and-planning/supporting-documents-and-online-tools/city-plan-online',icon:'📋'},
+    {label:'City Plan Interactive Map',url:'https://cityplan.brisbane.qld.gov.au/eplan/',icon:'&#9654;'},
+    {label:'Flood Awareness Map',url:'https://fam.brisbane.qld.gov.au/',icon:'&#9654;'},
+    {label:'Planning & Building Portal',url:'https://www.brisbane.qld.gov.au/building-and-planning/supporting-documents-and-online-tools/city-plan-online',icon:'&#9654;'},
   ]},
   {name:'Ipswich City',region:'Ipswich · Ripley, Springfield, Rosewood',links:[
-    {label:'Planning Scheme Map (Weave)',url:'https://maps.ipswich.qld.gov.au/weave/planscheme.html',icon:'🗺️'},
-    {label:'Development.i Portal',url:'https://developmenti.ipswich.qld.gov.au/',icon:'📋'},
-    {label:'Ipswich Plan 2025 Zones',url:'https://www.shapeyouripswich.com.au/new-ipswich-planning-scheme/ipswichplan2024zones',icon:'📊'},
+    {label:'Planning Scheme Map (Weave)',url:'https://maps.ipswich.qld.gov.au/weave/planscheme.html',icon:'&#9654;'},
+    {label:'Development.i Portal',url:'https://developmenti.ipswich.qld.gov.au/',icon:'&#9654;'},
+    {label:'Ipswich Plan 2025 Zones',url:'https://www.shapeyouripswich.com.au/new-ipswich-planning-scheme/ipswichplan2024zones',icon:'&#9654;'},
   ]},
   {name:'Logan City',region:'Logan · Flagstone, Park Ridge, Yarrabilba',links:[
-    {label:'PD Hub (Zoning + Overlays)',url:'https://www.logan.qld.gov.au/planning-and-building/planning-and-development/pd-hub',icon:'🗺️'},
-    {label:'Interactive Mapping',url:'https://loganhub.com.au/interactive-mapping',icon:'📋'},
-    {label:'PD Online',url:'https://www.logan.qld.gov.au/planning-and-development/pd-online',icon:'📊'},
+    {label:'PD Hub (Zoning + Overlays)',url:'https://www.logan.qld.gov.au/planning-and-building/planning-and-development/pd-hub',icon:'&#9654;'},
+    {label:'Interactive Mapping',url:'https://loganhub.com.au/interactive-mapping',icon:'&#9654;'},
+    {label:'PD Online',url:'https://www.logan.qld.gov.au/planning-and-development/pd-online',icon:'&#9654;'},
   ]},
   {name:'Gold Coast City',region:'Gold Coast · Pimpama, Coomera, Canungra',links:[
-    {label:'City Plan Interactive Map',url:'https://cityplan.goldcoast.qld.gov.au/eplan/',icon:'🗺️'},
-    {label:'PD Online',url:'https://www.goldcoast.qld.gov.au/Planning-building/PD-Online',icon:'📋'},
-    {label:'Flood Level Search',url:'https://www.goldcoast.qld.gov.au/Planning-building/Buying-researching-property/Mapping-search/Flood-level-search/Flood-maps',icon:'🌊'},
+    {label:'City Plan Interactive Map',url:'https://cityplan.goldcoast.qld.gov.au/eplan/',icon:'&#9654;'},
+    {label:'PD Online',url:'https://www.goldcoast.qld.gov.au/Planning-building/PD-Online',icon:'&#9654;'},
+    {label:'Flood Level Search',url:'https://www.goldcoast.qld.gov.au/Planning-building/Buying-researching-property/Mapping-search/Flood-level-search/Flood-maps',icon:'&#9654;'},
   ]},
   {name:'Moreton Bay Regional',region:'Moreton Bay · Burpengary, Caboolture, North Lakes',links:[
-    {label:'Planning Scheme Zones & Overlays',url:'https://moretonbay.maps.arcgis.com/apps/webappviewer/index.html?id=86604cba0e1b43fa8871b0361674b7d5',icon:'🗺️'},
-    {label:'Flood Hazard Overlay Info',url:'https://www.moretonbay.qld.gov.au/Services/Building-Development/Planning-Schemes/MBRC/Info-Sheets/Flood-Hazard-Overlay',icon:'🌊'},
-    {label:'DataHub (Open Data)',url:'https://datahub.moretonbay.qld.gov.au/',icon:'📊'},
+    {label:'Planning Scheme Zones & Overlays',url:'https://moretonbay.maps.arcgis.com/apps/webappviewer/index.html?id=86604cba0e1b43fa8871b0361674b7d5',icon:'&#9654;'},
+    {label:'Flood Hazard Overlay Info',url:'https://www.moretonbay.qld.gov.au/Services/Building-Development/Planning-Schemes/MBRC/Info-Sheets/Flood-Hazard-Overlay',icon:'&#9654;'},
+    {label:'DataHub (Open Data)',url:'https://datahub.moretonbay.qld.gov.au/',icon:'&#9654;'},
   ]},
   {name:'Sunshine Coast',region:'Sunshine Coast · Palmview, Caloundra South, Aura',links:[
-    {label:'Interactive Mapping',url:'https://www.sunshinecoast.qld.gov.au/development/planning-documents/sunshine-coast-planning-scheme-2014/interactive-mapping',icon:'🗺️'},
-    {label:'Zoning Open Data',url:'https://data.sunshinecoast.qld.gov.au/maps/9214a2e42f0e45508036ff9e7bf229bb',icon:'📊'},
-    {label:'Planning Scheme 2014',url:'https://www.sunshinecoast.qld.gov.au/development/planning-documents/sunshine-coast-planning-scheme-2014',icon:'📋'},
+    {label:'Interactive Mapping',url:'https://www.sunshinecoast.qld.gov.au/development/planning-documents/sunshine-coast-planning-scheme-2014/interactive-mapping',icon:'&#9654;'},
+    {label:'Zoning Open Data',url:'https://data.sunshinecoast.qld.gov.au/maps/9214a2e42f0e45508036ff9e7bf229bb',icon:'&#9654;'},
+    {label:'Planning Scheme 2014',url:'https://www.sunshinecoast.qld.gov.au/development/planning-documents/sunshine-coast-planning-scheme-2014',icon:'&#9654;'},
   ]},
   {name:'Toowoomba Regional',region:'Toowoomba · Highfields, Glenvale, Oakey',links:[
-    {label:'Planning Scheme Online Mapping',url:'https://www.tr.qld.gov.au/planning-building/scheme-strategies/planning-scheme/13289-access-the-toowoomba-regional-planning-scheme-9',icon:'🗺️'},
-    {label:'Development.i Portal',url:'https://www.tr.qld.gov.au/payments-self-service-laws/web-apps/pdonline/8892-planning-and-development-online',icon:'📋'},
+    {label:'Planning Scheme Online Mapping',url:'https://www.tr.qld.gov.au/planning-building/scheme-strategies/planning-scheme/13289-access-the-toowoomba-regional-planning-scheme-9',icon:'&#9654;'},
+    {label:'Development.i Portal',url:'https://www.tr.qld.gov.au/payments-self-service-laws/web-apps/pdonline/8892-planning-and-development-online',icon:'&#9654;'},
   ]},
   {name:'Lockyer Valley Regional',region:'Lockyer Valley · Gatton, Laidley, Fernvale',links:[
-    {label:'Current Planning Scheme',url:'https://www.lockyervalley.qld.gov.au/our-services/strategic-planning/current-planning-scheme',icon:'🗺️'},
-    {label:'Zone Maps (PDF)',url:'https://www.lockyervalley.qld.gov.au/repository/libraries/id:2eccbxg5l17q9su8pzhy/hierarchy/our-services/strategic-planning/documents/draft-planning-scheme/Overlay%20Mapping/Adopted%20version%20-%2017072024/ZM1_Zones%20map.pdf',icon:'📊'},
+    {label:'Current Planning Scheme',url:'https://www.lockyervalley.qld.gov.au/our-services/strategic-planning/current-planning-scheme',icon:'&#9654;'},
+    {label:'Zone Maps (PDF)',url:'https://www.lockyervalley.qld.gov.au/repository/libraries/id:2eccbxg5l17q9su8pzhy/hierarchy/our-services/strategic-planning/documents/draft-planning-scheme/Overlay%20Mapping/Adopted%20version%20-%2017072024/ZM1_Zones%20map.pdf',icon:'&#9654;'},
   ]},
   {name:'Somerset Regional',region:'Somerset · Fernvale South, Lowood, Esk',links:[
-    {label:'Subdividing in Rural Zone Guide',url:'https://www.somerset.qld.gov.au/our-services/subdividing-land-in-the-rural-zone',icon:'📋'},
+    {label:'Subdividing in Rural Zone Guide',url:'https://www.somerset.qld.gov.au/our-services/subdividing-land-in-the-rural-zone',icon:'&#9654;'},
   ]},
 ];
 const ccEl = document.getElementById('council-cards');
 councils.forEach(c => {
   let links = '';
-  c.links.forEach(l => { links += `<a class="council-link" href="${l.url}" target="_blank">${l.icon} ${l.label}</a>`; });
+  c.links.forEach(l => { links += `<a class="council-link" href="${l.url}" target="_blank">${l.label} &#8599;</a>`; });
   ccEl.innerHTML += `<div class="council-card"><h4>${c.name}</h4><div class="region">${c.region}</div>${links}</div>`;
 });
 
@@ -1144,10 +1145,10 @@ function toggleRadar(){
     else lg.remove();
   });
   if(radarVisible){
-    btn.textContent = '📡 Radar ON';
+    btn.textContent = 'Radar ON';
     btn.classList.remove('btn-o'); btn.classList.add('btn-p');
   } else {
-    btn.textContent = '📡 Radar OFF';
+    btn.textContent = 'Radar OFF';
     btn.classList.remove('btn-p'); btn.classList.add('btn-o');
   }
 }
