@@ -1277,14 +1277,16 @@ function addMarkers(mi){
     }
   });
 
-  // Growth corridors
+  // Growth corridors — non-interactive so they don't block parcel clicks
   [{n:'Ripley Valley',c:[[-27.58,152.72],[-27.58,152.82],[-27.65,152.82],[-27.65,152.72]]},
    {n:'Flagstone PDA',c:[[-27.72,152.92],[-27.72,153.02],[-27.78,153.02],[-27.78,152.92]]},
    {n:'Pimpama-Coomera',c:[[-27.78,153.16],[-27.78,153.26],[-27.86,153.26],[-27.86,153.16]]},
    {n:'Toowoomba West',c:[[-27.50,151.88],[-27.50,151.98],[-27.58,151.98],[-27.58,151.88]]}
   ].forEach(co => {
-    L.polygon(co.c,{color:'#22c55e',weight:1,fillColor:'#22c55e',fillOpacity:.07}).addTo(mi)
-      .bindPopup(`<strong>${co.n} Growth Corridor</strong>`);
+    L.polygon(co.c,{color:'#22c55e',weight:1,fillColor:'#22c55e',fillOpacity:.07,interactive:false}).addTo(mi);
+    // Corridor label as a tooltip marker in the centre
+    const ctr = [(co.c[0][0]+co.c[2][0])/2, (co.c[0][1]+co.c[2][1])/2];
+    L.marker(ctr,{interactive:false, icon:L.divIcon({className:'',html:`<div style="background:rgba(34,197,94,.85);color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap;pointer-events:none">${co.n}</div>`,iconAnchor:[40,10]})}).addTo(mi);
   });
 
   // RADAR LEGEND
@@ -1422,6 +1424,8 @@ function toggleLayer(layerKey, on) {
 
 // Cadastral is on by default for full map — handled separately via addCadastral
 // We'll track it so the toggle works
+let _markerClicked = false; // Flag to prevent identify when marker popup opens
+
 function initFullMapLayers() {
   // Mark cadastral as active (already added by addCadastral)
   const svc = qldServices.cadastral;
@@ -1431,9 +1435,19 @@ function initFullMapLayers() {
     attribution: '© QLD Govt DCDB'
   }).addTo(mapFull);
 
-  // Click-to-identify: query parcel data on map click
+  // Listen for popup opens — means a marker was clicked, not empty space
+  mapFull.on('popupopen', function() { _markerClicked = true; });
+
+  // Click-to-identify: query parcel data on map click (only if no marker was clicked)
   mapFull.on('click', function(e) {
-    identifyParcel(e.latlng);
+    // Small delay to let popupopen fire first if a marker was clicked
+    setTimeout(function(){
+      if (_markerClicked) {
+        _markerClicked = false;
+        return; // A marker popup opened — don't identify
+      }
+      identifyParcel(e.latlng);
+    }, 100);
   });
 }
 
