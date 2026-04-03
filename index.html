@@ -6,6 +6,7 @@
 <title>Deal Vault — QLD Land Subdivision Portal</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
@@ -1018,20 +1019,30 @@ Chart.defaults.font.size = 10;
 const tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 const tileOpts = { attribution:'© OpenStreetMap © CARTO', maxZoom:19 };
 
-// QLD Cadastral (parcel boundary) overlay — QLD Government WMS
-const cadastralUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/tile/{z}/{y}/{x}';
-const cadastralOpts = { maxZoom:19, opacity:0.6, attribution:'© QLD Govt Spatial' };
+// QLD Government Digital Cadastral Database (DCDB) — official parcel boundaries updated nightly
+const cadastralService = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer';
+
+function addCadastral(mi) {
+  L.esri.dynamicMapLayer({
+    url: cadastralService,
+    layers: [4], // Layer 4 = Cadastral parcels
+    opacity: 0.5,
+    minZoom: 13,
+    maxZoom: 19,
+    attribution: '© QLD Govt DCDB'
+  }).addTo(mi);
+}
 
 const map = L.map('map-dash',{zoomControl:false}).setView([-27.6,152.8],9);
 L.tileLayer(tileUrl,tileOpts).addTo(map);
-L.tileLayer(cadastralUrl,cadastralOpts).addTo(map);
+addCadastral(map);
 L.control.zoom({position:'topright'}).addTo(map);
 
 let mapFull;
 setTimeout(() => {
   mapFull = L.map('map-full',{zoomControl:false}).setView([-27.6,152.8],9);
   L.tileLayer(tileUrl,tileOpts).addTo(mapFull);
-  L.tileLayer(cadastralUrl,cadastralOpts).addTo(mapFull);
+  addCadastral(mapFull);
   L.control.zoom({position:'topright'}).addTo(mapFull);
   addMarkers(mapFull);
 }, 200);
