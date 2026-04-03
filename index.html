@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Vault — QLD Land Subdivision Portal</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --bg: #0b0d14; --bg-card: #141722; --bg-card2: #1a1e2e;
+  --accent: #00d4aa; --accent2: #00a888;
+  --identified: #8b5cf6; --prospecting: #f59e0b; --option: #3b82f6;
+  --develop: #22c55e; --novate: #ec4899; --settled: #6b7280;
+  --text: #e8e8ed; --dim: #7a8194; --border: #232840;
+  --r: 12px; --danger: #ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+
+/* ── LAYOUT ── */
+.shell{display:flex;height:100vh}
+.sidebar{width:240px;background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{padding:20px;display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;border-bottom:1px solid var(--border)}
+.sidebar-logo .ico{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--bg)}
+.sidebar-logo em{color:var(--accent);font-style:normal}
+.sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+.nav-group{margin-bottom:16px}
+.nav-group-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);padding:8px 12px;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--dim);transition:all .15s}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-item.active{color:var(--accent);background:rgba(0,212,170,.08)}
+.nav-item .nav-icon{font-size:16px;width:22px;text-align:center}
+.nav-item .badge{margin-left:auto;background:var(--accent);color:var(--bg);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.top-bar{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);position:sticky;top:0;z-index:100}
+.top-bar h2{font-size:18px;font-weight:700}
+.top-bar-sub{font-size:12px;color:var(--dim);margin-top:2px}
+.top-actions{display:flex;gap:8px}
+.content{flex:1;padding:20px 24px}
+.page{display:none}.page.active{display:block}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--accent);color:var(--bg)}.btn-p:hover{background:var(--accent2)}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-o:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:5px 12px;font-size:11px}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--danger)}
+
+/* ── CARDS / STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+.stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.stat-label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:28px;font-weight:700;margin:4px 0}
+.stat-sub{font-size:12px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r)}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.card-head h4{font-size:14px;font-weight:600}
+.card-body{padding:14px 18px}
+
+/* ── MAP ── */
+#map-dash{height:420px;width:100%}
+#map-full{height:calc(100vh - 140px);width:100%}
+.map-legend{position:absolute;bottom:16px;left:16px;z-index:999;background:rgba(11,13,20,.92);border:1px solid var(--border);border-radius:10px;padding:12px 16px;backdrop-filter:blur(8px)}
+.leg-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+
+/* ── PIPELINE ── */
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.pipe-col{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);min-height:500px}
+.pipe-header{padding:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.pipe-header h4{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.pipe-count{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.pipe-cards{padding:10px;display:flex;flex-direction:column;gap:8px}
+.p-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s}
+.p-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.p-card-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.p-card-sub{font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.4}
+.p-card-row{display:flex;justify-content:space-between;align-items:center}
+.p-card-price{font-size:13px;font-weight:700;color:var(--accent)}
+.tag{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+
+/* ── TABLES ── */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:8px 14px;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;font-size:12px;border-bottom:1px solid rgba(35,40,64,.6)}
+tr:hover td{background:rgba(255,255,255,.015)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filter-bar input,.filter-bar select{padding:7px 14px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--text);font-size:12px;outline:none}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--accent)}
+.chip{padding:5px 12px;border-radius:16px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--dim);transition:all .15s}
+.chip.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,170,.08)}
+
+/* ── PROSPECT CARDS ── */
+.prospect-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.pros-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:all .15s}
+.pros-card:hover{border-color:var(--accent)}
+.pros-top{display:flex;justify-content:space-between;margin-bottom:8px}
+.pros-addr{font-size:14px;font-weight:600}
+.score{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.score-hi{background:rgba(34,197,94,.15);color:#22c55e}
+.score-md{background:rgba(245,158,11,.15);color:#f59e0b}
+.score-lo{background:rgba(239,68,68,.15);color:#ef4444}
+.pros-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}
+.pros-meta div{font-size:11px;color:var(--dim)}
+.pros-meta div strong{color:var(--text)}
+.pros-actions{display:flex;gap:6px;margin-top:12px}
+
+/* ── COUNCIL HUB ── */
+.council-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.council-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.council-card h4{font-size:15px;font-weight:700;margin-bottom:4px}
+.council-card .region{font-size:11px;color:var(--dim);margin-bottom:12px}
+.council-link{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:var(--accent);text-decoration:none;transition:all .15s}
+.council-link:hover{color:var(--text)}
+
+/* ── COMPETITOR CARDS ── */
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.comp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r);padding:18px;transition:all .15s}
+.comp-card:hover{border-color:var(--accent)}
+.comp-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin-bottom:10px}
+.comp-name{font-size:15px;font-weight:700;margin-bottom:2px}
+.comp-type{font-size:11px;color:var(--dim);margin-bottom:10px}
+.comp-info{font-size:11px;color:var(--dim);margin-bottom:4px}
+.comp-info strong{color:var(--text)}
+
+/* ── LETTER TEMPLATES ── */
+.letter-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:24px;font-family:Georgia,serif;font-size:13px;line-height:1.7;color:var(--dim);max-width:680px;margin:16px auto}
+.letter-preview .field{color:var(--accent);font-weight:600;font-family:sans-serif}
+.letter-preview p{margin-bottom:12px}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg-card);border-radius:14px;border:1px solid var(--border);width:540px;max-height:82vh;overflow-y:auto;padding:24px}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:18px}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.fi,.fs,.ft{width:100%;padding:8px 12px;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:13px;outline:none;font-family:inherit}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--accent)}
+.ft{min-height:70px;resize:vertical}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+
+/* ── BUYERS ── */
+.buyers-layout{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+.notif-item{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.notif-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.notif-text{font-size:12px;line-height:1.5}
+.notif-time{font-size:10px;color:var(--dim);margin-top:3px}
+
+/* ── ANALYTICS ── */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bar-chart{display:flex;align-items:flex-end;gap:10px;height:180px;padding-top:8px}
+.bar-g{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:5px 5px 0 0;min-height:6px}
+.bar-lbl{font-size:10px;color:var(--dim)}
+.bar-val{font-size:10px;font-weight:600}
+.growth-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(35,40,64,.5);font-size:13px}
+.growth-item:last-child{border:none}
+
+/* ── TWO-COL LAYOUTS ── */
+.two-col{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.pipeline{grid-template-columns:repeat(3,1fr)}.stats-row{grid-template-columns:repeat(3,1fr)}.comp-grid,.council-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.sidebar{display:none}.pipeline{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr}.prospect-grid,.analytics-grid,.buyers-layout,.two-col,.comp-grid,.council-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="ico">DV</div>Deal <em>Vault</em></div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span>Dashboard</div>
+      <div class="nav-item" data-page="map-page"><span class="nav-icon">🗺️</span>Map</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Deal Flow</div>
+      <div class="nav-item" data-page="pipeline"><span class="nav-icon">📋</span>Pipeline<span class="badge">15</span></div>
+      <div class="nav-item" data-page="prospecting"><span class="nav-icon">🔍</span>Site Finder</div>
+      <div class="nav-item" data-page="letters"><span class="nav-icon">✉️</span>Prospecting Letters</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Data</div>
+      <div class="nav-item" data-page="council-hub"><span class="nav-icon">🏛️</span>Council Hub</div>
+      <div class="nav-item" data-page="competitors"><span class="nav-icon">🏗️</span>Competitors</div>
+      <div class="nav-item" data-page="analytics"><span class="nav-icon">📈</span>Analytics</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Buyers</div>
+      <div class="nav-item" data-page="buyers"><span class="nav-icon">👥</span>Buyer Network<span class="badge">28</span></div>
+    </div>
+  </nav>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+<!-- ── TOP BAR (dynamic) ── -->
+<div class="top-bar">
+  <div>
+    <h2 id="page-title">Dashboard</h2>
+    <div class="top-bar-sub" id="page-sub">SEQ + Toowoomba Corridor — Deal overview</div>
+  </div>
+  <div class="top-actions">
+    <button class="btn btn-o" onclick="openModal('deal')">+ New Site</button>
+    <button class="btn btn-p" onclick="openModal('buyer')">+ Add Buyer</button>
+  </div>
+</div>
+<div class="content">
+
+<!-- ═══════════════════ DASHBOARD ═══════════════════ -->
+<div class="page active" id="dashboard">
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Sites Identified</div><div class="stat-val" style="color:var(--identified)">15</div><div class="stat-sub" style="color:var(--dim)">Across 8 LGAs</div></div>
+    <div class="stat"><div class="stat-label">Prospecting</div><div class="stat-val" style="color:var(--prospecting)">6</div><div class="stat-sub" style="color:var(--dim)">Letters sent / In contact</div></div>
+    <div class="stat"><div class="stat-label">Under Option</div><div class="stat-val" style="color:var(--option)">3</div><div class="stat-sub" style="color:var(--dim)">$8.2M combined value</div></div>
+    <div class="stat"><div class="stat-label">To Develop</div><div class="stat-val" style="color:var(--develop)">2</div><div class="stat-sub" style="color:var(--dim)">~95 lot yield</div></div>
+    <div class="stat"><div class="stat-label">Novated / Settled</div><div class="stat-val" style="color:var(--novate)">4</div><div class="stat-sub" style="color:var(--dim)">$1.2M profit realised</div></div>
+  </div>
+  <div class="two-col">
+    <div class="card" style="position:relative">
+      <div class="card-head"><h4>SEQ + Toowoomba — Live Map</h4><span style="font-size:11px;color:var(--dim)">Competitors & opportunities</span></div>
+      <div id="map-dash"></div>
+      <div class="map-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Competitor Estate</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--identified)"></div>Identified</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--prospecting)"></div>Prospecting</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--option)"></div>Under Option</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--develop)"></div>Develop</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--novate)"></div>Novated</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <div class="card-head"><h4>Recent Activity</h4></div>
+        <div class="card-body" id="activity-feed"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h4>Quick Filters — Site Suitability</h4></div>
+        <div class="card-body">
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="chip active">No Flood</span>
+            <span class="chip">Residential Zoning</span>
+            <span class="chip">Emerging Community</span>
+            <span class="chip">&gt; 2ha</span>
+            <span class="chip">&gt; 5ha</span>
+            <span class="chip">Near Developer</span>
+            <span class="chip">DA Approved</span>
+            <span class="chip">Toowoomba</span>
+            <span class="chip">SEQ Growth</span>
+          </div>
+          <p style="font-size:11px;color:var(--dim);margin-top:10px">Filter to reduce 100 properties to the 1 that works. Combine zoning + flood + size + proximity.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ FULL MAP ═══════════════════ -->
+<div class="page" id="map-page">
+  <div class="filter-bar">
+    <button class="chip active" data-mf="all">All</button>
+    <button class="chip" data-mf="competitor">Competitors</button>
+    <button class="chip" data-mf="identified">Identified</button>
+    <button class="chip" data-mf="prospecting">Prospecting</button>
+    <button class="chip" data-mf="option">Under Option</button>
+    <button class="chip" data-mf="develop">Develop</button>
+    <button class="chip" data-mf="novate">Novated</button>
+    <span style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.6,152.8],9)">SEQ</button>
+      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.56,151.95],12)">Toowoomba</button>
+      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.7,153.0],11)">Logan/Flagstone</button>
+      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.6,152.75],12)">Ripley</button>
+    </span>
+  </div>
+  <div style="position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)">
+    <div id="map-full"></div>
+    <div class="map-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Competitor Estate</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--identified)"></div>Identified Site</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--prospecting)"></div>Prospecting</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--option)"></div>Under Call Option</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--develop)"></div>Develop / Hold</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--novate)"></div>Novated to Buyer</div>
+      <div class="leg-item"><div class="leg-dot" style="background:rgba(34,197,94,.4);border:2px solid #22c55e"></div>Growth Corridor</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PIPELINE ═══════════════════ -->
+<div class="page" id="pipeline">
+  <div class="filter-bar" style="margin-bottom:14px">
+    <input class="fi" style="width:260px" placeholder="Search sites..." />
+    <select class="fs" style="width:150px"><option>All Regions</option><option>Ipswich</option><option>Logan</option><option>Moreton Bay</option><option>Gold Coast</option><option>Sunshine Coast</option><option>Toowoomba</option><option>Lockyer Valley</option><option>Brisbane</option></select>
+    <button class="btn btn-p" onclick="openModal('deal')">+ New Site</button>
+  </div>
+  <div class="pipeline" id="pipeline-board"></div>
+</div>
+
+<!-- ═══════════════════ SITE FINDER (Smart Filter) ═══════════════════ -->
+<div class="page" id="prospecting">
+  <div class="filter-bar">
+    <input class="fi" style="flex:1" placeholder="Search by suburb, lot/plan, or developer proximity..." id="site-search" />
+    <select class="fs" style="width:150px" id="site-region">
+      <option>All Regions</option><option>Ipswich</option><option>Logan</option><option>Gold Coast</option>
+      <option>Sunshine Coast</option><option>Moreton Bay</option><option>Toowoomba</option><option>Lockyer Valley</option><option>Brisbane</option>
+    </select>
+    <select class="fs" style="width:130px" id="site-zoning">
+      <option>All Zoning</option><option>Emerging Community</option><option>Low Density Residential</option>
+      <option>Rural Residential</option><option>Next Generation</option><option>Township</option>
+    </select>
+    <select class="fs" style="width:130px" id="site-flood">
+      <option>Flood Status</option><option>No Flood Risk</option><option>Low Flood</option><option>Moderate Flood</option>
+    </select>
+    <select class="fs" style="width:120px" id="site-size">
+      <option>Any Size</option><option>&gt; 1ha</option><option>&gt; 2ha</option><option>&gt; 5ha</option><option>&gt; 10ha</option>
+    </select>
+    <select class="fs" style="width:130px" id="site-sort">
+      <option>Best Score</option><option>Price: Low</option><option>Price: High</option><option>Lot Yield</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+    <span class="chip active">Near Major Developer</span>
+    <span class="chip">No Flood Risk</span>
+    <span class="chip">Council Pre-app Done</span>
+    <span class="chip">Owner Contacted</span>
+    <span class="chip">Under $2M</span>
+    <span class="chip">20+ Lot Yield</span>
+    <span class="chip">Toowoomba Corridor</span>
+  </div>
+  <div class="prospect-grid" id="prospect-grid"></div>
+</div>
+
+<!-- ═══════════════════ PROSPECTING LETTERS ═══════════════════ -->
+<div class="page" id="letters">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+    <div class="card">
+      <div class="card-head"><h4>Letter Template — Initial Approach</h4><button class="btn btn-p btn-sm">Copy Template</button></div>
+      <div class="card-body">
+        <div class="letter-preview">
+          <p><span class="field">[YOUR COMPANY NAME]</span><br><span class="field">[YOUR ADDRESS]</span><br><span class="field">[DATE]</span></p>
+          <p><span class="field">[LANDOWNER NAME]</span><br><span class="field">[PROPERTY ADDRESS]</span></p>
+          <p>Dear <span class="field">[LANDOWNER NAME]</span>,</p>
+          <p>I am writing to you as the registered owner of the property at <span class="field">[PROPERTY ADDRESS]</span> (Lot <span class="field">[LOT]</span> on Plan <span class="field">[PLAN]</span>).</p>
+          <p>My company specialises in identifying land with residential subdivision potential in South East Queensland. We have been researching opportunities in the <span class="field">[SUBURB/REGION]</span> area and believe your property may present an exciting opportunity.</p>
+          <p>Rather than a traditional purchase, we typically work with landowners through a <strong>Call Option Agreement</strong> — a simple arrangement where we secure the right to purchase your property at an agreed price within a set timeframe, while we complete the necessary council approvals and due diligence. You receive an upfront, non-refundable option fee, and there is no obligation on your part unless we proceed.</p>
+          <p>This approach means <strong>no disruption to your current use of the property</strong> while we work through the planning process. If the project doesn't proceed, you keep the option fee and retain full ownership.</p>
+          <p>I would welcome the opportunity to discuss this further with you at your convenience. Please feel free to contact me on <span class="field">[PHONE]</span> or <span class="field">[EMAIL]</span>.</p>
+          <p>Kind regards,<br><span class="field">[YOUR NAME]</span><br><span class="field">[YOUR TITLE]</span><br><span class="field">[COMPANY]</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h4>Letter Template — Follow-Up</h4><button class="btn btn-p btn-sm">Copy Template</button></div>
+      <div class="card-body">
+        <div class="letter-preview">
+          <p><span class="field">[YOUR COMPANY NAME]</span><br><span class="field">[YOUR ADDRESS]</span><br><span class="field">[DATE]</span></p>
+          <p><span class="field">[LANDOWNER NAME]</span><br><span class="field">[PROPERTY ADDRESS]</span></p>
+          <p>Dear <span class="field">[LANDOWNER NAME]</span>,</p>
+          <p>I wrote to you recently regarding your property at <span class="field">[PROPERTY ADDRESS]</span> and our interest in exploring a potential residential land opportunity on the site.</p>
+          <p>I understand you may have been busy, so I wanted to follow up briefly. We remain very interested in your property, which we believe has excellent subdivision potential given its proximity to <span class="field">[NEARBY DEVELOPMENT / INFRASTRUCTURE]</span> and current zoning under the <span class="field">[COUNCIL]</span> planning scheme.</p>
+          <p>To give you confidence in our approach, I'd be happy to meet at the property or at a location convenient to you, with no obligation whatsoever. We can walk through how a Call Option works and what it could mean for you financially.</p>
+          <p>We have successfully completed similar arrangements with landowners across <span class="field">[REGION]</span> and would be pleased to provide references if helpful.</p>
+          <p>Please don't hesitate to reach out — I'm available on <span class="field">[PHONE]</span> or <span class="field">[EMAIL]</span> at any time.</p>
+          <p>Warm regards,<br><span class="field">[YOUR NAME]</span><br><span class="field">[YOUR TITLE]</span><br><span class="field">[COMPANY]</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h4>Landowner Contact Tracker</h4><button class="btn btn-p btn-sm" onclick="openModal('deal')">+ Log Contact</button></div>
+    <div class="card-body" style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Property</th><th>Owner</th><th>Method</th><th>Date Sent</th><th>Response</th><th>Follow-up</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Lot 14, Smiths Rd, Ripley</td><td>R. Henderson</td><td>Letter</td><td>18 Mar 2026</td><td>Phone call received</td><td>Meeting 10 Apr</td><td><span class="tag" style="background:rgba(34,197,94,.15);color:#22c55e">Engaged</span></td></tr>
+          <tr><td>280 Warrego Hwy, Fernvale</td><td>Estate of J. Murphy</td><td>Letter</td><td>12 Mar 2026</td><td>No response yet</td><td>Follow-up letter due</td><td><span class="tag" style="background:rgba(245,158,11,.15);color:var(--prospecting)">Pending</span></td></tr>
+          <tr><td>Lot 8, Flagstone Creek Rd</td><td>B & M Thompson</td><td>Door knock</td><td>8 Mar 2026</td><td>Interested — wants valuation</td><td>Send comparable sales</td><td><span class="tag" style="background:rgba(34,197,94,.15);color:#22c55e">Engaged</span></td></tr>
+          <tr><td>145 New England Hwy, Highfields</td><td>Highfields Pastoral Pty Ltd</td><td>Letter + Email</td><td>1 Mar 2026</td><td>Director called — keen</td><td>Call option draft sent</td><td><span class="tag" style="background:rgba(59,130,246,.15);color:var(--option)">Negotiating</span></td></tr>
+          <tr><td>55 Park Ridge Rd</td><td>A. Kowalski</td><td>Letter</td><td>25 Feb 2026</td><td>Not interested</td><td>—</td><td><span class="tag" style="background:rgba(239,68,68,.15);color:var(--danger)">Declined</span></td></tr>
+          <tr><td>Lot 22, Lakeview Dr, Gatton</td><td>D. & S. Clarke</td><td>Letter</td><td>20 Feb 2026</td><td>Wants to meet</td><td>Meeting scheduled 8 Apr</td><td><span class="tag" style="background:rgba(34,197,94,.15);color:#22c55e">Engaged</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ COUNCIL HUB ═══════════════════ -->
+<div class="page" id="council-hub">
+  <p style="color:var(--dim);font-size:13px;margin-bottom:16px">Direct links to every SEQ council's planning scheme, zoning maps, flood overlays, and due diligence tools. Plus state-level QLD Globe and FloodCheck.</p>
+
+  <!-- STATE TOOLS -->
+  <h3 style="font-size:15px;font-weight:700;margin-bottom:12px">Queensland State Tools</h3>
+  <div class="council-grid" style="margin-bottom:24px">
+    <div class="council-card" style="border-left:3px solid var(--accent)">
+      <h4>QLD Globe</h4>
+      <div class="region">State-wide interactive mapping — zoning, land use, overlays</div>
+      <a class="council-link" href="https://qldglobe.information.qld.gov.au/" target="_blank">🌐 Open QLD Globe</a>
+      <a class="council-link" href="https://www.planning.qld.gov.au/planning-framework/plan-making/local-planning/zoning-information" target="_blank">📋 QLD Zoning Guide</a>
+    </div>
+    <div class="council-card" style="border-left:3px solid var(--option)">
+      <h4>FloodCheck QLD</h4>
+      <div class="region">State-wide flood mapping — floodplain overlays, historic floods</div>
+      <a class="council-link" href="https://floodcheck.information.qld.gov.au/" target="_blank">🌊 Open FloodCheck</a>
+      <a class="council-link" href="https://www.qra.qld.gov.au/publications-and-maps/maps/flood-mapping" target="_blank">📊 QRA Flood Mapping</a>
+    </div>
+    <div class="council-card" style="border-left:3px solid var(--prospecting)">
+      <h4>QLD Open Data</h4>
+      <div class="region">Government datasets — land use, regional plans, statistics</div>
+      <a class="council-link" href="https://www.data.qld.gov.au/dataset/regional-land-use-categories-regional-plans-series" target="_blank">🗂️ Regional Land Use Data</a>
+      <a class="council-link" href="https://www.qgso.qld.gov.au/statistics/theme/industry-development/residential-land-supply-development/residential-development" target="_blank">📈 Residential Development Stats</a>
+    </div>
+  </div>
+
+  <h3 style="font-size:15px;font-weight:700;margin-bottom:12px">Council Planning Portals</h3>
+  <div class="council-grid" id="council-cards"></div>
+</div>
+
+<!-- ═══════════════════ COMPETITORS ═══════════════════ -->
+<div class="page" id="competitors">
+  <p style="color:var(--dim);font-size:13px;margin-bottom:16px">Major land subdivision developers active in SEQ + Toowoomba. We prospect for sites <strong style="color:var(--text)">near their estates</strong> where demand is proven.</p>
+  <div class="comp-grid" id="comp-grid"></div>
+</div>
+
+<!-- ═══════════════════ ANALYTICS ═══════════════════ -->
+<div class="page" id="analytics">
+  <div class="analytics-grid">
+    <div class="card"><div class="card-head"><h4>Median Land Value ($/m²) by Area</h4></div><div class="card-body"><div class="bar-chart" id="bar-chart"></div></div></div>
+    <div class="card"><div class="card-head"><h4>Growth Corridors — YoY Change</h4></div><div class="card-body" id="growth-list"></div></div>
+    <div class="card">
+      <div class="card-head"><h4>Deal Flow Summary</h4></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div><div style="font-size:11px;color:var(--dim)">Sites Reviewed (total)</div><div style="font-size:26px;font-weight:700;color:var(--identified)">84</div></div>
+          <div><div style="font-size:11px;color:var(--dim)">Conversion Rate</div><div style="font-size:26px;font-weight:700;color:var(--accent)">4.8%</div></div>
+          <div><div style="font-size:11px;color:var(--dim)">Avg Option Fee Paid</div><div style="font-size:26px;font-weight:700">$25K</div></div>
+          <div><div style="font-size:11px;color:var(--dim)">Avg Novation Margin</div><div style="font-size:26px;font-weight:700;color:var(--novate)">$310K</div></div>
+          <div><div style="font-size:11px;color:var(--dim)">Letters Sent</div><div style="font-size:26px;font-weight:700">142</div></div>
+          <div><div style="font-size:11px;color:var(--dim)">Response Rate</div><div style="font-size:26px;font-weight:700;color:var(--prospecting)">18%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h4>Lot Yield — Active Option Sites</h4></div>
+      <div class="card-body">
+        <div class="growth-item"><span>Ripley Valley 14ha</span><span style="font-weight:700;color:var(--option)">~45 lots</span></div>
+        <div class="growth-item"><span>Flagstone 18ha</span><span style="font-weight:700;color:var(--option)">~60 lots</span></div>
+        <div class="growth-item"><span>Highfields 8.5ha</span><span style="font-weight:700;color:var(--option)">~28 lots</span></div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between">
+          <span style="font-weight:600">Total Estimated Yield</span>
+          <span style="font-weight:700;color:var(--develop)">~133 lots</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ BUYERS ═══════════════════ -->
+<div class="page" id="buyers">
+  <div class="buyers-layout">
+    <div class="card">
+      <div class="card-head"><h4>Registered Buyers (28)</h4><input class="fi" style="width:200px" placeholder="Search..." /></div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Name</th><th>Budget</th><th>Regions</th><th>Type</th><th>Status</th><th>Deals</th></tr></thead>
+          <tbody>
+            <tr><td><span class="dot" style="background:#22c55e"></span>Michael Chen</td><td>$400K–$600K</td><td>Gold Coast, Logan</td><td>Investor</td><td style="color:#22c55e">Active</td><td>2</td></tr>
+            <tr><td><span class="dot" style="background:#22c55e"></span>Sarah Patel</td><td>$500K–$900K</td><td>Logan, Ipswich</td><td>Investor</td><td style="color:#22c55e">Active</td><td>1</td></tr>
+            <tr><td><span class="dot" style="background:#22c55e"></span>David Nguyen</td><td>$1M–$3M</td><td>SEQ Wide</td><td>Developer</td><td style="color:#22c55e">Active</td><td>0</td></tr>
+            <tr><td><span class="dot" style="background:#22c55e"></span>James Wilson</td><td>$2M–$5M</td><td>Toowoomba, Lockyer</td><td>Developer</td><td style="color:#22c55e">Active</td><td>0</td></tr>
+            <tr><td><span class="dot" style="background:#22c55e"></span>Li Wei Holdings</td><td>$3M–$8M</td><td>SEQ Growth Corridors</td><td>Syndicate</td><td style="color:#22c55e">Active</td><td>0</td></tr>
+            <tr><td><span class="dot" style="background:#f59e0b"></span>Rachel Foster</td><td>$300K–$500K</td><td>Sunshine Coast</td><td>Investor</td><td style="color:#f59e0b">Pending</td><td>0</td></tr>
+            <tr><td><span class="dot" style="background:#22c55e"></span>Tom Bradley</td><td>$600K–$1.2M</td><td>Moreton Bay</td><td>Builder</td><td style="color:#22c55e">Active</td><td>1</td></tr>
+            <tr><td><span class="dot" style="background:#22c55e"></span>Apex Dev Group</td><td>$5M–$15M</td><td>All QLD</td><td>Developer</td><td style="color:#22c55e">Active</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-head"><h4>Novation Queue</h4><button class="btn btn-p btn-sm">Notify All</button></div>
+        <div class="card-body">
+          <div class="notif-item">
+            <div class="notif-ico" style="background:rgba(59,130,246,.15);color:var(--option)">📱</div>
+            <div>
+              <div class="notif-text"><strong>Ripley Valley 14ha</strong> — Under option. 6 matching buyers to notify for novation.</div>
+              <div class="notif-time">Budget match: $3M–$8M · Region: Ipswich</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-ico" style="background:rgba(236,72,153,.15);color:var(--novate)">✅</div>
+            <div>
+              <div class="notif-text"><strong>Highfields 8.5ha</strong> — 3 buyers expressed interest. Tom Bradley committed.</div>
+              <div class="notif-time">Novation in progress · $310K margin</div>
+            </div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-ico" style="background:rgba(34,197,94,.15);color:#22c55e">🤝</div>
+            <div>
+              <div class="notif-text"><strong>Coomera 2.8ha</strong> — Novated to M. Chen. Option fee recovered + $285K profit.</div>
+              <div class="notif-time">Settled 2 days ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h4>Call Option Status</h4></div>
+        <div class="card-body">
+          <div class="growth-item"><span>Ripley Valley 14ha</span><span style="font-weight:600;color:var(--option)">Active — 8 months left</span></div>
+          <div class="growth-item"><span>Flagstone 18ha</span><span style="font-weight:600;color:var(--option)">Active — 5 months left</span></div>
+          <div class="growth-item"><span>Highfields 8.5ha</span><span style="font-weight:600;color:var(--novate)">Novating to buyer</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- content -->
+</div><!-- main -->
+</div><!-- shell -->
+
+<!-- ═══ ADD SITE MODAL ═══ -->
+<div class="modal-bg" id="modal-deal">
+  <div class="modal">
+    <h3>Add New Site</h3>
+    <div class="fg"><label class="fl">Property / Lot Description</label><input class="fi" placeholder="e.g. Lot 14 SP123456, Smiths Rd, Ripley Valley" /></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Land Size</label><input class="fi" placeholder="e.g. 14ha" /></div>
+      <div class="fg"><label class="fl">Asking / Est. Value</label><input class="fi" placeholder="e.g. $4,800,000" /></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Region / LGA</label>
+        <select class="fs"><option>Select...</option><option>Ipswich</option><option>Logan</option><option>Gold Coast</option><option>Sunshine Coast</option><option>Moreton Bay</option><option>Toowoomba</option><option>Lockyer Valley</option><option>Brisbane</option></select></div>
+      <div class="fg"><label class="fl">Pipeline Stage</label>
+        <select class="fs"><option>Identified</option><option>Prospecting</option><option>Under Call Option</option><option>Develop / Hold</option><option>Novate to Buyer</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Zoning</label><input class="fi" placeholder="e.g. Emerging Community / Rural Residential" /></div>
+      <div class="fg"><label class="fl">Flood Status</label>
+        <select class="fs"><option>Unknown</option><option>No Flood Risk</option><option>Low Flood Risk</option><option>Moderate Flood Risk</option><option>High Flood Risk</option></select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Est. Lot Yield</label><input class="fi" placeholder="e.g. 45 lots" /></div>
+      <div class="fg"><label class="fl">Nearest Competitor Estate</label><input class="fi" placeholder="e.g. Stockland Providence (800m)" /></div>
+    </div>
+    <div class="fg"><label class="fl">Landowner (if known)</label><input class="fi" placeholder="Name / company" /></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Option Fee (if applicable)</label><input class="fi" placeholder="e.g. $25,000" /></div>
+      <div class="fg"><label class="fl">Option Period</label><input class="fi" placeholder="e.g. 12 months" /></div>
+    </div>
+    <div class="fg"><label class="fl">Notes / Due Diligence</label><textarea class="ft" placeholder="Council check status, flood check, soil, access, zoning compatibility, condition of title..."></textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-o" onclick="closeModal('deal')">Cancel</button>
+      <button class="btn btn-p" onclick="closeModal('deal')">Add Site</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD BUYER MODAL ═══ -->
+<div class="modal-bg" id="modal-buyer">
+  <div class="modal">
+    <h3>Add New Buyer</h3>
+    <div class="frow">
+      <div class="fg"><label class="fl">Name / Company</label><input class="fi" placeholder="Full name or company" /></div>
+      <div class="fg"><label class="fl">Phone</label><input class="fi" placeholder="+61 4XX XXX XXX" /></div>
+    </div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" placeholder="buyer@email.com" /></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Budget Min</label><input class="fi" placeholder="$500,000" /></div>
+      <div class="fg"><label class="fl">Budget Max</label><input class="fi" placeholder="$3,000,000" /></div>
+    </div>
+    <div class="fg"><label class="fl">Preferred Regions</label><input class="fi" placeholder="e.g. Logan, Ipswich, Toowoomba" /></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Buyer Type</label><select class="fs"><option>Individual Investor</option><option>Developer</option><option>Builder</option><option>Syndicate / Group</option></select></div>
+      <div class="fg"><label class="fl">Notifications</label><select class="fs"><option>Instant Push (matching deals)</option><option>Daily Digest</option><option>Email Only</option></select></div>
+    </div>
+    <div class="fg"><label class="fl">Notes</label><textarea class="ft" placeholder="Past deals, preferences, reliability..."></textarea></div>
+    <div class="modal-foot">
+      <button class="btn btn-o" onclick="closeModal('buyer')">Cancel</button>
+      <button class="btn btn-p" onclick="closeModal('buyer')">Add Buyer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── NAV ───
+const titles = {
+  'dashboard': ['Dashboard', 'SEQ + Toowoomba Corridor — Deal overview'],
+  'map-page': ['Interactive Map', 'Competitor estates, opportunities & growth corridors'],
+  'pipeline': ['Deal Pipeline', 'Identified → Prospecting → Call Option → Develop / Novate'],
+  'prospecting': ['Site Finder', 'Smart filters to find the 1 in 100 that works'],
+  'letters': ['Prospecting & Letters', 'Templates, contact tracking, and landowner outreach'],
+  'council-hub': ['Council Data Hub', 'Zoning, flood, planning scheme links for all SEQ councils'],
+  'competitors': ['Competitor Tracker', 'Where the big developers are — prospect nearby'],
+  'analytics': ['Market Analytics', 'Land values, growth corridors, deal performance'],
+  'buyers': ['Buyer Network', 'Registered buyers for novation opportunities'],
+};
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    const pg = item.dataset.page;
+    document.getElementById(pg).classList.add('active');
+    document.getElementById('page-title').textContent = titles[pg][0];
+    document.getElementById('page-sub').textContent = titles[pg][1];
+    if (pg === 'map-page') setTimeout(() => mapFull && mapFull.invalidateSize(), 100);
+  });
+});
+
+// ─── CHIP TOGGLES ───
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => c.classList.toggle('active')));
+
+// ─── MODALS ───
+function openModal(t){document.getElementById('modal-'+t).classList.add('open')}
+function closeModal(t){document.getElementById('modal-'+t).classList.remove('open')}
+document.querySelectorAll('.modal-bg').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open') }));
+
+// ─── ACTIVITY FEED ───
+const activities = [
+  {color:'var(--option)',text:'<strong>Call option signed</strong> — Highfields 8.5ha. Option fee: $25K. 12-month exercise period.',time:'3 hours ago'},
+  {color:'var(--prospecting)',text:'Letter sent to landowner — <strong>Lot 22, Lakeview Dr, Gatton</strong>. Initial approach.',time:'6 hours ago'},
+  {color:'var(--novate)',text:'<strong>3 buyers notified</strong> of Ripley Valley option. David Nguyen & Li Wei Holdings interested.',time:'Yesterday'},
+  {color:'var(--develop)',text:'Council pre-application meeting booked — <strong>Flagstone 18ha</strong>. Zoning confirmed: PDA.',time:'Yesterday'},
+  {color:'#ef4444',text:'Competitor alert: <strong>AVID Property</strong> acquired 22ha adjacent to our Ripley target.',time:'2 days ago'},
+  {color:'var(--accent)',text:'FloodCheck confirmed <strong>no flood risk</strong> — Fernvale South 22ha site.',time:'3 days ago'},
+  {color:'var(--novate)',text:'<strong>Novation completed</strong> — Coomera 2.8ha to M. Chen. $285K profit on $15K option fee.',time:'5 days ago'},
+];
+const feedEl = document.getElementById('activity-feed');
+activities.forEach(a => {
+  feedEl.innerHTML += `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(35,40,64,.4)">
+    <div style="width:7px;height:7px;border-radius:50%;background:${a.color};margin-top:6px;flex-shrink:0"></div>
+    <div><div style="font-size:12px;line-height:1.5">${a.text}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">${a.time}</div></div>
+  </div>`;
+});
+
+// ─── PIPELINE DATA ───
+const stages = [
+  { name:'Identified', color:'var(--identified)', key:'identified', deals:[
+    {title:'12ha — Glenvale, Toowoomba',sub:'Adjacent Bunnings precinct · Rural Residential',price:'$2.1M',flood:'No Flood',zoning:'Rural Res.'},
+    {title:'5.2ha — Caloundra South',sub:'Near Stockland Aura · PDA zoned',price:'$3.4M',flood:'Low Risk',zoning:'Emerging Comm.'},
+    {title:'3.2ha — Coomera North',sub:'Near Pimpama growth · Residential zoning',price:'$1.4M',flood:'No Flood',zoning:'Low Density Res.'},
+  ]},
+  { name:'Prospecting', color:'var(--prospecting)', key:'prospecting', deals:[
+    {title:'22ha — Fernvale South',sub:'New road link unlocking area · Letter sent',price:'$3.2M',flood:'No Flood',zoning:'Rural Res.'},
+    {title:'6ha — Gatton (Lockyer Valley)',sub:'Near Lakeview Estate · Meeting scheduled',price:'$1.1M',flood:'No Flood',zoning:'Emerging Comm.'},
+    {title:'9ha — Yarrabilba',sub:'Lendlease catchment · Door knock done',price:'$2.9M',flood:'Low Risk',zoning:'PDA'},
+  ]},
+  { name:'Under Call Option', color:'var(--option)', key:'option', deals:[
+    {title:'14ha — Ripley Valley',sub:'800m from Stockland Providence · Option fee $30K · 10 months left',price:'$4.8M',flood:'No Flood',zoning:'Emerging Comm.'},
+    {title:'18ha — Flagstone',sub:'Adjacent Peet 12,000-home community · Option fee $35K · 5 months left',price:'$5.1M',flood:'No Flood',zoning:'PDA'},
+    {title:'8.5ha — Highfields, Toowoomba',sub:'Near Highfields Village · Option fee $25K · 12 months · Novating',price:'$1.2M',flood:'No Flood',zoning:'Rural Res.'},
+  ]},
+  { name:'Develop / Hold', color:'var(--develop)', key:'develop', deals:[
+    {title:'7ha — Springfield Lakes',sub:'28 lots approved · Civil works commenced',price:'$3.8M',flood:'No Flood',zoning:'Low Density Res.'},
+    {title:'4ha — North Lakes Extension',sub:'18 lots · DA lodged with MBRC',price:'$2.4M',flood:'No Flood',zoning:'Next Gen.'},
+  ]},
+  { name:'Novated / Settled', color:'var(--novate)', key:'novate', deals:[
+    {title:'2.8ha — Coomera',sub:'Novated to M. Chen · $15K option → $285K profit',price:'$592K',flood:'—',zoning:'—'},
+    {title:'1.5ha — Logan Reserve',sub:'Novated to S. Patel · $10K option → $112K profit',price:'$732K',flood:'—',zoning:'—'},
+    {title:'3ha — Park Ridge',sub:'Novated to Tom Bradley · $20K option → $190K profit',price:'$1.6M',flood:'—',zoning:'—'},
+    {title:'5ha — Burpengary',sub:'Developed — 22 lots settled · $1.8M revenue',price:'$8.2M rev',flood:'—',zoning:'—'},
+  ]},
+];
+const boardEl = document.getElementById('pipeline-board');
+stages.forEach(s => {
+  let cards = '';
+  s.deals.forEach(d => {
+    const floodTag = d.flood === 'No Flood' ? 'background:rgba(34,197,94,.12);color:#22c55e' : d.flood === 'Low Risk' ? 'background:rgba(245,158,11,.12);color:#f59e0b' : 'background:rgba(107,114,128,.12);color:var(--dim)';
+    cards += `<div class="p-card">
+      <div class="p-card-title">${d.title}</div>
+      <div class="p-card-sub">${d.sub}</div>
+      <div class="p-card-row">
+        <span class="p-card-price">${d.price}</span>
+        <span class="tag" style="${floodTag}">${d.flood}</span>
+      </div>
+    </div>`;
+  });
+  boardEl.innerHTML += `<div class="pipe-col">
+    <div class="pipe-header"><h4><div class="pipe-count" style="background:${s.color}22;color:${s.color}">${s.deals.length}</div>${s.name}</h4></div>
+    <div class="pipe-cards">${cards}</div>
+  </div>`;
+});
+
+// ─── PROSPECT / SITE FINDER DATA ───
+const prospects = [
+  {addr:'Lot 14, Smiths Rd, Ripley Valley',score:94,size:'14ha',price:'$4.8M',zoning:'Emerging Community',flood:'No Flood Risk',nearDev:'Stockland Providence (800m)',lots:'~45',growth:'+24.3%',lga:'Ipswich'},
+  {addr:'Lot 8, Flagstone Creek Rd',score:91,size:'18ha',price:'$5.1M',zoning:'PDA — Flagstone',flood:'No Flood Risk',nearDev:'Peet Flagstone (1.2km)',lots:'~60',growth:'+21.7%',lga:'Logan'},
+  {addr:'280 Warrego Hwy, Fernvale South',score:88,size:'22ha',price:'$3.2M',zoning:'Rural Residential',flood:'No Flood Risk',nearDev:'New road link (adjacent)',lots:'~70',growth:'+14.2%',lga:'Somerset'},
+  {addr:'145 New England Hwy, Highfields',score:86,size:'8.5ha',price:'$1.2M',zoning:'Rural Residential',flood:'No Flood Risk',nearDev:'Highfields Village (500m)',lots:'~28',growth:'+18.2%',lga:'Toowoomba'},
+  {addr:'Lot 22, Lakeview Dr, Gatton',score:84,size:'6ha',price:'$1.1M',zoning:'Emerging Community',flood:'No Flood Risk',nearDev:'Lakeview Estate (adj)',lots:'~20',growth:'+12.6%',lga:'Lockyer Valley'},
+  {addr:'55 Park Ridge Rd, Park Ridge',score:82,size:'3.8ha',price:'$1.6M',zoning:'Low Density Residential',flood:'No Flood Risk',nearDev:'AVID Elation (1km)',lots:'~18',growth:'+16.1%',lga:'Logan'},
+  {addr:'Lot 5, Pimpama-Jacobs Well Rd',score:79,size:'2.1ha',price:'$980K',zoning:'Emerging Community',flood:'Low Risk',nearDev:'Gainsborough Greens (600m)',lots:'~12',growth:'+19.8%',lga:'Gold Coast'},
+  {addr:'88 North Harbour Dr, Burpengary',score:77,size:'4.5ha',price:'$2.2M',zoning:'Next Generation',flood:'No Flood Risk',nearDev:'Unity/North Harbour (adj)',lots:'~22',growth:'+15.3%',lga:'Moreton Bay'},
+];
+const pgEl = document.getElementById('prospect-grid');
+prospects.forEach(p => {
+  const sc = p.score>=85?'score-hi':p.score>=75?'score-md':'score-lo';
+  const fl = p.flood==='No Flood Risk'?'color:#22c55e':'color:#f59e0b';
+  pgEl.innerHTML += `<div class="pros-card">
+    <div class="pros-top"><div class="pros-addr">${p.addr}</div><div class="score ${sc}">${p.score}/100</div></div>
+    <div style="font-size:11px;color:var(--dim)">${p.lga} LGA · Near: ${p.nearDev}</div>
+    <div class="pros-meta">
+      <div><strong>Size:</strong> ${p.size}</div><div><strong>Price:</strong> ${p.price}</div>
+      <div><strong>Zoning:</strong> ${p.zoning}</div><div><strong>Lots:</strong> ${p.lots}</div>
+      <div><strong>Flood:</strong> <span style="${fl}">${p.flood}</span></div><div><strong>Growth:</strong> <span style="color:#22c55e">${p.growth}</span></div>
+    </div>
+    <div class="pros-actions">
+      <button class="btn btn-p btn-sm" onclick="openModal('deal')">Add to Pipeline</button>
+      <button class="btn btn-o btn-sm">Send Letter</button>
+      <button class="btn btn-o btn-sm">Council Check</button>
+    </div>
+  </div>`;
+});
+
+// ─── COUNCIL DATA ───
+const councils = [
+  {name:'Brisbane City',region:'Brisbane Metro',links:[
+    {label:'City Plan Interactive Map',url:'https://cityplan.brisbane.qld.gov.au/eplan/',icon:'🗺️'},
+    {label:'Flood Awareness Map',url:'https://fam.brisbane.qld.gov.au/',icon:'🌊'},
+    {label:'Planning & Building Portal',url:'https://www.brisbane.qld.gov.au/building-and-planning/supporting-documents-and-online-tools/city-plan-online',icon:'📋'},
+  ]},
+  {name:'Ipswich City',region:'Ipswich · Ripley, Springfield, Rosewood',links:[
+    {label:'Planning Scheme Map (Weave)',url:'https://maps.ipswich.qld.gov.au/weave/planscheme.html',icon:'🗺️'},
+    {label:'Development.i Portal',url:'https://developmenti.ipswich.qld.gov.au/',icon:'📋'},
+    {label:'Ipswich Plan 2025 Zones',url:'https://www.shapeyouripswich.com.au/new-ipswich-planning-scheme/ipswichplan2024zones',icon:'📊'},
+  ]},
+  {name:'Logan City',region:'Logan · Flagstone, Park Ridge, Yarrabilba',links:[
+    {label:'PD Hub (Zoning + Overlays)',url:'https://www.logan.qld.gov.au/planning-and-building/planning-and-development/pd-hub',icon:'🗺️'},
+    {label:'Interactive Mapping',url:'https://loganhub.com.au/interactive-mapping',icon:'📋'},
+    {label:'PD Online',url:'https://www.logan.qld.gov.au/planning-and-development/pd-online',icon:'📊'},
+  ]},
+  {name:'Gold Coast City',region:'Gold Coast · Pimpama, Coomera, Canungra',links:[
+    {label:'City Plan Interactive Map',url:'https://cityplan.goldcoast.qld.gov.au/eplan/',icon:'🗺️'},
+    {label:'PD Online',url:'https://www.goldcoast.qld.gov.au/Planning-building/PD-Online',icon:'📋'},
+    {label:'Flood Level Search',url:'https://www.goldcoast.qld.gov.au/Planning-building/Buying-researching-property/Mapping-search/Flood-level-search/Flood-maps',icon:'🌊'},
+  ]},
+  {name:'Moreton Bay Regional',region:'Moreton Bay · Burpengary, Caboolture, North Lakes',links:[
+    {label:'Planning Scheme Zones & Overlays',url:'https://moretonbay.maps.arcgis.com/apps/webappviewer/index.html?id=86604cba0e1b43fa8871b0361674b7d5',icon:'🗺️'},
+    {label:'Flood Hazard Overlay Info',url:'https://www.moretonbay.qld.gov.au/Services/Building-Development/Planning-Schemes/MBRC/Info-Sheets/Flood-Hazard-Overlay',icon:'🌊'},
+    {label:'DataHub (Open Data)',url:'https://datahub.moretonbay.qld.gov.au/',icon:'📊'},
+  ]},
+  {name:'Sunshine Coast',region:'Sunshine Coast · Palmview, Caloundra South, Aura',links:[
+    {label:'Interactive Mapping',url:'https://www.sunshinecoast.qld.gov.au/development/planning-documents/sunshine-coast-planning-scheme-2014/interactive-mapping',icon:'🗺️'},
+    {label:'Zoning Open Data',url:'https://data.sunshinecoast.qld.gov.au/maps/9214a2e42f0e45508036ff9e7bf229bb',icon:'📊'},
+    {label:'Planning Scheme 2014',url:'https://www.sunshinecoast.qld.gov.au/development/planning-documents/sunshine-coast-planning-scheme-2014',icon:'📋'},
+  ]},
+  {name:'Toowoomba Regional',region:'Toowoomba · Highfields, Glenvale, Oakey',links:[
+    {label:'Planning Scheme Online Mapping',url:'https://www.tr.qld.gov.au/planning-building/scheme-strategies/planning-scheme/13289-access-the-toowoomba-regional-planning-scheme-9',icon:'🗺️'},
+    {label:'Development.i Portal',url:'https://www.tr.qld.gov.au/payments-self-service-laws/web-apps/pdonline/8892-planning-and-development-online',icon:'📋'},
+  ]},
+  {name:'Lockyer Valley Regional',region:'Lockyer Valley · Gatton, Laidley, Fernvale',links:[
+    {label:'Current Planning Scheme',url:'https://www.lockyervalley.qld.gov.au/our-services/strategic-planning/current-planning-scheme',icon:'🗺️'},
+    {label:'Zone Maps (PDF)',url:'https://www.lockyervalley.qld.gov.au/repository/libraries/id:2eccbxg5l17q9su8pzhy/hierarchy/our-services/strategic-planning/documents/draft-planning-scheme/Overlay%20Mapping/Adopted%20version%20-%2017072024/ZM1_Zones%20map.pdf',icon:'📊'},
+  ]},
+  {name:'Somerset Regional',region:'Somerset · Fernvale South, Lowood, Esk',links:[
+    {label:'Subdividing in Rural Zone Guide',url:'https://www.somerset.qld.gov.au/our-services/subdividing-land-in-the-rural-zone',icon:'📋'},
+  ]},
+];
+const ccEl = document.getElementById('council-cards');
+councils.forEach(c => {
+  let links = '';
+  c.links.forEach(l => { links += `<a class="council-link" href="${l.url}" target="_blank">${l.icon} ${l.label}</a>`; });
+  ccEl.innerHTML += `<div class="council-card"><h4>${c.name}</h4><div class="region">${c.region}</div>${links}</div>`;
+});
+
+// ─── COMPETITORS ───
+const comps = [
+  {name:'Stockland',type:'ASX · Masterplanned Communities',color:'#ef4444',estates:'Newport, Aura, Providence, Pallara, Kinma Valley, Rivermont',focus:'Affordable masterplanned with infrastructure',regions:'Moreton Bay, Ipswich, Gold Coast, Sunshine Coast',lots:'3,500+'},
+  {name:'Mirvac',type:'ASX · Premium Residential',color:'#3b82f6',estates:'Everleigh (Greenbank), Kindira (Flagstone), Gainsborough Greens',focus:'Premium lifestyle communities',regions:'Logan, Ipswich, Brisbane, Gold Coast',lots:'2,200+'},
+  {name:'AVID Property',type:'Private · Large-scale Subdivisions',color:'#f59e0b',estates:'Brentwood Forest, Harmony, Spring Mountain, Covella, Waterford',focus:'Near-city masterplanned + land lease',regions:'SEQ-wide, Toowoomba',lots:'4,000+'},
+  {name:'Peet Limited',type:'ASX · Growth Corridors',color:'#8b5cf6',estates:'Flagstone (12,000-home community), Meander',focus:'Massive-scale growth corridor communities',regions:'Logan, Gold Coast',lots:'12,000+'},
+  {name:'Lendlease',type:'ASX · Urban Regeneration',color:'#06b6d4',estates:'Yarrabilba (masterplanned city), Springfield',focus:'New city-scale with town centres',regions:'Logan, Springfield',lots:'8,000+'},
+  {name:'Frasers Property',type:'SGX · Mixed-use',color:'#22c55e',estates:'The Lanes (Pimpama), Ed.Square',focus:'Connected communities with retail',regions:'Gold Coast, Brisbane',lots:'1,500+'},
+  {name:'QM Properties',type:'Private · QLD-focused',color:'#ec4899',estates:'Griffin, North Lakes extensions, Deebing Heights',focus:'Suburban expansion in high-demand corridors',regions:'Moreton Bay, Ipswich, Toowoomba',lots:'2,000+'},
+  {name:'Sekisui House',type:'Japanese · Premium',color:'#14b8a6',estates:'The Meadows (Baringa), Ecco Ripley',focus:'Sustainable community design',regions:'Sunshine Coast, Ipswich',lots:'800+'},
+  {name:'Villa World (AVID)',type:'Private · House & Land',color:'#f97316',estates:'Elation (Park Ridge), Ripley, Logan Reserve',focus:'Integrated house-and-land in growth areas',regions:'SEQ-wide',lots:'1,800+'},
+];
+const compEl = document.getElementById('comp-grid');
+comps.forEach(c => {
+  compEl.innerHTML += `<div class="comp-card">
+    <div class="comp-icon" style="background:${c.color}22;color:${c.color}">${c.name.charAt(0)}</div>
+    <div class="comp-name">${c.name}</div><div class="comp-type">${c.type}</div>
+    <div class="comp-info"><strong>Key Estates:</strong> ${c.estates}</div>
+    <div class="comp-info"><strong>Focus:</strong> ${c.focus}</div>
+    <div class="comp-info"><strong>Regions:</strong> ${c.regions}</div>
+    <div class="comp-info"><strong>Lots Pipeline:</strong> ${c.lots}</div>
+  </div>`;
+});
+
+// ─── ANALYTICS ───
+const barData = [{l:'Ripley',v:420,c:'var(--accent)'},{l:'Flagstone',v:380,c:'var(--option)'},{l:'Pimpama',v:510,c:'var(--prospecting)'},{l:'Park Ridge',v:350,c:'var(--develop)'},{l:'Highfields',v:290,c:'var(--identified)'},{l:'Fernvale',v:220,c:'#06b6d4'},{l:'Gatton',v:180,c:'var(--novate)'},{l:'Palmview',v:580,c:'#f97316'},{l:'Aura',v:490,c:'#ef4444'}];
+const maxV = Math.max(...barData.map(b=>b.v));
+const bcEl = document.getElementById('bar-chart');
+barData.forEach(b => { bcEl.innerHTML += `<div class="bar-g"><div class="bar-val">$${b.v}</div><div class="bar" style="height:${(b.v/maxV)*160}px;background:${b.c}"></div><div class="bar-lbl">${b.l}</div></div>`; });
+
+const growthData = [{n:'Ripley Valley',g:'+24.3%'},{n:'Flagstone PDA',g:'+21.7%'},{n:'Pimpama / Coomera',g:'+19.8%'},{n:'Highfields (Toowoomba)',g:'+18.2%'},{n:'Palmview (Sunshine Coast)',g:'+17.5%'},{n:'Park Ridge / Logan',g:'+16.1%'},{n:'Caloundra South / Aura',g:'+15.8%'},{n:'Fernvale / Somerset',g:'+14.2%'},{n:'Gatton (Lockyer)',g:'+12.6%'}];
+const glEl = document.getElementById('growth-list');
+growthData.forEach(g => { glEl.innerHTML += `<div class="growth-item"><span>${g.n}</span><span style="font-weight:700;color:#22c55e">${g.g}</span></div>`; });
+
+// ─── MAP ───
+const tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const tileOpts = { attribution:'© OpenStreetMap © CARTO', maxZoom:18 };
+
+const map = L.map('map-dash',{zoomControl:false}).setView([-27.6,152.8],9);
+L.tileLayer(tileUrl,tileOpts).addTo(map); L.control.zoom({position:'topright'}).addTo(map);
+
+let mapFull;
+setTimeout(() => {
+  mapFull = L.map('map-full',{zoomControl:false}).setView([-27.6,152.8],9);
+  L.tileLayer(tileUrl,tileOpts).addTo(mapFull); L.control.zoom({position:'topright'}).addTo(mapFull);
+  addMarkers(mapFull);
+}, 200);
+
+const markers = [
+  // Competitors
+  {lat:-27.22,lng:153.08,t:'competitor',n:'Stockland Newport',d:'Moreton Bay · 4,000+ lot masterplan',dev:'Stockland'},
+  {lat:-26.80,lng:153.10,t:'competitor',n:'Stockland Aura',d:'Caloundra South · Largest in Aus',dev:'Stockland'},
+  {lat:-27.62,lng:152.78,t:'competitor',n:'Stockland Providence',d:'Ripley Valley',dev:'Stockland'},
+  {lat:-27.79,lng:153.18,t:'competitor',n:'Mirvac Gainsborough Greens',d:'Pimpama · Premium',dev:'Mirvac'},
+  {lat:-27.72,lng:152.94,t:'competitor',n:'Mirvac Everleigh',d:'Greenbank',dev:'Mirvac'},
+  {lat:-27.76,lng:153.00,t:'competitor',n:'Mirvac Kindira',d:'Flagstone PDA',dev:'Mirvac'},
+  {lat:-27.74,lng:152.98,t:'competitor',n:'Peet Flagstone',d:'12,000-home masterplan',dev:'Peet'},
+  {lat:-27.82,lng:153.12,t:'competitor',n:'Lendlease Yarrabilba',d:'Masterplanned city',dev:'Lendlease'},
+  {lat:-27.68,lng:152.90,t:'competitor',n:'AVID Spring Mountain',d:'Near Springfield',dev:'AVID'},
+  {lat:-27.67,lng:153.06,t:'competitor',n:'AVID Elation',d:'Park Ridge · House & Land',dev:'AVID/VillaWorld'},
+  {lat:-26.73,lng:153.06,t:'competitor',n:'AVID Harmony',d:'Palmview · Sunshine Coast',dev:'AVID'},
+  {lat:-27.58,lng:152.86,t:'competitor',n:'Sekisui Ecco Ripley',d:'Sustainable design',dev:'Sekisui'},
+  {lat:-27.51,lng:151.95,t:'competitor',n:'QM Highfields Rise',d:'Toowoomba',dev:'QM Properties'},
+  {lat:-27.27,lng:153.04,t:'competitor',n:'Stockland North Harbour',d:'Burpengary',dev:'Stockland'},
+  {lat:-27.84,lng:153.22,t:'competitor',n:'Frasers The Lanes',d:'Pimpama',dev:'Frasers'},
+  // Identified
+  {lat:-27.57,lng:151.92,t:'identified',n:'12ha Glenvale',d:'Adjacent Bunnings · Rural Res.',stage:'Identified'},
+  {lat:-26.82,lng:153.12,t:'identified',n:'5.2ha Caloundra South',d:'Near Aura · PDA',stage:'Identified'},
+  {lat:-27.83,lng:153.25,t:'identified',n:'3.2ha Coomera North',d:'Residential zoning',stage:'Identified'},
+  // Prospecting
+  {lat:-27.43,lng:152.58,t:'prospecting',n:'22ha Fernvale South',d:'Letter sent · ~70 lots',stage:'Prospecting'},
+  {lat:-27.55,lng:152.27,t:'prospecting',n:'6ha Gatton',d:'Meeting scheduled · ~20 lots',stage:'Prospecting'},
+  {lat:-27.80,lng:153.10,t:'prospecting',n:'9ha Yarrabilba',d:'Door knock done · ~30 lots',stage:'Prospecting'},
+  // Under Option
+  {lat:-27.61,lng:152.76,t:'option',n:'14ha Ripley Valley',d:'Option $30K · 10 months · ~45 lots',stage:'Under Option'},
+  {lat:-27.73,lng:152.96,t:'option',n:'18ha Flagstone',d:'Option $35K · 5 months · ~60 lots',stage:'Under Option'},
+  {lat:-27.46,lng:151.93,t:'option',n:'8.5ha Highfields',d:'Option $25K · 12 months · Novating',stage:'Under Option'},
+  // Develop
+  {lat:-27.66,lng:152.92,t:'develop',n:'7ha Springfield Lakes',d:'28 lots approved · Civil works',stage:'Develop'},
+  {lat:-27.24,lng:153.00,t:'develop',n:'4ha North Lakes Ext',d:'18 lots · DA lodged',stage:'Develop'},
+  // Novated
+  {lat:-27.85,lng:153.30,t:'novate',n:'2.8ha Coomera (Sold)',d:'Novated M. Chen · $285K profit',stage:'Novated'},
+  {lat:-27.70,lng:153.04,t:'novate',n:'3ha Park Ridge (Sold)',d:'Novated T. Bradley · $190K profit',stage:'Novated'},
+];
+
+function mColor(t){return({competitor:'#ef4444',identified:'var(--identified)',prospecting:'var(--prospecting)',option:'var(--option)',develop:'var(--develop)',novate:'var(--novate)'})[t]||'#fff'}
+function mkIcon(c,s){return L.divIcon({className:'',html:`<div style="width:${s}px;height:${s}px;background:${c};border-radius:50%;border:2px solid rgba(255,255,255,.25);box-shadow:0 0 10px ${c}55"></div>`,iconSize:[s,s],iconAnchor:[s/2,s/2]})}
+
+function addMarkers(mi){
+  markers.forEach(m => {
+    const sz = m.t==='competitor'?13:11;
+    const mk = L.marker([m.lat,m.lng],{icon:mkIcon(mColor(m.t),sz)}).addTo(mi);
+    let pp = `<div style="font-size:12px;min-width:180px"><strong>${m.n}</strong><br><span style="color:#9ca3af">${m.d}</span>`;
+    if(m.dev) pp += `<br><span style="color:#ef4444">Developer: ${m.dev}</span>`;
+    if(m.stage) pp += `<br><span style="color:${mColor(m.t)}">Stage: ${m.stage}</span>`;
+    pp += '</div>';
+    mk.bindPopup(pp);
+  });
+  // Growth corridors
+  [{n:'Ripley Valley',c:[[-27.58,152.72],[-27.58,152.82],[-27.65,152.82],[-27.65,152.72]]},
+   {n:'Flagstone PDA',c:[[-27.72,152.92],[-27.72,153.02],[-27.78,153.02],[-27.78,152.92]]},
+   {n:'Pimpama-Coomera',c:[[-27.78,153.16],[-27.78,153.26],[-27.86,153.26],[-27.86,153.16]]},
+   {n:'Toowoomba West',c:[[-27.50,151.88],[-27.50,151.98],[-27.58,151.98],[-27.58,151.88]]}
+  ].forEach(co => {
+    L.polygon(co.c,{color:'#22c55e',weight:1,fillColor:'#22c55e',fillOpacity:.07}).addTo(mi)
+      .bindPopup(`<strong>${co.n} Growth Corridor</strong>`);
+  });
+}
+addMarkers(map);
+</script>
+</body>
+</html>
