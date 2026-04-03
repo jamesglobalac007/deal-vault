@@ -80,7 +80,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* ── MAP ── */
 #map-dash{height:420px;width:100%}
 #map-full{height:calc(100vh - 140px);width:100%}
-.map-legend{position:absolute;bottom:16px;left:16px;z-index:999;background:rgba(11,13,20,.92);border:1px solid var(--border);border-radius:10px;padding:12px 16px;backdrop-filter:blur(8px)}
+.map-legend{position:absolute;bottom:16px;left:16px;z-index:999;background:rgba(255,255,255,.94);border:1px solid #d1d5db;border-radius:10px;padding:12px 16px;backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(0,0,0,.12);color:#1a1e2e}
 .leg-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px}
 .leg-dot{width:10px;height:10px;border-radius:50%}
 
@@ -352,6 +352,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="leg-item"><div class="leg-dot" style="background:var(--develop)"></div>Develop / Hold</div>
       <div class="leg-item"><div class="leg-dot" style="background:var(--novate)"></div>Novated to Buyer</div>
       <div class="leg-item"><div class="leg-dot" style="background:rgba(34,197,94,.4);border:2px solid #22c55e"></div>Growth Corridor</div>
+      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;font-size:10px;color:#6b7280">Parcel boundaries visible at zoom 14+</div>
     </div>
   </div>
 </div>
@@ -1013,16 +1014,25 @@ Chart.defaults.font.size = 10;
 })();
 
 // ─── MAP ───
-const tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-const tileOpts = { attribution:'© OpenStreetMap © CARTO', maxZoom:18 };
+// Light base tiles for clear parcel visibility
+const tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const tileOpts = { attribution:'© OpenStreetMap © CARTO', maxZoom:19 };
+
+// QLD Cadastral (parcel boundary) overlay — QLD Government WMS
+const cadastralUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/tile/{z}/{y}/{x}';
+const cadastralOpts = { maxZoom:19, opacity:0.6, attribution:'© QLD Govt Spatial' };
 
 const map = L.map('map-dash',{zoomControl:false}).setView([-27.6,152.8],9);
-L.tileLayer(tileUrl,tileOpts).addTo(map); L.control.zoom({position:'topright'}).addTo(map);
+L.tileLayer(tileUrl,tileOpts).addTo(map);
+L.tileLayer(cadastralUrl,cadastralOpts).addTo(map);
+L.control.zoom({position:'topright'}).addTo(map);
 
 let mapFull;
 setTimeout(() => {
   mapFull = L.map('map-full',{zoomControl:false}).setView([-27.6,152.8],9);
-  L.tileLayer(tileUrl,tileOpts).addTo(mapFull); L.control.zoom({position:'topright'}).addTo(mapFull);
+  L.tileLayer(tileUrl,tileOpts).addTo(mapFull);
+  L.tileLayer(cadastralUrl,cadastralOpts).addTo(mapFull);
+  L.control.zoom({position:'topright'}).addTo(mapFull);
   addMarkers(mapFull);
 }, 200);
 
@@ -1064,7 +1074,7 @@ const markers = [
 ];
 
 function mColor(t){return({competitor:'#ef4444',identified:'var(--identified)',prospecting:'var(--prospecting)',option:'var(--option)',develop:'var(--develop)',novate:'var(--novate)'})[t]||'#fff'}
-function mkIcon(c,s){return L.divIcon({className:'',html:`<div style="width:${s}px;height:${s}px;background:${c};border-radius:50%;border:2px solid rgba(255,255,255,.25);box-shadow:0 0 10px ${c}55"></div>`,iconSize:[s,s],iconAnchor:[s/2,s/2]})}
+function mkIcon(c,s){return L.divIcon({className:'',html:`<div style="width:${s}px;height:${s}px;background:${c};border-radius:50%;border:2px solid rgba(0,0,0,.3);box-shadow:0 0 8px ${c}88,0 1px 3px rgba(0,0,0,.3)"></div>`,iconSize:[s,s],iconAnchor:[s/2,s/2]})}
 
 // Radar ring layer groups
 let radarLayers = {};
@@ -1076,9 +1086,9 @@ function addMarkers(mi){
   markers.forEach(m => {
     const sz = m.t==='competitor'?13:11;
     const mk = L.marker([m.lat,m.lng],{icon:mkIcon(mColor(m.t),sz)}).addTo(mi);
-    let pp = `<div style="font-size:12px;min-width:200px"><strong>${m.n}</strong><br><span style="color:#9ca3af">${m.d}</span>`;
-    if(m.dev) pp += `<br><span style="color:#ef4444">Developer: ${m.dev}</span>`;
-    if(m.stage) pp += `<br><span style="color:${mColor(m.t)}">Stage: ${m.stage}</span>`;
+    let pp = `<div style="font-size:12px;min-width:200px;color:#1a1e2e"><strong>${m.n}</strong><br><span style="color:#555">${m.d}</span>`;
+    if(m.dev) pp += `<br><span style="color:#dc2626;font-weight:600">Developer: ${m.dev}</span>`;
+    if(m.stage) pp += `<br><span style="font-weight:600">Stage: ${m.stage}</span>`;
     pp += '</div>';
     mk.bindPopup(pp);
 
@@ -1124,8 +1134,8 @@ function addMarkers(mi){
   const radarLegend = L.control({position:'bottomright'});
   radarLegend.onAdd = function(){
     const d = L.DomUtil.create('div');
-    d.style.cssText = 'background:rgba(20,23,34,.92);border:1px solid #232840;border-radius:8px;padding:10px 14px;font-size:11px;color:#e8e8ed;line-height:1.8;backdrop-filter:blur(8px)';
-    d.innerHTML = `<div style="font-weight:700;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7a8194">Proximity Radar</div>
+    d.style.cssText = 'background:rgba(255,255,255,.94);border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;font-size:11px;color:#1a1e2e;line-height:1.8;backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(0,0,0,.12)';
+    d.innerHTML = `<div style="font-weight:700;margin-bottom:4px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280">Proximity Radar</div>
       <div><span style="display:inline-block;width:10px;height:2px;background:#00d4aa;margin-right:6px;vertical-align:middle"></span>1 km — Prime zone</div>
       <div><span style="display:inline-block;width:10px;height:2px;background:#f59e0b;margin-right:6px;vertical-align:middle;opacity:.7"></span>3 km — Strong demand</div>
       <div><span style="display:inline-block;width:10px;height:2px;background:#ef4444;margin-right:6px;vertical-align:middle;opacity:.5"></span>5 km — Catchment area</div>`;
