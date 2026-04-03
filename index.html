@@ -1446,67 +1446,42 @@ function openPropPanel() {
   document.getElementById('propPanel').classList.add('open');
 }
 
+// Direct REST API identify — bypasses CORS issues with JSONP fallback
+function arcgisIdentify(serviceUrl, latlng, layerSpec, tolerance, callback) {
+  const b = mapFull.getBounds();
+  const s = mapFull.getSize();
+  const params = new URLSearchParams({
+    geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
+    geometryType: 'esriGeometryPoint',
+    sr: '4326',
+    layers: layerSpec || 'all',
+    tolerance: tolerance || 5,
+    mapExtent: JSON.stringify({xmin:b.getWest(),ymin:b.getSouth(),xmax:b.getEast(),ymax:b.getNorth(),spatialReference:{wkid:4326}}),
+    imageDisplay: s.x+','+s.y+',96',
+    returnGeometry: 'false',
+    f: 'json'
+  });
+  fetch(serviceUrl + '/identify?' + params.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.results && data.results.length > 0) {
+        callback(data.results);
+      } else {
+        callback(null);
+      }
+    })
+    .catch(function(err){
+      console.log('Identify error for', serviceUrl, err);
+      callback(null);
+    });
+}
+
 function identifyParcel(latlng) {
-  const panel = document.getElementById('propPanel');
   const content = document.getElementById('propContent');
 
   // Show loading state
   content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying QLD Government data...</div>';
   openPropPanel();
-
-  // Query multiple services in parallel
-  const bounds = mapFull.getBounds();
-  const size = mapFull.getSize();
-
-  // 1. Cadastral parcel identify
-  const cadastralQuery = L.esri.identifyFeatures({
-    url: qldServices.cadastral.url
-  }).on(mapFull).at(latlng).layers('visible:4').tolerance(5);
-
-  // 2. Land use identify
-  const landUseQuery = L.esri.identifyFeatures({
-    url: qldServices.landuse.url
-  }).on(mapFull).at(latlng).tolerance(5);
-
-  // 3. PDA identify
-  const pdaQuery = L.esri.identifyFeatures({
-    url: qldServices.pda.url
-  }).on(mapFull).at(latlng).tolerance(5);
-
-  // 4. Flood lines identify
-  const floodQuery = L.esri.identifyFeatures({
-    url: qldServices.flood.url
-  }).on(mapFull).at(latlng).tolerance(50);
-
-  // 5. Floodplain assess
-  const floodplainQuery = L.esri.identifyFeatures({
-    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer'
-  }).on(mapFull).at(latlng).layers('all:188').tolerance(5);
-
-  // 6. Contours (elevation)
-  const contourQuery = L.esri.identifyFeatures({
-    url: qldServices.contours.url
-  }).on(mapFull).at(latlng).tolerance(30);
-
-  // 7. MSES (environmental)
-  const msesQuery = L.esri.identifyFeatures({
-    url: qldServices.mses.url
-  }).on(mapFull).at(latlng).tolerance(5);
-
-  // 8. Koala habitat
-  const koalaQuery = L.esri.identifyFeatures({
-    url: qldServices.koala.url
-  }).on(mapFull).at(latlng).tolerance(5);
-
-  // 9. Cultural heritage
-  const heritageQuery = L.esri.identifyFeatures({
-    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/CulturalHeritageBoundaries/MapServer'
-  }).on(mapFull).at(latlng).tolerance(5);
-
-  // 10. Acid sulfate soils
-  const acidQuery = L.esri.identifyFeatures({
-    url: qldServices.acidsoils.url
-  }).on(mapFull).at(latlng).layers('all:2052').tolerance(10);
 
   // Results accumulator
   const results = {
@@ -1519,68 +1494,82 @@ function identifyParcel(latlng) {
 
   function checkComplete() {
     completed++;
+    // Update loading text with progress
+    if (completed < total) {
+      content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying... (' + completed + '/' + total + ' services)</div>';
+    }
     if (completed >= total) {
       renderPropPanel(latlng, results);
     }
   }
 
-  cadastralQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.cadastral = fc.features[0].properties;
+  // 1. Cadastral parcels
+  arcgisIdentify(qldServices.cadastral.url, latlng, 'all:4', 3, function(r){
+    if(r) results.cadastral = r[0].attributes;
     checkComplete();
   });
 
-  landUseQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.landuse = fc.features[0].properties;
+  // 2. Land use
+  arcgisIdentify(qldServices.landuse.url, latlng, 'all', 5, function(r){
+    if(r) results.landuse = r[0].attributes;
     checkComplete();
   });
 
-  pdaQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.pda = fc.features[0].properties;
+  // 3. PDA
+  arcgisIdentify(qldServices.pda.url, latlng, 'all', 5, function(r){
+    if(r) results.pda = r[0].attributes;
     checkComplete();
   });
 
-  floodQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.flood = fc.features;
+  // 4. Flood lines
+  arcgisIdentify(qldServices.flood.url, latlng, 'all', 30, function(r){
+    if(r) results.flood = r;
     checkComplete();
   });
 
-  floodplainQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.floodplain = fc.features[0].properties;
+  // 5. Floodplain
+  arcgisIdentify('https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer', latlng, 'all:188', 5, function(r){
+    if(r) results.floodplain = r[0].attributes;
     checkComplete();
   });
 
-  contourQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.contour = fc.features[0].properties;
+  // 6. Contours
+  arcgisIdentify(qldServices.contours.url, latlng, 'all:10', 30, function(r){
+    if(r) results.contour = r[0].attributes;
     checkComplete();
   });
 
-  msesQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.mses = fc.features;
+  // 7. MSES
+  arcgisIdentify(qldServices.mses.url, latlng, 'all', 5, function(r){
+    if(r) results.mses = r;
     checkComplete();
   });
 
-  koalaQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.koala = fc.features[0].properties;
+  // 8. Koala
+  arcgisIdentify(qldServices.koala.url, latlng, 'all', 5, function(r){
+    if(r) results.koala = r[0].attributes;
     checkComplete();
   });
 
-  heritageQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.heritage = fc.features[0].properties;
+  // 9. Heritage
+  arcgisIdentify('https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/CulturalHeritageBoundaries/MapServer', latlng, 'all', 5, function(r){
+    if(r) results.heritage = r[0].attributes;
     checkComplete();
   });
 
-  acidQuery.run(function(err, fc) {
-    if (!err && fc && fc.features && fc.features.length > 0) results.acid = fc.features[0].properties;
+  // 10. Acid sulfate soils
+  arcgisIdentify(qldServices.acidsoils.url, latlng, 'all:2052', 10, function(r){
+    if(r) results.acid = r[0].attributes;
     checkComplete();
   });
 
-  // Timeout fallback — render whatever we have after 8s
+  // Timeout fallback — render whatever we have after 10s
   setTimeout(function() {
     if (completed < total) {
       completed = total;
       renderPropPanel(latlng, results);
     }
-  }, 8000);
+  }, 10000);
 }
 
 function renderPropPanel(latlng, r) {
@@ -1588,19 +1577,22 @@ function renderPropPanel(latlng, r) {
   const c = r.cadastral || {};
   const lu = r.landuse || {};
 
-  // Extract key fields from cadastral
-  const lotPlan = c.LOTPLAN || c.LOT_PLAN || c.Lot_Plan || c.LOTNUMBER || '—';
-  const lot = c.LOT || c.LOTNUMBER || c.Lot || '—';
-  const plan = c.PLAN || c.PLANNUMBER || c.Plan || '—';
-  const area = c.AREA_M2 || c.SHAPE_Area || c.AREA || c.Shape_Area || c.AREA_HA || null;
-  const areaDisplay = area ? (area > 10000 ? (area/10000).toFixed(2) + ' ha' : Math.round(area).toLocaleString() + ' m²') : '—';
-  const tenure = c.TENURE || c.TENURE_DESC || c.Tenure || '—';
-  const lga = c.LGA || c.LOCAL_GOVERNMENT || c.LGA_NAME || '—';
-  const locality = c.LOCALITY || c.LOCALITY_NAME || c.Locality || '—';
-  const segParcel = c.SEG_PARCEL || c.PARCEL_TYPE || '—';
+  // Extract key fields from cadastral (DCDB field names)
+  const lotPlan = c.LOTPLAN || c.LOT_PLAN || c.Lot_Plan || c.LOTNUMBER || c.Lot_Plan_Desc || '—';
+  const lot = c.LOT || c.LOTNUMBER || c.Lot || c.LOT_NUMBER || '—';
+  const plan = c.PLAN || c.PLANNUMBER || c.Plan || c.PLAN_NUMBER || '—';
+  const area = c.AREA_M2 || c.SHAPE_Area || c.AREA || c.Shape_Area || c.AREA_HA || (c.SHAPE && c.SHAPE.area) || c.O_SHAPE_Area || null;
+  const areaDisplay = area ? (area > 10000 ? (area/10000).toFixed(2) + ' ha' : Math.round(area).toLocaleString() + ' m\u00B2') : '—';
+  const tenure = c.TENURE || c.TENURE_DESC || c.Tenure || c.COVER_TY || '—';
+  const lga = c.LGA || c.LOCAL_GOVERNMENT || c.LGA_NAME || c.SHIRE_NAME || c.LOC_AUTH || '—';
+  const locality = c.LOCALITY || c.LOCALITY_NAME || c.Locality || c.LOC_NAME || '—';
+  const segParcel = c.SEG_PARCEL || c.PARCEL_TYPE || c.SEGMENT_PARCEL || '—';
+
+  // Log cadastral data for debugging (check browser console)
+  if (Object.keys(c).length > 0) console.log('Cadastral data:', c);
 
   // Land use
-  const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.LU_DESC || lu.DESCRIPTION || '—';
+  const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.LU_DESC || lu.DESCRIPTION || lu.Land_Use || '—';
 
   // PDA
   const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.NAME || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
@@ -1619,7 +1611,7 @@ function renderPropPanel(latlng, r) {
   // MSES (environmental)
   const msesStatus = r.mses && r.mses.length > 0 ? 'Affected' : 'Unaffected';
   const msesClass = r.mses && r.mses.length > 0 ? 'affected' : 'clear';
-  const msesDetails = r.mses ? r.mses.map(f => f.properties.CATEGORY || f.properties.RE_STATUS || f.properties.DESCRIPTION || 'MSES Feature').slice(0,3) : [];
+  const msesDetails = r.mses ? r.mses.map(f => { const a = f.attributes || f.properties || f; return a.CATEGORY || a.RE_STATUS || a.DESCRIPTION || a.layerName || 'MSES Feature'; }).slice(0,3) : [];
 
   // Build HTML
   let html = '';
