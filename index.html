@@ -207,6 +207,62 @@ tr:hover td{background:rgba(255,255,255,.015)}
 /* ── TWO-COL LAYOUTS ── */
 .two-col{display:grid;grid-template-columns:2fr 1fr;gap:16px}
 
+/* ── LAYER CONTROL PANEL ── */
+.layer-panel{position:absolute;top:12px;right:12px;z-index:1002;background:rgba(20,23,34,.94);border:1px solid var(--border);border-radius:10px;width:240px;backdrop-filter:blur(12px);box-shadow:0 4px 20px rgba(0,0,0,.4);font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;overflow:hidden;transition:all .25s}
+.prop-panel.open ~ .layer-panel{right:352px}
+.layer-panel.collapsed .lp-body{display:none}
+.lp-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.lp-head h5{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);font-weight:700;margin:0}
+.lp-toggle-btn{background:none;border:none;color:var(--dim);font-size:14px;cursor:pointer;padding:0;line-height:1;transition:transform .2s}
+.layer-panel.collapsed .lp-toggle-btn{transform:rotate(180deg)}
+.lp-body{padding:6px 0;max-height:400px;overflow-y:auto}
+.lp-group{padding:4px 14px 2px;font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);font-weight:600;margin-top:4px}
+.lp-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;transition:background .1s;font-size:11px;color:#c8c8d0}
+.lp-item:hover{background:rgba(255,255,255,.04)}
+.lp-item.active{color:var(--accent)}
+.lp-switch{position:relative;width:28px;height:16px;flex-shrink:0}
+.lp-switch input{opacity:0;width:0;height:0;position:absolute}
+.lp-switch .lp-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:8px;transition:all .2s;cursor:pointer}
+.lp-switch .lp-slider:after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:#555;top:2px;left:2px;transition:all .2s}
+.lp-switch input:checked + .lp-slider{background:rgba(0,212,170,.3)}
+.lp-switch input:checked + .lp-slider:after{background:var(--accent);left:14px}
+.lp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.lp-loading{font-size:9px;color:var(--dim);padding:2px 14px 6px;font-style:italic;display:none}
+
+/* ── PROPERTY INFO PANEL (Landchecker-style) ── */
+.prop-panel{position:absolute;top:0;right:0;width:340px;height:100%;background:rgba(20,23,34,.96);border-left:1px solid var(--border);z-index:1001;overflow-y:auto;transform:translateX(100%);transition:transform .25s ease;backdrop-filter:blur(14px)}
+.prop-panel.open{transform:translateX(0)}
+.pp-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(20,23,34,.98);z-index:1}
+.pp-head h4{font-size:13px;font-weight:700;color:var(--text)}
+.pp-close{background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.pp-close:hover{color:var(--text)}
+.pp-addr{padding:12px 16px;border-bottom:1px solid var(--border)}
+.pp-addr h3{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:2px}
+.pp-addr .pp-lotplan{font-size:11px;color:var(--dim);font-family:'SF Mono',Consolas,monospace}
+.pp-section{padding:12px 16px;border-bottom:1px solid var(--border)}
+.pp-section-title{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);font-weight:700;margin-bottom:10px}
+.pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pp-field{display:flex;flex-direction:column;gap:2px}
+.pp-field-label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);font-weight:600}
+.pp-field-val{font-size:13px;font-weight:600;color:var(--text)}
+.pp-field-val.pp-zone{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.pp-hazard-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(35,40,64,.4)}
+.pp-hazard-row:last-child{border-bottom:none}
+.pp-hazard-label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text)}
+.pp-hazard-icon{width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center}
+.pp-hazard-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+.pp-status{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.pp-status.clear{background:rgba(34,197,94,.15);color:#22c55e}
+.pp-status.affected{background:rgba(239,68,68,.15);color:#ef4444}
+.pp-status.moderate{background:rgba(245,158,11,.15);color:#f59e0b}
+.pp-status.loading{background:rgba(255,255,255,.06);color:var(--dim)}
+.pp-overlay-tag{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;margin:2px;background:rgba(245,158,11,.12);color:#f59e0b}
+.pp-actions{padding:12px 16px;display:flex;flex-direction:column;gap:6px}
+.pp-actions .btn{width:100%;justify-content:center}
+.pp-loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:12px;gap:8px}
+.pp-spinner{width:16px;height:16px;border:2px solid var(--border);border-top:2px solid var(--accent);border-radius:50%;animation:pp-spin .8s linear infinite}
+@keyframes pp-spin{to{transform:rotate(360deg)}}
+
 /* ── RESPONSIVE ── */
 @media(max-width:1100px){.pipeline{grid-template-columns:repeat(3,1fr)}.stats-row{grid-template-columns:repeat(3,1fr)}.comp-grid,.council-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){.sidebar{display:none}.pipeline{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr}.prospect-grid,.analytics-grid,.buyers-layout,.two-col,.comp-grid,.council-grid{grid-template-columns:1fr}}
@@ -345,6 +401,95 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
   <div style="position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)">
     <div id="map-full"></div>
+    <!-- PROPERTY INFO PANEL (Landchecker-style) -->
+    <div class="prop-panel" id="propPanel">
+      <div class="pp-head">
+        <h4>Property Details</h4>
+        <button class="pp-close" onclick="closePropPanel()">&times;</button>
+      </div>
+      <div id="propContent">
+        <div class="pp-loading"><div class="pp-spinner"></div>Click a parcel to view details</div>
+      </div>
+    </div>
+    <!-- LAYER CONTROL PANEL -->
+    <div class="layer-panel" id="layerPanel">
+      <div class="lp-head" onclick="document.getElementById('layerPanel').classList.toggle('collapsed')">
+        <h5>Data Layers</h5>
+        <button class="lp-toggle-btn">&#9650;</button>
+      </div>
+      <div class="lp-body">
+        <div class="lp-group">Cadastral</div>
+        <label class="lp-item active" data-layer="cadastral">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('cadastral',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#6b7280"></div>Parcel Boundaries
+        </label>
+        <div class="lp-group">Planning</div>
+        <label class="lp-item" data-layer="landuse">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#8b5cf6"></div>Land Use Classification
+        </label>
+        <label class="lp-item" data-layer="pda">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pda',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#3b82f6"></div>Priority Dev Areas
+        </label>
+        <label class="lp-item" data-layer="sda">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('sda',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#06b6d4"></div>State Dev Areas
+        </label>
+        <div class="lp-group">Hazards</div>
+        <label class="lp-item" data-layer="flood">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#3b82f6"></div>Flood Lines (Historical)
+        </label>
+        <label class="lp-item" data-layer="floodplain">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodplain',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#60a5fa"></div>Floodplain Assessment
+        </label>
+        <label class="lp-item" data-layer="bushfire">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#f97316"></div>Bushfire Prone Areas
+        </label>
+        <label class="lp-item" data-layer="landslide">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landslide',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ef4444"></div>Landslide Susceptibility
+        </label>
+        <label class="lp-item" data-layer="acidsoils">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('acidsoils',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#eab308"></div>Acid Sulfate Soils
+        </label>
+        <div class="lp-group">Terrain</div>
+        <label class="lp-item" data-layer="contours">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#a78bfa"></div>Contours (Elevation)
+        </label>
+        <label class="lp-item" data-layer="geology">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('geology',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#78716c"></div>Geology (Detailed)
+        </label>
+        <div class="lp-group">Environment</div>
+        <label class="lp-item" data-layer="mses">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('mses',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#22c55e"></div>Environmental (MSES)
+        </label>
+        <label class="lp-item" data-layer="koala">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#16a34a"></div>Koala Habitat (SEQ)
+        </label>
+        <label class="lp-item" data-layer="heritage">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('heritage',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#b45309"></div>Cultural Heritage
+        </label>
+        <div class="lp-group">Boundaries</div>
+        <label class="lp-item" data-layer="lga">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('lga',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#64748b"></div>LGA Boundaries
+        </label>
+        <label class="lp-item" data-layer="localities">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('localities',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#94a3b8"></div>Localities / Suburbs
+        </label>
+      </div>
+    </div>
     <div class="map-legend">
       <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Competitor Estate</div>
       <div class="leg-item"><div class="leg-dot" style="background:var(--identified)"></div>Identified Site</div>
@@ -353,7 +498,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="leg-item"><div class="leg-dot" style="background:var(--develop)"></div>Develop / Hold</div>
       <div class="leg-item"><div class="leg-dot" style="background:var(--novate)"></div>Novated to Buyer</div>
       <div class="leg-item"><div class="leg-dot" style="background:rgba(34,197,94,.4);border:2px solid #22c55e"></div>Growth Corridor</div>
-      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;font-size:10px;color:#6b7280">Parcel boundaries visible at zoom 14+</div>
+      <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;font-size:10px;color:#6b7280">Toggle data layers via panel (top right)</div>
     </div>
   </div>
 </div>
@@ -1042,9 +1187,10 @@ let mapFull;
 setTimeout(() => {
   mapFull = L.map('map-full',{zoomControl:false}).setView([-27.6,152.8],9);
   L.tileLayer(tileUrl,tileOpts).addTo(mapFull);
-  addCadastral(mapFull);
+  // Cadastral managed via layer panel — don't use addCadastral here
   L.control.zoom({position:'topright'}).addTo(mapFull);
   addMarkers(mapFull);
+  initFullMapLayers(); // Wire up layer panel + property click
 }, 200);
 
 const markers = [
@@ -1155,6 +1301,466 @@ function addMarkers(mi){
   radarLegend.addTo(mi);
 }
 addMarkers(map);
+
+// ─── DATA LAYER MANAGEMENT ───
+// QLD Government ArcGIS service endpoints
+const qldServices = {
+  cadastral: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer',
+    layers: [4], opacity: 0.5, minZoom: 13, maxZoom: 19
+  },
+  landuse: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandUse/MapServer',
+    layers: [0], opacity: 0.45, minZoom: 10, maxZoom: 19
+  },
+  pda: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PriorityDevelopmentAreas/MapServer',
+    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
+  },
+  sda: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/StateDevelopmentAreas/MapServer',
+    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
+  },
+  flood: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/InlandWaters/FloodLines/MapServer',
+    layers: false, opacity: 0.55, minZoom: 10, maxZoom: 19
+  },
+  floodplain: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer',
+    layers: [188], opacity: 0.4, minZoom: 8, maxZoom: 19
+  },
+  bushfire: {
+    url: 'https://tiles.arcgis.com/tiles/vkTwD8kHw2woKBqV/arcgis/rest/services/Bushfire_Prone_Areas/MapServer',
+    isTile: true, opacity: 0.5, minZoom: 8, maxZoom: 19
+  },
+  landslide: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/GeoscientificInformation/SoilsAndLandResource/MapServer',
+    layers: [2040,2041], opacity: 0.45, minZoom: 10, maxZoom: 19
+  },
+  acidsoils: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/GeoscientificInformation/SoilsAndLandResource/MapServer',
+    layers: [2052], opacity: 0.45, minZoom: 10, maxZoom: 19
+  },
+  contours: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Elevation/Contours/MapServer',
+    layers: [10], opacity: 0.5, minZoom: 13, maxZoom: 19
+  },
+  geology: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/GeoscientificInformation/GeologyDetailed/MapServer',
+    layers: false, opacity: 0.35, minZoom: 10, maxZoom: 19
+  },
+  mses: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Environment/MattersOfStateEnvironmentalSignificance/MapServer',
+    layers: false, opacity: 0.4, minZoom: 10, maxZoom: 19
+  },
+  koala: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Environment/KoalaPlan/MapServer',
+    layers: false, opacity: 0.45, minZoom: 10, maxZoom: 19
+  },
+  heritage: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/CulturalHeritageBoundaries/MapServer',
+    layers: false, opacity: 0.5, minZoom: 10, maxZoom: 19
+  },
+  lga: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer',
+    layers: [3], opacity: 0.35, minZoom: 6, maxZoom: 19
+  },
+  localities: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer',
+    layers: [8], opacity: 0.35, minZoom: 10, maxZoom: 19
+  }
+};
+
+// Active layer references for the full map
+const activeLayers = {};
+
+function toggleLayer(layerKey, on) {
+  if (!mapFull) return;
+
+  // Update UI state
+  const item = document.querySelector(`.lp-item[data-layer="${layerKey}"]`);
+  if (item) item.classList.toggle('active', on);
+
+  if (on) {
+    // Already active? skip
+    if (activeLayers[layerKey]) return;
+
+    const svc = qldServices[layerKey];
+    if (!svc) return;
+
+    let layer;
+    if (svc.isTile) {
+      // Tile layer (e.g. bushfire)
+      layer = L.esri.tiledMapLayer({
+        url: svc.url,
+        opacity: svc.opacity,
+        minZoom: svc.minZoom || 8,
+        maxZoom: svc.maxZoom || 19
+      });
+    } else {
+      // Dynamic map layer
+      const opts = {
+        url: svc.url,
+        opacity: svc.opacity,
+        minZoom: svc.minZoom || 10,
+        maxZoom: svc.maxZoom || 19
+      };
+      if (svc.layers) opts.layers = svc.layers;
+      layer = L.esri.dynamicMapLayer(opts);
+    }
+
+    layer.addTo(mapFull);
+    activeLayers[layerKey] = layer;
+  } else {
+    // Remove layer
+    if (activeLayers[layerKey]) {
+      mapFull.removeLayer(activeLayers[layerKey]);
+      delete activeLayers[layerKey];
+    }
+  }
+}
+
+// Cadastral is on by default for full map — handled separately via addCadastral
+// We'll track it so the toggle works
+function initFullMapLayers() {
+  // Mark cadastral as active (already added by addCadastral)
+  const svc = qldServices.cadastral;
+  activeLayers.cadastral = L.esri.dynamicMapLayer({
+    url: svc.url, layers: svc.layers, opacity: svc.opacity,
+    minZoom: svc.minZoom, maxZoom: svc.maxZoom,
+    attribution: '© QLD Govt DCDB'
+  }).addTo(mapFull);
+
+  // Click-to-identify: query parcel data on map click
+  mapFull.on('click', function(e) {
+    identifyParcel(e.latlng);
+  });
+}
+
+// ─── PROPERTY INFO PANEL (Landchecker-style) ───
+function closePropPanel() {
+  document.getElementById('propPanel').classList.remove('open');
+}
+
+function openPropPanel() {
+  document.getElementById('propPanel').classList.add('open');
+}
+
+function identifyParcel(latlng) {
+  const panel = document.getElementById('propPanel');
+  const content = document.getElementById('propContent');
+
+  // Show loading state
+  content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying QLD Government data...</div>';
+  openPropPanel();
+
+  // Query multiple services in parallel
+  const bounds = mapFull.getBounds();
+  const size = mapFull.getSize();
+
+  // 1. Cadastral parcel identify
+  const cadastralQuery = L.esri.identifyFeatures({
+    url: qldServices.cadastral.url
+  }).on(mapFull).at(latlng).layers('visible:4').tolerance(5);
+
+  // 2. Land use identify
+  const landUseQuery = L.esri.identifyFeatures({
+    url: qldServices.landuse.url
+  }).on(mapFull).at(latlng).tolerance(5);
+
+  // 3. PDA identify
+  const pdaQuery = L.esri.identifyFeatures({
+    url: qldServices.pda.url
+  }).on(mapFull).at(latlng).tolerance(5);
+
+  // 4. Flood lines identify
+  const floodQuery = L.esri.identifyFeatures({
+    url: qldServices.flood.url
+  }).on(mapFull).at(latlng).tolerance(50);
+
+  // 5. Floodplain assess
+  const floodplainQuery = L.esri.identifyFeatures({
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer'
+  }).on(mapFull).at(latlng).layers('all:188').tolerance(5);
+
+  // 6. Contours (elevation)
+  const contourQuery = L.esri.identifyFeatures({
+    url: qldServices.contours.url
+  }).on(mapFull).at(latlng).tolerance(30);
+
+  // 7. MSES (environmental)
+  const msesQuery = L.esri.identifyFeatures({
+    url: qldServices.mses.url
+  }).on(mapFull).at(latlng).tolerance(5);
+
+  // 8. Koala habitat
+  const koalaQuery = L.esri.identifyFeatures({
+    url: qldServices.koala.url
+  }).on(mapFull).at(latlng).tolerance(5);
+
+  // 9. Cultural heritage
+  const heritageQuery = L.esri.identifyFeatures({
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/CulturalHeritageBoundaries/MapServer'
+  }).on(mapFull).at(latlng).tolerance(5);
+
+  // 10. Acid sulfate soils
+  const acidQuery = L.esri.identifyFeatures({
+    url: qldServices.acidsoils.url
+  }).on(mapFull).at(latlng).layers('all:2052').tolerance(10);
+
+  // Results accumulator
+  const results = {
+    cadastral: null, landuse: null, pda: null,
+    flood: null, floodplain: null, contour: null, mses: null,
+    koala: null, heritage: null, acid: null
+  };
+  let completed = 0;
+  const total = 10;
+
+  function checkComplete() {
+    completed++;
+    if (completed >= total) {
+      renderPropPanel(latlng, results);
+    }
+  }
+
+  cadastralQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.cadastral = fc.features[0].properties;
+    checkComplete();
+  });
+
+  landUseQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.landuse = fc.features[0].properties;
+    checkComplete();
+  });
+
+  pdaQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.pda = fc.features[0].properties;
+    checkComplete();
+  });
+
+  floodQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.flood = fc.features;
+    checkComplete();
+  });
+
+  floodplainQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.floodplain = fc.features[0].properties;
+    checkComplete();
+  });
+
+  contourQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.contour = fc.features[0].properties;
+    checkComplete();
+  });
+
+  msesQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.mses = fc.features;
+    checkComplete();
+  });
+
+  koalaQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.koala = fc.features[0].properties;
+    checkComplete();
+  });
+
+  heritageQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.heritage = fc.features[0].properties;
+    checkComplete();
+  });
+
+  acidQuery.run(function(err, fc) {
+    if (!err && fc && fc.features && fc.features.length > 0) results.acid = fc.features[0].properties;
+    checkComplete();
+  });
+
+  // Timeout fallback — render whatever we have after 8s
+  setTimeout(function() {
+    if (completed < total) {
+      completed = total;
+      renderPropPanel(latlng, results);
+    }
+  }, 8000);
+}
+
+function renderPropPanel(latlng, r) {
+  const content = document.getElementById('propContent');
+  const c = r.cadastral || {};
+  const lu = r.landuse || {};
+
+  // Extract key fields from cadastral
+  const lotPlan = c.LOTPLAN || c.LOT_PLAN || c.Lot_Plan || c.LOTNUMBER || '—';
+  const lot = c.LOT || c.LOTNUMBER || c.Lot || '—';
+  const plan = c.PLAN || c.PLANNUMBER || c.Plan || '—';
+  const area = c.AREA_M2 || c.SHAPE_Area || c.AREA || c.Shape_Area || c.AREA_HA || null;
+  const areaDisplay = area ? (area > 10000 ? (area/10000).toFixed(2) + ' ha' : Math.round(area).toLocaleString() + ' m²') : '—';
+  const tenure = c.TENURE || c.TENURE_DESC || c.Tenure || '—';
+  const lga = c.LGA || c.LOCAL_GOVERNMENT || c.LGA_NAME || '—';
+  const locality = c.LOCALITY || c.LOCALITY_NAME || c.Locality || '—';
+  const segParcel = c.SEG_PARCEL || c.PARCEL_TYPE || '—';
+
+  // Land use
+  const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.LU_DESC || lu.DESCRIPTION || '—';
+
+  // PDA
+  const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.NAME || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
+
+  // Flood status
+  const floodStatus = r.flood ? 'Potentially Affected' : 'Unaffected';
+  const floodClass = r.flood ? 'affected' : 'clear';
+
+  // Floodplain
+  const fpStatus = r.floodplain ? 'In Floodplain' : 'Outside Floodplain';
+  const fpClass = r.floodplain ? 'moderate' : 'clear';
+
+  // Elevation
+  const elevation = r.contour ? (r.contour.ELEVATION || r.contour.CONTOUR || r.contour.ELEV_M || '—') : '—';
+
+  // MSES (environmental)
+  const msesStatus = r.mses && r.mses.length > 0 ? 'Affected' : 'Unaffected';
+  const msesClass = r.mses && r.mses.length > 0 ? 'affected' : 'clear';
+  const msesDetails = r.mses ? r.mses.map(f => f.properties.CATEGORY || f.properties.RE_STATUS || f.properties.DESCRIPTION || 'MSES Feature').slice(0,3) : [];
+
+  // Build HTML
+  let html = '';
+
+  // Address / Lot Plan header
+  html += `<div class="pp-addr">
+    <h3>${locality !== '—' ? locality : 'Selected Parcel'}</h3>
+    <div class="pp-lotplan">${lotPlan !== '—' ? 'Lot ' + lotPlan : lot !== '—' ? 'Lot ' + lot + ' on ' + plan : 'Lat ' + latlng.lat.toFixed(5) + ', Lng ' + latlng.lng.toFixed(5)}</div>
+  </div>`;
+
+  // Property Details section
+  html += `<div class="pp-section">
+    <div class="pp-section-title">Property Details</div>
+    <div class="pp-grid">
+      <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Tenure</div><div class="pp-field-val">${tenure}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
+      <div class="pp-field"><div class="pp-field-label">LGA</div><div class="pp-field-val">${lga}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Elevation</div><div class="pp-field-val">${elevation !== '—' ? elevation + 'm AHD' : '—'}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Coordinates</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:10px">${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}</div></div>
+    </div>
+  </div>`;
+
+  // Planning Information section
+  html += `<div class="pp-section">
+    <div class="pp-section-title">Planning Information</div>
+    <div class="pp-grid">
+      <div class="pp-field"><div class="pp-field-label">Land Use</div><div class="pp-field-val pp-zone" style="background:rgba(139,92,246,.15);color:#8b5cf6">${landUseClass}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Priority Dev Area</div><div class="pp-field-val">${pdaName || 'Not in PDA'}</div></div>
+    </div>`;
+  if (pdaName) {
+    html += `<div style="margin-top:8px"><span class="pp-overlay-tag" style="background:rgba(59,130,246,.12);color:#3b82f6">${pdaName}</span></div>`;
+  }
+  html += `</div>`;
+
+  // Koala habitat
+  const koalaStatus = r.koala ? 'Habitat Identified' : 'Unaffected';
+  const koalaClass = r.koala ? 'affected' : 'clear';
+
+  // Heritage
+  const heritageStatus = r.heritage ? 'Heritage Area' : 'Unaffected';
+  const heritageClass = r.heritage ? 'moderate' : 'clear';
+
+  // Acid sulfate
+  const acidStatus = r.acid ? 'Affected' : 'Unaffected';
+  const acidClass = r.acid ? 'moderate' : 'clear';
+
+  // Hazard section (Landchecker-style grid)
+  html += `<div class="pp-section">
+    <div class="pp-section-title">Hazard Assessment</div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M20 14c0 4-3.6 7-8 7s-8-3-8-7 4-10 8-14c4 4 8 10 8 14z"/></svg></div>Flood</div>
+      <span class="pp-status ${floodClass}">${floodStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2-3 4-5.5 4-7.5a4 4 0 0 0-8 0c0 2 2 4.5 4 7.5z"/><path d="M5 21h14"/></svg></div>Bushfire</div>
+      <span class="pp-status clear">Check Layer</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M2 22L12 2l10 20H2z"/></svg></div>Landslide</div>
+      <span class="pp-status clear">Check Layer</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg></div>Acid Sulfate</div>
+      <span class="pp-status ${acidClass}">${acidStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></div>Heritage</div>
+      <span class="pp-status ${heritageClass}">${heritageStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 22c-4 0-8-3-8-7 0-3 2-6 4-8l4 3 4-3c2 2 4 5 4 8 0 4-4 7-8 7z"/></svg></div>Koala Habitat</div>
+      <span class="pp-status ${koalaClass}">${koalaStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M20 14c0 4-3.6 7-8 7s-8-3-8-7 4-10 8-14c4 4 8 10 8 14z"/></svg></div>Floodplain Overlay</div>
+      <span class="pp-status ${fpClass}">${fpStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></div>Environmental (MSES)</div>
+      <span class="pp-status ${msesClass}">${msesStatus}</span>
+    </div>
+  </div>`;
+
+  // MSES details if affected
+  if (msesDetails.length > 0) {
+    html += `<div class="pp-section"><div class="pp-section-title">Environmental Overlays</div>`;
+    msesDetails.forEach(d => { html += `<span class="pp-overlay-tag">${d}</span>`; });
+    html += `</div>`;
+  }
+
+  // Subdivision Quick Assessment
+  const noFlood = !r.flood;
+  const noFloodplain = !r.floodplain;
+  const noMSES = !r.mses || r.mses.length === 0;
+  const noAcid = !r.acid;
+  const noKoala = !r.koala;
+  const noHeritage = !r.heritage;
+  const isPDA = !!r.pda;
+  const bigEnough = area && area > 2000;
+  let score = 0;
+  if (noFlood) score += 15;
+  if (noFloodplain) score += 10;
+  if (noMSES) score += 12;
+  if (noAcid) score += 8;
+  if (noKoala) score += 10;
+  if (noHeritage) score += 5;
+  if (isPDA) score += 15;
+  if (bigEnough) score += 15;
+  score = Math.min(score, 100);
+  const scoreClass = score >= 70 ? '#22c55e' : score >= 40 ? '#f59e0b' : '#ef4444';
+
+  html += `<div class="pp-section">
+    <div class="pp-section-title">Subdivision Quick Check</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:44px;height:44px;border-radius:50%;border:3px solid ${scoreClass};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:${scoreClass};font-family:'SF Mono',Consolas,monospace">${score}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${score >= 70 ? 'Strong Potential' : score >= 40 ? 'Moderate — Needs Review' : 'Significant Constraints'}</div>
+        <div style="font-size:10px;color:var(--dim)">Based on available government data</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--dim);line-height:1.7">
+      ${noFlood ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#ef4444">&#10007;</span>'} No historical flood lines<br>
+      ${noFloodplain ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#f59e0b">&#10007;</span>'} Outside floodplain overlay<br>
+      ${noAcid ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#f59e0b">&#10007;</span>'} No acid sulfate soils<br>
+      ${noKoala ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#ef4444">&#10007;</span>'} No koala habitat constraints<br>
+      ${noHeritage ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#f59e0b">&#10007;</span>'} No heritage overlay<br>
+      ${noMSES ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#ef4444">&#10007;</span>'} No environmental constraints (MSES)<br>
+      ${isPDA ? '<span style="color:#22c55e">&#10003;</span> Within Priority Development Area' : '<span style="color:var(--dim)">&#8212;</span> Not in PDA (standard DA process)'}<br>
+      ${bigEnough ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#f59e0b">&#10007;</span>'} ${area ? 'Land area: ' + areaDisplay : 'Area data unavailable'}
+    </div>
+  </div>`;
+
+  // Actions
+  html += `<div class="pp-actions">
+    <button class="btn btn-p" onclick="openModal('deal')">+ Add to Pipeline</button>
+    <button class="btn btn-o" onclick="window.open('https://qldglobe.information.qld.gov.au/?ll=${latlng.lat},${latlng.lng}&z=17','_blank')">Open in QldGlobe</button>
+  </div>`;
+
+  content.innerHTML = html;
+}
 
 // Radar toggle
 let radarVisible = true;
