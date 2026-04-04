@@ -563,6 +563,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
             <button class="size-btn" onclick="toggleSizeFilter(10000)" data-size="10000">1 Ha+</button>
             <button class="size-btn" onclick="toggleSizeFilter(20000)" data-size="20000">2 Ha+</button>
           </div>
+          <div id="sizeFilterStatus" style="font-size:9px;margin-top:4px;min-height:12px"></div>
         </div>
         <div class="lp-group" style="color:#a78bfa">Planning</div>
         <label class="lp-item" data-layer="landuse">
@@ -3341,6 +3342,9 @@ function initFullMapLayers() {
       identifyParcel(e.latlng);
     }, 100);
   });
+
+  // Size filter: re-query when map pans/zooms
+  mapFull.on('moveend', _onMapMoveSize);
 }
 
 // ─── COUNCIL MAPPING LINKS ───
@@ -3585,13 +3589,16 @@ function showTrackingModal(lotPlan, address, lat, lng, lga, zone, area) {
 // ─── LAND SIZE FILTER ───
 var activeSizeFilter = 0;
 var sizeFilterLayer = null;
-var sizeFilterLoading = false;
+var sizeFilterAbort = null; // abort controller for in-flight requests
 
 function toggleSizeFilter(minSqm) {
   // Update button states
   document.querySelectorAll('.size-btn').forEach(function(b) {
     b.classList.toggle('active', parseInt(b.dataset.size) === minSqm);
   });
+
+  // Abort any in-flight query
+  if (sizeFilterAbort) { try { sizeFilterAbort.abort(); } catch(e){} sizeFilterAbort = null; }
 
   // If same filter clicked or Off, remove existing
   if (minSqm === 0 || minSqm === activeSizeFilter) {
@@ -3601,6 +3608,7 @@ function toggleSizeFilter(minSqm) {
     }
     activeSizeFilter = 0;
     document.querySelectorAll('.size-btn[data-size="0"]').forEach(function(b){ b.classList.add('active'); });
+    document.getElementById('sizeFilterStatus').textContent = '';
     return;
   }
 
@@ -3612,62 +3620,113 @@ function toggleSizeFilter(minSqm) {
     sizeFilterLayer = null;
   }
 
-  // Use esri featureLayer with a where clause to only load parcels >= threshold
-  // DCDB Layer 4 has lot_area field in square metres
-  var cadastralUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/4';
+  // Show loading
+  document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#00d4aa">Loading parcels...</span>';
 
-  // Pick colour based on size tier
-  var fillColor, borderColor, fillOpacity;
-  if (minSqm >= 20000) {
-    fillColor = '#f59e0b'; borderColor = '#d97706'; fillOpacity = 0.30;
-  } else if (minSqm >= 10000) {
-    fillColor = '#f59e0b'; borderColor = '#d97706'; fillOpacity = 0.25;
-  } else if (minSqm >= 4000) {
-    fillColor = '#eab308'; borderColor = '#ca8a04'; fillOpacity = 0.20;
-  } else {
-    fillColor = '#eab308'; borderColor = '#ca8a04'; fillOpacity = 0.18;
+  // Query current map bounds
+  fetchSizeParcels(minSqm);
+}
+
+function fetchSizeParcels(minSqm) {
+  if (!window.mapFull || activeSizeFilter !== minSqm) return;
+
+  var bounds = window.mapFull.getBounds();
+  var zoom = window.mapFull.getZoom();
+  if (zoom < 13) {
+    document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#f59e0b">Zoom in to see parcels (min zoom 13)</span>';
+    return;
   }
 
-  sizeFilterLayer = L.esri.featureLayer({
-    url: cadastralUrl,
+  var env = {
+    xmin: bounds.getWest(), ymin: bounds.getSouth(),
+    xmax: bounds.getEast(), ymax: bounds.getNorth(),
+    spatialReference: {wkid: 4326}
+  };
+
+  var cadastralUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/4/query';
+  var qp = new URLSearchParams({
+    geometry: JSON.stringify(env),
+    geometryType: 'esriGeometryEnvelope',
+    spatialRel: 'esriSpatialRelIntersects',
     where: 'lot_area >= ' + minSqm,
-    minZoom: 13,
-    maxZoom: 19,
-    style: function(feature) {
-      // Graduated colour — bigger parcels get more intense
-      var a = (feature.properties && feature.properties.lot_area) ? feature.properties.lot_area : minSqm;
-      var intensity = Math.min(1, a / 40000); // scale 0-1 over 4ha
-      var fo = fillOpacity + (intensity * 0.15);
-      return {
-        color: borderColor,
-        weight: 2,
-        opacity: 0.85,
-        fillColor: fillColor,
-        fillOpacity: Math.min(fo, 0.45)
-      };
-    },
-    onEachFeature: function(feature, layer) {
-      var p = feature.properties || {};
-      var areaSqm = p.lot_area || 0;
-      var areaDisp = areaSqm > 10000 ? (areaSqm / 10000).toFixed(2) + ' ha' : Math.round(areaSqm).toLocaleString() + ' m\u00B2';
-      var lotplan = p.lotplan || p.lot_plan || (p.lot && p.plan ? p.lot + '/' + p.plan : '');
-      layer.bindTooltip(
-        '<div style="font-size:11px;font-weight:700;color:#f59e0b">' + areaDisp + '</div>' +
-        (lotplan ? '<div style="font-size:10px;color:#e2e8f0">' + lotplan + '</div>' : '') +
-        (p.shire_name ? '<div style="font-size:9px;color:#94a3b8">' + p.shire_name + '</div>' : ''),
-        {className: 'tracked-tooltip', direction: 'top', offset: [0, -5], sticky: true}
-      );
-    }
+    outFields: 'lot_area,lotplan,lot_plan,lot,plan,shire_name',
+    returnGeometry: 'true',
+    resultRecordCount: '500',
+    outSR: '4326',
+    f: 'json'
   });
 
-  sizeFilterLayer.addTo(window.mapFull);
+  sizeFilterAbort = new AbortController();
+  fetch(cadastralUrl + '?' + qp.toString(), {signal: sizeFilterAbort.signal})
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (activeSizeFilter !== minSqm) return; // filter changed while loading
+      // Remove old layer
+      if (sizeFilterLayer && window.mapFull) {
+        window.mapFull.removeLayer(sizeFilterLayer);
+      }
 
-  // Count feedback
-  sizeFilterLayer.on('load', function() {
-    var count = 0;
-    sizeFilterLayer.eachFeature(function() { count++; });
-    console.log('Size filter: ' + count + ' parcels >= ' + minSqm + ' m² in view');
-  });
+      var group = L.layerGroup();
+      var count = 0;
+
+      if (data.features && data.features.length > 0) {
+        data.features.forEach(function(f) {
+          if (!f.geometry || !f.geometry.rings) return;
+          var attrs = f.attributes || {};
+          var areaSqm = attrs.lot_area || 0;
+
+          // Convert ArcGIS rings [lng,lat] to Leaflet [lat,lng]
+          var latlngs = f.geometry.rings.map(function(ring) {
+            return ring.map(function(pt) { return [pt[1], pt[0]]; });
+          });
+
+          // Graduated colour — bigger = brighter
+          var intensity = Math.min(1, areaSqm / 40000);
+          var fillOp = 0.18 + (intensity * 0.17);
+
+          var poly = L.polygon(latlngs, {
+            color: '#00d4aa',
+            weight: 2.5,
+            opacity: 0.9,
+            fillColor: '#00d4aa',
+            fillOpacity: fillOp
+          });
+
+          // Tooltip with area info
+          var areaDisp = areaSqm > 10000 ? (areaSqm / 10000).toFixed(2) + ' ha' : Math.round(areaSqm).toLocaleString() + ' m\u00B2';
+          var lotplan = attrs.lotplan || attrs.lot_plan || '';
+          poly.bindTooltip(
+            '<div style="font-size:12px;font-weight:700;color:#00d4aa">' + areaDisp + '</div>' +
+            (lotplan ? '<div style="font-size:10px;color:#e2e8f0">' + lotplan + '</div>' : '') +
+            (attrs.shire_name ? '<div style="font-size:9px;color:#94a3b8">' + attrs.shire_name + '</div>' : ''),
+            {className: 'tracked-tooltip', direction: 'top', offset: [0, -5], sticky: true}
+          );
+
+          group.addLayer(poly);
+          count++;
+        });
+      }
+
+      sizeFilterLayer = group;
+      sizeFilterLayer.addTo(window.mapFull);
+      document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#00d4aa">' + count + ' parcel' + (count !== 1 ? 's' : '') + ' found</span>';
+      console.log('Size filter: ' + count + ' parcels >= ' + minSqm + ' m\u00B2 in view');
+    })
+    .catch(function(err) {
+      if (err.name === 'AbortError') return;
+      console.log('Size filter error:', err);
+      document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#ef4444">Query failed — try zooming in</span>';
+    });
+}
+
+// Re-query when map moves (debounced)
+var _sizeFilterTimer = null;
+function _onMapMoveSize() {
+  if (!activeSizeFilter) return;
+  clearTimeout(_sizeFilterTimer);
+  _sizeFilterTimer = setTimeout(function() {
+    fetchSizeParcels(activeSizeFilter);
+  }, 600);
 }
 
 // Toggle tracked property layer visibility
