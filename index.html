@@ -276,6 +276,16 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .map-zoom-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid rgba(20,23,34,.9);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:transform .12s}
 .map-zoom-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
 .map-zoom-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid rgba(20,23,34,.9);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.map-style-toggle{position:absolute;top:12px;right:12px;z-index:1002;display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.map-style-btn{padding:6px 12px;font-size:10px;font-weight:600;background:rgba(20,23,34,.92);backdrop-filter:blur(10px);color:var(--dim);border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.map-style-btn:hover{color:var(--text)}
+.map-style-btn.active{background:var(--accent);color:#0a0d14}
+.aerial-modal{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.aerial-modal.open{display:flex}
+.aerial-box{width:90vw;max-width:900px;height:75vh;border-radius:14px;overflow:hidden;border:1px solid var(--border);position:relative;background:#0a0d14}
+.aerial-box .aerial-close{position:absolute;top:10px;right:10px;z-index:10;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:1px solid rgba(255,255,255,.2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.aerial-box .aerial-close:hover{background:rgba(239,68,68,.6)}
+.aerial-box .aerial-label{position:absolute;bottom:12px;left:12px;z-index:10;background:rgba(0,0,0,.75);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;backdrop-filter:blur(6px)}
 .pp-actions{padding:12px 16px;display:flex;flex-direction:column;gap:6px}
 .pp-actions .btn{width:100%;justify-content:center}
 .pp-loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:12px;gap:8px}
@@ -1408,6 +1418,15 @@ tr:hover td{background:rgba(255,255,255,.015)}
 </div>
 
 <!-- ═══ ADD BUYER MODAL ═══ -->
+<!-- AERIAL VIEW MODAL -->
+<div class="aerial-modal" id="aerialModal" onclick="if(event.target===this)closeAerial()">
+  <div class="aerial-box">
+    <button class="aerial-close" onclick="closeAerial()">&times;</button>
+    <div id="aerialMap" style="width:100%;height:100%"></div>
+    <div class="aerial-label" id="aerialLabel">Aerial View</div>
+  </div>
+</div>
+
 <div class="modal-bg" id="modal-buyer">
   <div class="modal">
     <h3>Add New Buyer</h3>
@@ -2198,17 +2217,65 @@ function addCadastral(mi) {
 
 // Dashboard map removed — use full map page instead
 
+// Tile layers
+const satUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const satOpts = { attribution:'© Esri', maxZoom:19 };
+
 let mapFull;
 setTimeout(() => {
   mapFull = L.map('map-full',{zoomControl:false}).setView([-27.6,152.8],9);
-  L.tileLayer(tileUrl,tileOpts).addTo(mapFull);
-  // Cadastral managed via layer panel — don't use addCadastral here
+  var streetLayer = L.tileLayer(tileUrl,tileOpts).addTo(mapFull);
+  var satLayer = L.tileLayer(satUrl,satOpts);
+  addMapStyleToggle(mapFull, streetLayer, satLayer);
   // markers removed from main map — competitors now on Competitors page
   addGrowthCorridors(mapFull);
   addGrowthIntelligence(mapFull);
   addMapNavControls(mapFull);
   initFullMapLayers(); // Wire up layer panel + property click
 }, 200);
+
+// ─── MAP STYLE TOGGLE (Street / Satellite) ───
+function addMapStyleToggle(mi, streetL, satL) {
+  var container = L.DomUtil.create('div','map-style-toggle');
+  L.DomEvent.disableClickPropagation(container);
+  container.innerHTML = '<button class="map-style-btn active" data-style="street">Street</button>'
+    +'<button class="map-style-btn" data-style="satellite">Satellite</button>';
+  mi.getContainer().appendChild(container);
+  container.querySelectorAll('.map-style-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      container.querySelectorAll('.map-style-btn').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      if(btn.dataset.style==='satellite'){
+        if(mi.hasLayer(streetL)) mi.removeLayer(streetL);
+        if(!mi.hasLayer(satL)) satL.addTo(mi); satL.bringToBack();
+      } else {
+        if(mi.hasLayer(satL)) mi.removeLayer(satL);
+        if(!mi.hasLayer(streetL)) streetL.addTo(mi); streetL.bringToBack();
+      }
+    });
+  });
+}
+
+// ─── AERIAL VIEW MODAL ───
+var aerialMapInstance = null;
+function openAerial(lat, lng, label) {
+  var modal = document.getElementById('aerialModal');
+  modal.classList.add('open');
+  document.getElementById('aerialLabel').textContent = label || 'Aerial View';
+  if(!aerialMapInstance) {
+    aerialMapInstance = L.map('aerialMap',{zoomControl:true}).setView([lat,lng],18);
+    L.tileLayer(satUrl,satOpts).addTo(aerialMapInstance);
+  } else {
+    aerialMapInstance.setView([lat,lng],18);
+  }
+  setTimeout(function(){ aerialMapInstance.invalidateSize(); },100);
+  // Add a marker at the location
+  if(window._aerialMarker) aerialMapInstance.removeLayer(window._aerialMarker);
+  window._aerialMarker = L.circleMarker([lat,lng],{radius:8,color:'#00d4aa',weight:3,fillColor:'#00d4aa',fillOpacity:0.3}).addTo(aerialMapInstance);
+}
+function closeAerial() {
+  document.getElementById('aerialModal').classList.remove('open');
+}
 
 // ── Growth Corridor Gold Perimeter Overlays ──
 function addGrowthCorridors(mi) {
@@ -3809,7 +3876,11 @@ function renderPropPanel(latlng, r) {
 
   // Actions
   html += `<div class="pp-actions">
-    <button class="btn btn-p" onclick="openModal('deal')">+ Add to Pipeline</button>
+    <button class="btn btn-p" onclick="openAerial(${latlng.lat},${latlng.lng},'${(streetAddress||lotPlan).replace(/'/g,"\\'")}')">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+      Aerial View
+    </button>
+    <button class="btn btn-o" onclick="openModal('deal')">+ Add to Pipeline</button>
     <button class="btn btn-o" onclick="window.open('https://qldglobe.information.qld.gov.au/?ll=${latlng.lat},${latlng.lng}&z=17','_blank')">Open in QldGlobe</button>
   </div>`;
 
@@ -3823,9 +3894,11 @@ function initCompMap(){
   var el = document.getElementById('comp-map');
   if(!el) return;
   compMap = L.map(el,{zoomControl:false}).setView([-27.6,152.8],9);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  var compStreet = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     attribution:'&copy; OSM &copy; CARTO',maxZoom:18
   }).addTo(compMap);
+  var compSat = L.tileLayer(satUrl,satOpts);
+  addMapStyleToggle(compMap, compStreet, compSat);
 
   // Add only competitor markers with radar rings
   var compMarkers = markers.filter(function(m){ return m.t==='competitor'; });
