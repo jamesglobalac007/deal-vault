@@ -322,6 +322,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="nav-item" data-page="council-hub"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg></span>Council Hub</div>
       <div class="nav-item" data-page="competitors"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Competitors</div>
       <div class="nav-item" data-page="analytics"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</div>
+      <div class="nav-item" data-page="targeting" style="color:#ec4899"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>Targeting Intel<span class="badge" style="background:#ec4899">NEW</span></div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">Buyers</div>
@@ -860,6 +861,53 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="growth-item"><span>Flagstone 18ha</span><span style="font-weight:600;color:var(--option)">Active — 5 months left</span></div>
           <div class="growth-item"><span>Highfields 8.5ha</span><span style="font-weight:600;color:var(--novate)">Novating to buyer</span></div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TARGETING INTELLIGENCE PAGE ═══ -->
+<div class="page" id="targeting">
+  <div style="margin-bottom:20px">
+    <h3 style="font-size:20px;font-weight:700;margin-bottom:4px">Developer Targeting Intelligence</h3>
+    <p style="color:var(--dim);font-size:13px">Scoring algorithm synthesising ShapingSEQ 2023 dwelling targets, EDQ PDA pipeline, BITRE employment data, 30 RSI infrastructure projects, and population growth forecasts to rank SEQ locations for acquisition, development, and flip potential.</p>
+  </div>
+  <div class="stats-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat"><div class="stat-label">New Dwellings Needed</div><div class="stat-val" style="color:#ec4899">863,800</div><div class="stat-sub" style="color:var(--dim)">SEQ 2021-2046 target</div></div>
+    <div class="stat"><div class="stat-label">Active PDAs</div><div class="stat-val" style="color:#3b82f6">34</div><div class="stat-sub" style="color:var(--dim)">EDQ accelerated zones</div></div>
+    <div class="stat"><div class="stat-label">RSI Projects</div><div class="stat-val" style="color:#f59e0b">30</div><div class="stat-sub" style="color:var(--dim)">Region-shaping infrastructure</div></div>
+    <div class="stat"><div class="stat-label">Pop Growth to 2046</div><div class="stat-val" style="color:#22c55e">+2.16M</div><div class="stat-sub" style="color:var(--dim)">3.79M → 5.95M residents</div></div>
+  </div>
+  <div id="targeting-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+    <!-- Filled by JS -->
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head"><h4>LGA Targeting Scorecard — Developer Opportunity Ranking</h4></div>
+    <div style="overflow-x:auto">
+      <table id="targeting-table">
+        <thead><tr>
+          <th>Rank</th><th>LGA</th><th style="color:#ec4899">Score /100</th><th>Strategy</th>
+          <th>Dwelling Gap</th><th>Expand %</th><th>Pop Growth</th><th>RSI Proximity</th>
+          <th>PDA/PFGA</th><th>Competitor Heat</th><th>Why Target</th>
+        </tr></thead>
+        <tbody id="targeting-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card">
+      <div class="card-head"><h4>Top 5 Hotspot Corridors — Buy Now</h4></div>
+      <div class="card-body" id="hotspot-corridors"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h4>Scoring Methodology</h4></div>
+      <div class="card-body" style="font-size:12px;color:var(--dim);line-height:1.7">
+        <div style="margin-bottom:8px"><strong style="color:var(--text)">Dwelling Supply Gap (25pts)</strong> — Difference between 2046 target and current stock. Larger gap = more demand for new lots.</div>
+        <div style="margin-bottom:8px"><strong style="color:var(--text)">Expansion Ratio (20pts)</strong> — % of growth on greenfield vs infill. Higher expansion = more subdivision opportunity.</div>
+        <div style="margin-bottom:8px"><strong style="color:var(--text)">Population Growth Rate (15pts)</strong> — Projected growth rate to 2046. Faster growth = stronger demand.</div>
+        <div style="margin-bottom:8px"><strong style="color:var(--text)">Infrastructure Investment (15pts)</strong> — Proximity to RSI projects (rail, road, social). Infrastructure drives land value.</div>
+        <div style="margin-bottom:8px"><strong style="color:var(--text)">PDA/PFGA Catalyst (15pts)</strong> — Government-accelerated zones with streamlined approvals and trunk infrastructure funding.</div>
+        <div><strong style="color:var(--text)">Competitor Validation (10pts)</strong> — Presence of Stockland, Lendlease, Peet, AVID etc. validates demand. Sweet spot: some competitors but not saturated.</div>
       </div>
     </div>
   </div>
@@ -2634,6 +2682,188 @@ function toggleRadar(){
     btn.classList.remove('btn-p'); btn.classList.add('btn-o');
   }
 }
+
+/* ── TARGETING INTELLIGENCE ENGINE ── */
+// Developer Targeting Algorithm — synthesises all research data sources
+(function buildTargetingIntel() {
+  const targetingData = [
+    { lga: 'Logan', current: 125700, target2046: 235900, expandPct: 58, popGrowthRate: 3.9, popGrowth: 316400,
+      rsiProjects: ['RSI 5: Gold Coast Rail Line Capacity', 'RSI 7: Coomera Connector', 'RSI 19: Mt Lindesay Hwy (Jimboomba-Beaudesert)', 'RSI 20: Centenary Hwy Extension'],
+      pdas: ['Greater Flagstone PDA (51,500 dw)', 'Yarrabilba PDA (20,000 dw)'], pfgas: ['G — South Logan Industrial', 'H — Buccan', 'J — Mundoolun'],
+      competitors: ['Stockland Yarrabilba', 'Peet Flagstone', 'AVID Greenbank', 'QM Properties Flagstone'],
+      strategy: 'BUY + DEVELOP', stratColor: '#22c55e',
+      why: 'Fastest growing LGA in QLD at 3.9% p.a. Largest broad-hectare supply (8,153ha) in SEQ. Two mega-PDAs delivering 71,500+ lots with EDQ trunk infrastructure. 58% expansion ratio means massive greenfield subdivision opportunity. Three PFGAs signal long-term government commitment. Mt Lindesay Hwy upgrade and Coomera Connector will transform accessibility.',
+      broadHectare: 8153, corridors: ['Flagstone-Yarrabilba', 'Park Ridge-Chambers Flat', 'Greenbank-North Maclean'] },
+    { lga: 'Ipswich', current: 87000, target2046: 177000, expandPct: 65, popGrowthRate: 3.5, popGrowth: 246700,
+      rsiProjects: ['RSI 4: Ipswich to Springfield PT Corridor', 'RSI 10: Inland Rail (Ebenezer Intermodal)', 'RSI 22: Ipswich Motorway (Rocklea-Darra)', 'RSI 23: Warrego Hwy (Ipswich-Toowoomba)'],
+      pdas: ['Ripley Valley PDA (48,750 dw)', 'Springfield PDA'], pfgas: ['D — Lanefield/Grandchester', 'E — Glamorgan Vale'],
+      competitors: ['Stockland Ripley', 'Springfield Rise', 'AVID Redbank Plains', 'Sekisui House Ecco Ripley'],
+      strategy: 'BUY + DEVELOP', stratColor: '#22c55e',
+      why: 'Highest expansion ratio in metro SEQ (65%). Ripley Valley PDA alone delivers 48,750 lots with $1B+ infrastructure. Inland Rail intermodal at Ebenezer will create massive employment hub. Ipswich to Springfield PT corridor unlocks new transit-oriented development. Western Corridor growing at 4.8% p.a. per BITRE — fastest in SEQ.',
+      broadHectare: 6200, corridors: ['Ripley Valley', 'Springfield-Redbank Plains', 'Walloon-Rosewood'] },
+    { lga: 'Moreton Bay', current: 188100, target2046: 313900, expandPct: 45, popGrowthRate: 2.8, popGrowth: 308300,
+      rsiProjects: ['RSI 1: Beerburrum to Nambour Rail', 'RSI 2: Caboolture-Bribie Island Road', 'RSI 3: North Brisbane-Strathpine PT Corridor', 'RSI 13: Bruce Hwy (Pine River-Caloundra Rd)', 'RSI 14: Bruce Hwy (Caboolture-Steve Irwin Way)'],
+      pdas: ['Waraba (Caboolture West) PDA'], pfgas: [],
+      competitors: ['Stockland North Lakes', 'AVID Morayfield', 'Villaworld Burpengary'],
+      strategy: 'BUY + FLIP', stratColor: '#f59e0b',
+      why: 'Waraba PDA is the new 15,000+ lot mega-community with accelerated EDQ approvals. Five RSI projects in the northern corridor will massively boost connectivity. Bruce Hwy upgrades and Beerburrum-Nambour rail create development uplift. Cat 1 areas at Burpengary East and Elimbah are pending structure planning — early acquisition opportunity before rezoning.',
+      broadHectare: 4800, corridors: ['Caboolture West-Waraba', 'North Lakes-Mango Hill', 'Burpengary East-Elimbah'] },
+    { lga: 'Gold Coast', current: 271400, target2046: 433100, expandPct: 31, popGrowthRate: 3.3, popGrowth: 388300,
+      rsiProjects: ['RSI 5: Gold Coast Rail Line Capacity', 'RSI 6: Gold Coast Light Rail Stage 4+', 'RSI 7: Coomera Connector', 'RSI 15: M1 Varsity Lakes-Tugun', 'RSI 16: M1 Coomera Connector-Nerang'],
+      pdas: ['Coomera Town Centre PDA', 'Southport PDA', 'Surfers Paradise PDA', 'Broadbeach PDA'], pfgas: ['I — Stapylton Industrial'],
+      competitors: ['Stockland Coomera', 'Lendlease Yarrabilba', 'Peet Pimpama', 'Villaworld Ormeau'],
+      strategy: 'BUY + FLIP', stratColor: '#f59e0b',
+      why: 'Largest absolute population growth in SEQ (+388,300). Coomera Connector creates new north-south spine opening Pimpama/Ormeau corridor. Light Rail Stage 4+ extension drives density uplift along coastal strip. Olympics 2032 venues at Robina, Broadbeach, Coomera drive infrastructure spend. Northern Gold Coast (Coomera-Pimpama) is the greenfield sweet spot.',
+      broadHectare: 3500, corridors: ['Coomera-Pimpama', 'Ormeau-Stapylton', 'Northern Corridor'] },
+    { lga: 'Sunshine Coast', current: 141300, target2046: 232000, expandPct: 40, popGrowthRate: 2.6, popGrowth: 219100,
+      rsiProjects: ['RSI 1: Beerburrum to Nambour Rail', 'RSI 8: Sunshine Coast Mass Transit', 'RSI 9: Sunshine Coast Airport Expansion', 'RSI 13: Bruce Hwy (Pine River-Caloundra Rd)'],
+      pdas: ['Caloundra South (Aura) PDA', 'Maroochydore PDA', 'Palmview PDA'], pfgas: ['F — Halls Creek'],
+      competitors: ['Stockland Aura', 'AVID Harmony', 'Peet Palmview'],
+      strategy: 'BUY + DEVELOP', stratColor: '#22c55e',
+      why: 'Aura is Australia\'s largest master-planned community. Mass transit system will transform coastal corridor density. Airport expansion creates economic catalyst and employment. Beerburrum-Nambour rail doubles capacity. Halls Creek PFGA signals post-2046 expansion. 40% expansion ratio with strong demand from SEQ southern migration.',
+      broadHectare: 3900, corridors: ['Caloundra South-Aura', 'Palmview-Sippy Downs', 'Beerwah East'] },
+    { lga: 'Toowoomba', current: 60000, target2046: 91300, expandPct: 50, popGrowthRate: 2.0, popGrowth: 81000,
+      rsiProjects: ['RSI 10: Inland Rail', 'RSI 11: Toowoomba Bypass + 2nd Range Crossing', 'RSI 26: Warrego Hwy Upgrade', 'RSI 28: New England Hwy (Highfields Bypass)', 'RSI 30: New England Hwy South'],
+      pdas: [], pfgas: ['A — Wellcamp Employment', 'B — Westbrook', 'C — Highfields'],
+      competitors: ['McNab Homes', 'Aveo Highfields'],
+      strategy: 'BUY + FLIP', stratColor: '#f59e0b',
+      why: 'Inland Rail intermodal at Wellcamp will be transformative — 1,700km Melbourne to Brisbane freight link. Toowoomba Bypass complete, opening Highfields and western expansion. Three PFGAs signal government commitment. Low competitor saturation = first-mover advantage. Affordable entry point ($200-350K/lot) vs metro SEQ. Wellcamp Airport adds employment catalyst.',
+      broadHectare: 2800, corridors: ['Highfields North', 'Westbrook-Glenvale', 'Wellcamp Employment'] },
+    { lga: 'Scenic Rim', current: 18200, target2046: 27900, expandPct: 65, popGrowthRate: 1.8, popGrowth: 0,
+      rsiProjects: ['RSI 19: Mt Lindesay Hwy', 'RSI 20: Centenary Hwy Extension'],
+      pdas: ['Bromelton SDA'], pfgas: ['J — Mundoolun', 'K — Beaudesert East'],
+      competitors: [],
+      strategy: 'BUY + HOLD', stratColor: '#3b82f6',
+      why: 'Highest expansion ratio (65%) with two PFGAs and Bromelton State Development Area for industrial. Zero major competitor presence = genuine first-mover territory. Mt Lindesay Hwy upgrade will connect to Logan mega-growth. Beaudesert East PFGA is future urban expansion. Affordable land banking play with 10-15 year horizon. Logan overspill will drive demand.',
+      broadHectare: 1500, corridors: ['Beaudesert-Bromelton', 'Canungra-Tamborine', 'Mundoolun Connection'] },
+    { lga: 'Lockyer Valley', current: 16700, target2046: 25800, expandPct: 60, popGrowthRate: 1.8, popGrowth: 0,
+      rsiProjects: ['RSI 10: Inland Rail', 'RSI 23: Warrego Hwy'],
+      pdas: [], pfgas: ['D — Lanefield/Grandchester'],
+      competitors: [],
+      strategy: 'BUY + HOLD', stratColor: '#3b82f6',
+      why: 'Inland Rail will put Lockyer Valley on the national freight map. Warrego Hwy upgrade improves Brisbane connectivity to <60 min. Lanefield/Grandchester PFGA signals long-term residential expansion. Ultra-affordable entry ($150-250K). Zero competitor saturation. Gatton and Plainland growing as Ipswich overspill. Agricultural land transition play.',
+      broadHectare: 1200, corridors: ['Plainland-Laidley', 'Gatton Growth', 'Grandchester PFGA'] },
+    { lga: 'Somerset', current: 10300, target2046: 16000, expandPct: 65, popGrowthRate: 1.5, popGrowth: 0,
+      rsiProjects: [],
+      pdas: [], pfgas: ['E — Glamorgan Vale'],
+      competitors: [],
+      strategy: 'BUY + HOLD', stratColor: '#3b82f6',
+      why: 'Glamorgan Vale PFGA connects to Ipswich growth corridor. Highest expansion ratio (65%) in rural LGAs. Fernvale and Lowood growing as Ipswich overspill. Ultra-affordable entry with long-term upside. Limited infrastructure investment currently — this is a patient capital play.',
+      broadHectare: 800, corridors: ['Fernvale-Lowood', 'Glamorgan Vale PFGA'] },
+    { lga: 'Brisbane', current: 398500, target2046: 729300, expandPct: 8, popGrowthRate: 1.5, popGrowth: 462400,
+      rsiProjects: ['RSI 12: Cross River Rail', 'RSI 21: Gateway Mwy South', 'RSI 24: Centenary Bridge', 'RSI 25: Inner City Bypass Upgrade'],
+      pdas: ['Northshore Hamilton PDA', 'Woolloongabba PDA', 'Bowen Hills PDA', 'Carseldine Village PDA'], pfgas: [],
+      competitors: ['Lendlease', 'Mirvac', 'Brookfield', 'QIC'],
+      strategy: 'INFILL ONLY', stratColor: '#8b5cf6',
+      why: 'Largest absolute dwelling need (330,800 new) but 92% consolidation = infill/medium density focus, not greenfield subdivision. Cross River Rail corridor creates transit-oriented opportunities. Olympics 2032 precincts drive urban renewal. High entry cost but premium returns. Target: knockdown-rebuild, townhouse sites, small-lot infill near CRR stations.',
+      broadHectare: 500, corridors: ['CRR Station Precincts', 'Northshore-Newstead', 'Carseldine Village'] },
+    { lga: 'Redland', current: 65000, target2046: 84800, expandPct: 25, popGrowthRate: 1.2, popGrowth: 0,
+      rsiProjects: ['RSI 18: Eastern Busway Extension', 'RSI 21: Gateway Mwy South'],
+      pdas: ['Southern Thornlands PDA (declared Apr 2025)'], pfgas: [],
+      competitors: [],
+      strategy: 'BUY + FLIP', stratColor: '#f59e0b',
+      why: 'Brand new Southern Thornlands PDA (890ha) declared April 2025 — ground floor opportunity. Eastern Busway Extension improves PT connectivity. Low competitor presence. Moderate dwelling gap but new PDA creates accelerated approval pathway. Bayside lifestyle premium supports pricing.',
+      broadHectare: 890, corridors: ['Southern Thornlands PDA', 'Victoria Point-Redland Bay'] },
+    { lga: 'Noosa', current: 28300, target2046: 48100, expandPct: 25, popGrowthRate: 2.0, popGrowth: 0,
+      rsiProjects: ['RSI 1: Beerburrum to Nambour Rail'],
+      pdas: [], pfgas: [],
+      competitors: [],
+      strategy: 'PREMIUM HOLD', stratColor: '#a855f7',
+      why: 'Lifestyle premium market with strong price growth. Rail upgrade improves connectivity. 75% consolidation limits supply = price pressure. Target: infill townhouse sites in Noosaville/Tewantin. Long-term hold with capital appreciation play.',
+      broadHectare: 400, corridors: ['Noosaville Infill', 'Cooroy-Pomona'] }
+  ];
+
+  // Scoring algorithm
+  function calcScore(d) {
+    var dwellingGap = d.target2046 - d.current;
+    var maxGap = 330800; // Brisbane has the biggest gap
+    var gapScore = Math.min(25, (dwellingGap / maxGap) * 25);
+    var expandScore = (d.expandPct / 65) * 20; // 65% is max
+    var growthScore = (d.popGrowthRate / 3.9) * 15; // 3.9% is Logan's rate
+    var infraScore = Math.min(15, (d.rsiProjects.length / 5) * 15);
+    var pdaPfgaCount = d.pdas.length + d.pfgas.length;
+    var catalystScore = Math.min(15, (pdaPfgaCount / 5) * 15);
+    var compCount = d.competitors.length;
+    var compScore = compCount === 0 ? 3 : compCount <= 2 ? 7 : compCount <= 4 ? 10 : 6;
+    return Math.round(gapScore + expandScore + growthScore + infraScore + catalystScore + compScore);
+  }
+
+  targetingData.forEach(function(d) { d.score = calcScore(d); });
+  targetingData.sort(function(a, b) { return b.score - a.score; });
+
+  // Render table
+  var tbody = document.getElementById('targeting-tbody');
+  if (!tbody) return;
+  var html = '';
+  targetingData.forEach(function(d, i) {
+    var gap = d.target2046 - d.current;
+    var barW = Math.round((d.score / 100) * 100);
+    var barColor = d.score >= 80 ? '#22c55e' : d.score >= 60 ? '#f59e0b' : d.score >= 40 ? '#3b82f6' : '#7a8194';
+    html += '<tr>';
+    html += '<td style="font-weight:700;font-size:16px;color:' + (i < 3 ? '#ec4899' : 'var(--text)') + '">#' + (i + 1) + '</td>';
+    html += '<td><strong>' + d.lga + '</strong></td>';
+    html += '<td><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:700;color:' + barColor + '">' + d.score + '</span>';
+    html += '<div style="width:60px;height:6px;background:var(--border);border-radius:3px"><div style="width:' + barW + '%;height:100%;background:' + barColor + ';border-radius:3px"></div></div></div></td>';
+    html += '<td><span style="background:' + d.stratColor + '22;color:' + d.stratColor + ';padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700">' + d.strategy + '</span></td>';
+    html += '<td>' + gap.toLocaleString() + '</td>';
+    html += '<td>' + d.expandPct + '%</td>';
+    html += '<td>' + d.popGrowthRate + '% p.a.</td>';
+    html += '<td>' + d.rsiProjects.length + ' projects</td>';
+    html += '<td>' + d.pdas.length + ' PDAs / ' + d.pfgas.length + ' PFGAs</td>';
+    html += '<td>' + d.competitors.length + ' active</td>';
+    html += '<td style="font-size:11px;color:var(--dim);max-width:300px">' + d.why.substring(0, 120) + '...</td>';
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+
+  // Render top hotspot grid cards (top 4)
+  var grid = document.getElementById('targeting-grid');
+  if (!grid) return;
+  var ghtml = '';
+  targetingData.slice(0, 4).forEach(function(d) {
+    var gap = d.target2046 - d.current;
+    ghtml += '<div class="card"><div class="card-head"><h4>' + d.lga + '</h4>';
+    ghtml += '<span style="background:' + d.stratColor + '22;color:' + d.stratColor + ';padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700">' + d.strategy + ' | Score: ' + d.score + '/100</span></div>';
+    ghtml += '<div class="card-body" style="font-size:12px;line-height:1.8">';
+    ghtml += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
+    ghtml += '<div><span style="color:var(--dim)">Dwelling Gap:</span> <strong style="color:#ec4899">' + gap.toLocaleString() + '</strong></div>';
+    ghtml += '<div><span style="color:var(--dim)">Expansion:</span> <strong>' + d.expandPct + '% greenfield</strong></div>';
+    ghtml += '<div><span style="color:var(--dim)">Growth Rate:</span> <strong style="color:#22c55e">' + d.popGrowthRate + '% p.a.</strong></div>';
+    ghtml += '<div><span style="color:var(--dim)">Broad-hectare:</span> <strong>' + d.broadHectare.toLocaleString() + ' ha</strong></div>';
+    ghtml += '</div>';
+    ghtml += '<div style="margin-bottom:8px"><strong style="color:#f59e0b">RSI Infrastructure (' + d.rsiProjects.length + '):</strong> ' + d.rsiProjects.join(', ') + '</div>';
+    ghtml += '<div style="margin-bottom:8px"><strong style="color:#ec4899">PDAs:</strong> ' + (d.pdas.length ? d.pdas.join(', ') : 'None') + '</div>';
+    if (d.pfgas.length) ghtml += '<div style="margin-bottom:8px"><strong style="color:#a855f7">PFGAs:</strong> ' + d.pfgas.join(', ') + '</div>';
+    ghtml += '<div style="margin-bottom:8px"><strong style="color:#ef4444">Competitors:</strong> ' + (d.competitors.length ? d.competitors.join(', ') : 'None — first mover opportunity') + '</div>';
+    ghtml += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)"><strong>Target Corridors:</strong> ' + d.corridors.join(' | ') + '</div>';
+    ghtml += '</div></div>';
+  });
+  grid.innerHTML = ghtml;
+
+  // Render top 5 hotspot corridors
+  var hotspots = document.getElementById('hotspot-corridors');
+  if (!hotspots) return;
+  var topCorridors = [
+    { name: 'Flagstone-Yarrabilba (Logan)', score: 98, reason: 'Two mega-PDAs delivering 71,500+ lots. EDQ trunk infrastructure funded ($1B+). 3.9% growth. Stockland/Peet active = demand validated. Mt Lindesay Hwy upgrade underway.', action: 'Acquire 5-20ha parcels adjacent to PDA boundaries for future expansion. Target $80-120K/ha.', type: 'DEVELOP' },
+    { name: 'Ripley Valley (Ipswich)', score: 95, reason: 'Single PDA with 48,750 lot capacity. Ipswich-Springfield PT corridor. Inland Rail employment at Ebenezer. 65% expansion ratio — most greenfield in metro.', action: 'Acquire undeveloped lots within PDA for immediate subdivision DA. Target $100-150K/ha.', type: 'DEVELOP' },
+    { name: 'Caboolture West/Waraba (Moreton Bay)', score: 89, reason: 'New mega-PDA with 15,000+ lot yield. 5 RSI projects in northern corridor. Bruce Hwy and rail upgrades. Cat 1 areas at Burpengary East pending.', action: 'Acquire on PDA fringe before structure plan locks in density. Target fringe parcels for flip to tier-1 developers.', type: 'FLIP' },
+    { name: 'Coomera-Pimpama (Gold Coast)', score: 86, reason: 'Coomera Connector opens new spine. Light Rail Stage 4. Olympics 2032 venues. Northern GC is greenfield sweet spot with proven absorption rate.', action: 'Acquire and flip 2-10ha parcels to builders/developers. Quick turn. Target $150-250K/ha.', type: 'FLIP' },
+    { name: 'Caloundra South/Aura (Sunshine Coast)', score: 82, reason: 'Australia\'s largest MPC. Mass transit coming. Airport expansion. Rail duplication. 40% expansion with strong southern migration demand.', action: 'Acquire on Aura fringe and Beerwah East (Cat 2) for medium-term hold. Target $60-100K/ha.', type: 'DEVELOP' }
+  ];
+  var hhtml = '';
+  topCorridors.forEach(function(c, i) {
+    var typeColor = c.type === 'DEVELOP' ? '#22c55e' : c.type === 'FLIP' ? '#f59e0b' : '#3b82f6';
+    hhtml += '<div style="padding:12px 0;border-bottom:1px solid var(--border)">';
+    hhtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    hhtml += '<strong style="font-size:13px">#' + (i + 1) + ' ' + c.name + '</strong>';
+    hhtml += '<span style="background:' + typeColor + '22;color:' + typeColor + ';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700">' + c.type + ' | ' + c.score + '/100</span>';
+    hhtml += '</div>';
+    hhtml += '<div style="font-size:11px;color:var(--dim);margin-bottom:4px">' + c.reason + '</div>';
+    hhtml += '<div style="font-size:11px;color:var(--accent)"><strong>Action:</strong> ' + c.action + '</div>';
+    hhtml += '</div>';
+  });
+  hotspots.innerHTML = hhtml;
+})();
 
 /* ── LOGIN LOGIC ── */
 const users = {
