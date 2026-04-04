@@ -524,6 +524,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('cat1Markers',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#14b8a6"></div>Cat 1 Dev Areas
         </label>
+        <label class="lp-item" data-layer="targetCorridors">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('targetCorridors',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ff006e"></div>Target Corridors
+        </label>
         <div class="lp-group">Boundaries</div>
         <label class="lp-item" data-layer="lga">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('lga',this.checked)"><span class="lp-slider"></span></div>
@@ -1574,6 +1578,135 @@ function addGrowthIntelligence(mi) {
   window.cat1MarkerLayers[mi._leaflet_id] = cat1Group;
 
   console.log('Growth Intelligence loaded: ' + pdaDatabase.length + ' PDAs, ' + infraDatabase.length + ' infrastructure, ' + devEstatesDatabase.length + ' estates, ' + pfgaDatabase.length + ' PFGAs, ' + cat1DevAreas.length + ' Cat 1 areas');
+
+  // ── TARGET CORRIDOR OVERLAYS ──
+  // Scored acquisition zones with strategy labels — toggle via layer panel
+  var targetCorridorGroup = L.layerGroup();
+
+  var corridorZones = [
+    // Each zone: center point, approx polygon bounds, score, strategy, color, name, key stats
+    { name: 'Flagstone-Yarrabilba', score: 98, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.12,
+      bounds: [[-27.77,152.88],[-27.77,153.13],[-27.87,153.13],[-27.87,152.88]],
+      center: [-27.82, 153.00], label: 'FLAGSTONE-YARRABILBA', sub: '71,500 lots · 2 PDAs · Score 98',
+      flyTo: [-27.82, 153.00, 12] },
+    { name: 'Ripley Valley', score: 95, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.12,
+      bounds: [[-27.62,152.68],[-27.62,152.80],[-27.73,152.80],[-27.73,152.68]],
+      center: [-27.68, 152.74], label: 'RIPLEY VALLEY', sub: '48,750 lots · Inland Rail · Score 95',
+      flyTo: [-27.68, 152.74, 12] },
+    { name: 'Caboolture West / Waraba', score: 89, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.10,
+      bounds: [[-27.01,152.80],[-27.01,152.93],[-27.11,152.93],[-27.11,152.80]],
+      center: [-27.06, 152.87], label: 'WARABA / CAB WEST', sub: '15,000+ lots · New PDA · Score 89',
+      flyTo: [-27.06, 152.87, 12] },
+    { name: 'Coomera-Pimpama', score: 86, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.10,
+      bounds: [[-27.80,153.25],[-27.80,153.38],[-27.92,153.38],[-27.92,153.25]],
+      center: [-27.86, 153.31], label: 'COOMERA-PIMPAMA', sub: 'GC growth spine · Score 86',
+      flyTo: [-27.86, 153.31, 12] },
+    { name: 'Caloundra South / Aura', score: 82, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.10,
+      bounds: [[-26.77,152.96],[-26.77,153.08],[-26.87,153.08],[-26.87,152.96]],
+      center: [-26.82, 153.02], label: 'AURA / CALOUNDRA SOUTH', sub: 'Aust largest MPC · Score 82',
+      flyTo: [-26.82, 153.02, 12] },
+    { name: 'Park Ridge-Chambers Flat', score: 78, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.08,
+      bounds: [[-27.68,153.02],[-27.68,153.13],[-27.76,153.13],[-27.76,153.02]],
+      center: [-27.72, 153.07], label: 'PARK RIDGE', sub: '+19.1% growth · Score 78',
+      flyTo: [-27.72, 153.07, 13] },
+    { name: 'Springfield-Redbank Plains', score: 75, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.08,
+      bounds: [[-27.62,152.87],[-27.62,152.97],[-27.70,152.97],[-27.70,152.87]],
+      center: [-27.66, 152.92], label: 'SPRINGFIELD', sub: 'Ipswich PT corridor · Score 75',
+      flyTo: [-27.66, 152.92, 13] },
+    { name: 'Highfields', score: 72, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.08,
+      bounds: [[-27.42,151.90],[-27.42,152.00],[-27.50,152.00],[-27.50,151.90]],
+      center: [-27.46, 151.95], label: 'HIGHFIELDS', sub: 'PFGA + Bypass · Score 72',
+      flyTo: [-27.46, 151.95, 13] },
+    { name: 'Beaudesert-Bromelton', score: 65, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
+      bounds: [[-27.93,152.88],[-27.93,153.06],[-28.03,153.06],[-28.03,152.88]],
+      center: [-27.98, 152.97], label: 'BEAUDESERT', sub: 'SDA + 2 PFGAs · Score 65',
+      flyTo: [-27.98, 152.97, 12] },
+    { name: 'Beerwah East', score: 63, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
+      bounds: [[-26.82,152.92],[-26.82,153.00],[-26.90,153.00],[-26.90,152.92]],
+      center: [-26.86, 152.96], label: 'BEERWAH EAST', sub: 'Cat 2 + Rail · Score 63',
+      flyTo: [-26.86, 152.96, 13] },
+    { name: 'Wellcamp Employment', score: 60, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
+      bounds: [[-27.52,151.73],[-27.52,151.85],[-27.62,151.85],[-27.62,151.73]],
+      center: [-27.57, 151.79], label: 'WELLCAMP', sub: 'Inland Rail + Airport · Score 60',
+      flyTo: [-27.57, 151.79, 12] },
+    { name: 'Southern Thornlands', score: 68, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.08,
+      bounds: [[-27.54,153.23],[-27.54,153.30],[-27.60,153.30],[-27.60,153.23]],
+      center: [-27.57, 153.27], label: 'STH THORNLANDS', sub: 'New PDA Apr 2025 · Score 68',
+      flyTo: [-27.57, 153.27, 13] },
+    { name: 'Burpengary East-Elimbah', score: 66, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
+      bounds: [[-27.10,152.93],[-27.10,153.03],[-27.19,153.03],[-27.19,152.93]],
+      center: [-27.15, 152.98], label: 'BURPENGARY E', sub: 'Cat 1 pre-rezoning · Score 66',
+      flyTo: [-27.15, 152.98, 13] }
+  ];
+
+  corridorZones.forEach(function(cz) {
+    // Draw scored polygon zone
+    var poly = L.polygon(cz.bounds, {
+      color: cz.color, weight: 2.5, opacity: 0.85,
+      fillColor: cz.color, fillOpacity: cz.fillOpacity,
+      dashArray: cz.strategy === 'HOLD' ? '8,6' : null
+    }).addTo(targetCorridorGroup);
+
+    // Strategy badge colours
+    var stratBg = cz.strategy === 'DEVELOP' ? '#22c55e' : cz.strategy === 'FLIP' ? '#f59e0b' : '#3b82f6';
+
+    // Permanent score label at center
+    var labelHtml = '<div style="text-align:center;pointer-events:none">' +
+      '<div style="background:' + stratBg + ';color:#fff;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:800;letter-spacing:.5px;display:inline-block;margin-bottom:2px">' + cz.strategy + '</div><br>' +
+      '<div style="background:rgba(11,13,20,.85);color:#fff;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;display:inline-block;border:1px solid ' + cz.color + '">' +
+      cz.label + ' <span style="color:' + cz.color + '">' + cz.score + '</span></div>' +
+      '</div>';
+
+    L.marker(cz.center, {
+      icon: L.divIcon({ html: labelHtml, className: '', iconSize: [160, 40], iconAnchor: [80, 20] }),
+      interactive: false
+    }).addTo(targetCorridorGroup);
+
+    // Popup with full details on polygon click
+    poly.bindPopup(
+      '<div style="min-width:240px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:15px;font-weight:800;color:' + cz.color + ';margin-bottom:4px">' + cz.name + '</div>' +
+      '<div style="display:flex;gap:6px;margin-bottom:8px">' +
+        '<span style="background:' + stratBg + '22;color:' + stratBg + ';padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700">' + cz.strategy + '</span>' +
+        '<span style="background:rgba(236,72,153,.15);color:#ec4899;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700">Score: ' + cz.score + '/100</span>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#333">' + cz.sub + '</div>' +
+      '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #eee;font-size:11px;color:#666">' +
+        '<strong>Click parcels within this zone</strong> to assess individual lots for subdivision potential.' +
+      '</div>' +
+      '</div>', { maxWidth: 300 }
+    );
+  });
+
+  // NOT added by default — user toggles on via layer panel
+  if (!window.targetCorridorLayers) window.targetCorridorLayers = {};
+  window.targetCorridorLayers[mi._leaflet_id] = targetCorridorGroup;
+
+  // ── Fly-to corridor function (called from targeting page) ──
+  window.flyToCorridor = function(idx) {
+    if (!mapFull) return;
+    var cz = corridorZones[idx];
+    if (!cz) return;
+    // Switch to map page
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById('map-page').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+    document.querySelector('[data-page="map-page"]').classList.add('active');
+    document.getElementById('page-title').textContent = 'Map';
+    // Enable target corridors layer
+    var tcLayer = window.targetCorridorLayers && window.targetCorridorLayers[mapFull._leaflet_id];
+    if (tcLayer && !mapFull.hasLayer(tcLayer)) {
+      tcLayer.addTo(mapFull);
+      var cb = document.querySelector('.lp-item[data-layer="targetCorridors"] input[type="checkbox"]');
+      if (cb) { cb.checked = true; }
+      var lpItem = document.querySelector('.lp-item[data-layer="targetCorridors"]');
+      if (lpItem) lpItem.classList.add('active');
+    }
+    // Fly to corridor
+    mapFull.flyTo([cz.flyTo[0], cz.flyTo[1]], cz.flyTo[2], { duration: 1.5 });
+    setTimeout(function(){ mapFull.invalidateSize(); }, 300);
+  };
+  window._corridorZones = corridorZones;
 }
 
 // ── Map Navigation Controls (zoom + directional pan) ──
@@ -1829,7 +1962,8 @@ function toggleLayer(layerKey, on) {
     'infraMarkers': window.infraMarkerLayers,
     'devMarkers': window.devMarkerLayers,
     'pfgaMarkers': window.pfgaMarkerLayers,
-    'cat1Markers': window.cat1MarkerLayers
+    'cat1Markers': window.cat1MarkerLayers,
+    'targetCorridors': window.targetCorridorLayers
   };
   if (intelligenceLayers[layerKey]) {
     var lg = intelligenceLayers[layerKey][mapFull._leaflet_id];
@@ -2558,6 +2692,85 @@ function renderPropPanel(latlng, r) {
     html += '</div></div>';
   }
 
+  // ── DEVELOPER FLIP CALCULATOR ──
+  // Estimates lot yield, acquisition cost range, and flip margin based on area, zone, and LGA
+  var flipCalc = null;
+  if (areaM2 > 0 && seqData) {
+    var lotSizeTarget = 400; // m² average lot target for subdivision
+    var estLots = 0;
+    var landRateMin = 0, landRateMax = 0; // $/m²
+    var lotSaleMin = 0, lotSaleMax = 0; // $ per lot
+    var infraCostPerLot = 45000; // avg trunk + reticulation infra per lot
+    var daCost = 0;
+    var timeMonths = 0;
+
+    // Lot yield estimate (assuming ~65% net developable area after roads/parks/drainage)
+    if (areaM2 >= 4000) {
+      estLots = Math.floor((areaM2 * 0.65) / lotSizeTarget);
+    }
+
+    // Land rate estimates by LGA ($/m² for raw subdividable land, 2024-25 market)
+    var lgaUpper = (lga || '').toUpperCase();
+    if (lgaUpper.indexOf('LOGAN') !== -1) { landRateMin = 80; landRateMax = 150; lotSaleMin = 280000; lotSaleMax = 380000; timeMonths = 18; }
+    else if (lgaUpper.indexOf('IPSWICH') !== -1) { landRateMin = 70; landRateMax = 130; lotSaleMin = 260000; lotSaleMax = 350000; timeMonths = 18; }
+    else if (lgaUpper.indexOf('MORETON') !== -1) { landRateMin = 100; landRateMax = 180; lotSaleMin = 320000; lotSaleMax = 420000; timeMonths = 20; }
+    else if (lgaUpper.indexOf('GOLD COAST') !== -1) { landRateMin = 130; landRateMax = 250; lotSaleMin = 380000; lotSaleMax = 550000; timeMonths = 24; }
+    else if (lgaUpper.indexOf('SUNSHINE') !== -1) { landRateMin = 110; landRateMax = 200; lotSaleMin = 350000; lotSaleMax = 480000; timeMonths = 22; }
+    else if (lgaUpper.indexOf('TOOWOOMBA') !== -1) { landRateMin = 50; landRateMax = 100; lotSaleMin = 200000; lotSaleMax = 300000; timeMonths = 20; }
+    else if (lgaUpper.indexOf('SCENIC') !== -1) { landRateMin = 40; landRateMax = 80; lotSaleMin = 220000; lotSaleMax = 320000; timeMonths = 24; }
+    else if (lgaUpper.indexOf('LOCKYER') !== -1) { landRateMin = 30; landRateMax = 70; lotSaleMin = 180000; lotSaleMax = 260000; timeMonths = 24; }
+    else if (lgaUpper.indexOf('SOMERSET') !== -1) { landRateMin = 25; landRateMax = 60; lotSaleMin = 180000; lotSaleMax = 250000; timeMonths = 24; }
+    else if (lgaUpper.indexOf('REDLAND') !== -1) { landRateMin = 120; landRateMax = 220; lotSaleMin = 380000; lotSaleMax = 500000; timeMonths = 22; }
+    else if (lgaUpper.indexOf('BRISBANE') !== -1) { landRateMin = 200; landRateMax = 500; lotSaleMin = 450000; lotSaleMax = 700000; timeMonths = 24; }
+    else { landRateMin = 80; landRateMax = 160; lotSaleMin = 280000; lotSaleMax = 400000; timeMonths = 20; }
+
+    // PDA discount on timeline (faster approvals)
+    if (pdaName) timeMonths = Math.max(12, timeMonths - 6);
+
+    if (estLots > 0 && landRateMin > 0) {
+      var acqMin = Math.round(areaM2 * landRateMin);
+      var acqMax = Math.round(areaM2 * landRateMax);
+      var totalInfra = estLots * infraCostPerLot;
+      daCost = Math.round(estLots * 8000); // DA + compliance ~$8K/lot
+      var totalCostMin = acqMin + totalInfra + daCost;
+      var totalCostMax = acqMax + totalInfra + daCost;
+      var revenueMin = estLots * lotSaleMin;
+      var revenueMax = estLots * lotSaleMax;
+      var marginMin = revenueMin - totalCostMax;
+      var marginMax = revenueMax - totalCostMin;
+      var roiMin = Math.round((marginMin / totalCostMax) * 100);
+      var roiMax = Math.round((marginMax / totalCostMin) * 100);
+
+      flipCalc = { estLots: estLots, acqMin: acqMin, acqMax: acqMax, infraCost: totalInfra, daCost: daCost,
+        totalCostMin: totalCostMin, totalCostMax: totalCostMax, revenueMin: revenueMin, revenueMax: revenueMax,
+        marginMin: marginMin, marginMax: marginMax, roiMin: roiMin, roiMax: roiMax, timeMonths: timeMonths,
+        lotSaleMin: lotSaleMin, lotSaleMax: lotSaleMax };
+    }
+  }
+
+  // Add flip calculator to HTML if viable
+  if (flipCalc && flipCalc.estLots >= 3) {
+    var mColor = flipCalc.marginMin > 0 ? '#22c55e' : '#ef4444';
+    var fmtK = function(v) { return v >= 1000000 ? '$' + (v/1000000).toFixed(1) + 'M' : '$' + Math.round(v/1000).toLocaleString() + 'K'; };
+    html += '<div class="pp-section">';
+    html += '<div class="pp-section-title" style="color:#ec4899">Developer Flip Calculator</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">';
+    html += '<div style="background:rgba(236,72,153,.08);padding:6px 8px;border-radius:6px;text-align:center"><div style="font-size:9px;color:#888;text-transform:uppercase">Est. Lots</div><div style="font-size:16px;font-weight:800;color:#ec4899">' + flipCalc.estLots + '</div></div>';
+    html += '<div style="background:rgba(34,197,94,.08);padding:6px 8px;border-radius:6px;text-align:center"><div style="font-size:9px;color:#888;text-transform:uppercase">Revenue</div><div style="font-size:14px;font-weight:700;color:#22c55e">' + fmtK(flipCalc.revenueMin) + '-' + fmtK(flipCalc.revenueMax) + '</div></div>';
+    html += '<div style="background:' + (flipCalc.marginMin > 0 ? 'rgba(34,197,94,.08)' : 'rgba(239,68,68,.08)') + ';padding:6px 8px;border-radius:6px;text-align:center"><div style="font-size:9px;color:#888;text-transform:uppercase">Margin</div><div style="font-size:14px;font-weight:700;color:' + mColor + '">' + fmtK(flipCalc.marginMin) + '-' + fmtK(flipCalc.marginMax) + '</div></div>';
+    html += '</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">';
+    html += '<div><span style="color:var(--dim)">Acquisition:</span> <strong>' + fmtK(flipCalc.acqMin) + '-' + fmtK(flipCalc.acqMax) + '</strong></div>';
+    html += '<div><span style="color:var(--dim)">Infrastructure:</span> <strong>' + fmtK(flipCalc.infraCost) + '</strong></div>';
+    html += '<div><span style="color:var(--dim)">DA + Compliance:</span> <strong>' + fmtK(flipCalc.daCost) + '</strong></div>';
+    html += '<div><span style="color:var(--dim)">Timeline:</span> <strong>' + flipCalc.timeMonths + ' months</strong></div>';
+    html += '<div><span style="color:var(--dim)">Lot sale range:</span> <strong>' + fmtK(flipCalc.lotSaleMin) + '-' + fmtK(flipCalc.lotSaleMax) + '</strong></div>';
+    html += '<div><span style="color:var(--dim)">ROI range:</span> <strong style="color:' + mColor + '">' + flipCalc.roiMin + '%-' + flipCalc.roiMax + '%</strong></div>';
+    html += '</div>';
+    html += '<div style="margin-top:8px;font-size:10px;color:var(--dim);font-style:italic">Estimates based on ' + lga + ' market rates. 65% net developable, 400m\u00B2 avg lots, $45K/lot infra. For indicative purposes only.</div>';
+    html += '</div>';
+  }
+
   // Koala habitat
   const koalaStatus = r.koala ? 'Habitat Identified' : 'Unaffected';
   const koalaClass = r.koala ? 'affected' : 'clear';
@@ -2811,7 +3024,7 @@ function toggleRadar(){
     html += '<td>' + d.rsiProjects.length + ' projects</td>';
     html += '<td>' + d.pdas.length + ' PDAs / ' + d.pfgas.length + ' PFGAs</td>';
     html += '<td>' + d.competitors.length + ' active</td>';
-    html += '<td style="font-size:11px;color:var(--dim);max-width:300px">' + d.why.substring(0, 120) + '...</td>';
+    html += '<td style="font-size:11px;color:var(--dim);max-width:300px">' + d.why.substring(0, 120) + '...<br><button onclick="flyToLGA(\'' + d.lga + '\')" style="margin-top:4px;background:#ec489922;color:#ec4899;border:1px solid #ec489944;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;cursor:pointer">MAP &rarr;</button></td>';
     html += '</tr>';
   });
   tbody.innerHTML = html;
@@ -2860,10 +3073,42 @@ function toggleRadar(){
     hhtml += '</div>';
     hhtml += '<div style="font-size:11px;color:var(--dim);margin-bottom:4px">' + c.reason + '</div>';
     hhtml += '<div style="font-size:11px;color:var(--accent)"><strong>Action:</strong> ' + c.action + '</div>';
+    hhtml += '<button onclick="flyToCorridor(' + i + ')" style="margin-top:6px;background:#ec489922;color:#ec4899;border:1px solid #ec489944;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer">VIEW ON MAP &rarr;</button>';
     hhtml += '</div>';
   });
   hotspots.innerHTML = hhtml;
 })();
+
+// Fly to LGA center from targeting table
+window.flyToLGA = function(lgaName) {
+  var lgaCenters = {
+    'Logan': [-27.64, 153.10, 11], 'Ipswich': [-27.62, 152.76, 11],
+    'Moreton Bay': [-27.12, 152.95, 10], 'Gold Coast': [-27.95, 153.35, 10],
+    'Sunshine Coast': [-26.72, 153.00, 10], 'Toowoomba': [-27.56, 151.95, 11],
+    'Scenic Rim': [-28.00, 153.00, 10], 'Lockyer Valley': [-27.55, 152.35, 11],
+    'Somerset': [-27.35, 152.55, 10], 'Brisbane': [-27.47, 153.03, 11],
+    'Redland': [-27.55, 153.27, 12], 'Noosa': [-26.40, 153.00, 11]
+  };
+  var coords = lgaCenters[lgaName];
+  if (!coords || !mapFull) return;
+  // Switch to map page
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('map-page').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  document.querySelector('[data-page="map-page"]').classList.add('active');
+  document.getElementById('page-title').textContent = 'Map';
+  // Enable target corridors
+  var tcLayer = window.targetCorridorLayers && window.targetCorridorLayers[mapFull._leaflet_id];
+  if (tcLayer && !mapFull.hasLayer(tcLayer)) {
+    tcLayer.addTo(mapFull);
+    var cb = document.querySelector('.lp-item[data-layer="targetCorridors"] input[type="checkbox"]');
+    if (cb) cb.checked = true;
+    var lpItem = document.querySelector('.lp-item[data-layer="targetCorridors"]');
+    if (lpItem) lpItem.classList.add('active');
+  }
+  mapFull.flyTo([coords[0], coords[1]], coords[2], { duration: 1.5 });
+  setTimeout(function(){ mapFull.invalidateSize(); }, 300);
+};
 
 /* ── LOGIN LOGIC ── */
 const users = {
