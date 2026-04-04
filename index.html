@@ -328,6 +328,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="nav-item" data-page="competitors"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Competitors</div>
       <div class="nav-item" data-page="analytics"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</div>
       <div class="nav-item" data-page="targeting" style="color:#ec4899"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>Targeting Intel<span class="badge" style="background:#ec4899">NEW</span></div>
+      <div class="nav-item" data-page="da-tracker" style="color:#f59e0b"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>DA Tracker<span class="badge" style="background:#f59e0b">NEW</span></div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">Buyers</div>
@@ -882,6 +883,109 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
 </div>
 
+<!-- ═══════════════════ DA TRACKER ═══════════════════ -->
+<div class="page" id="da-tracker">
+  <p style="color:var(--dim);font-size:13px;margin-bottom:16px">Track <strong style="color:var(--text)">land subdivision &amp; reconfiguring-a-lot (ROL)</strong> development applications across all 13 target corridors. Direct links to every council DA portal, EDQ for Priority Development Areas, and PlanningAlerts for real-time monitoring.</p>
+
+  <!-- STATS ROW -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#f59e0b">8</div>
+      <div style="font-size:11px;color:var(--dim)">Council DA Portals</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#ec4899">4</div>
+      <div style="font-size:11px;color:var(--dim)">EDQ Priority Areas</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#8b5cf6">13</div>
+      <div style="font-size:11px;color:var(--dim)">Target Corridors</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:var(--accent)">47</div>
+      <div style="font-size:11px;color:var(--dim)">Focus Suburbs</div>
+    </div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div style="background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(236,72,153,.08));border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:16px 20px;margin-bottom:20px">
+    <h4 style="font-size:13px;font-weight:700;color:#f59e0b;margin:0 0 8px">How to Find Subdivision DAs in Your Target Corridors</h4>
+    <div style="font-size:12px;color:var(--dim);line-height:1.7">
+      <strong style="color:var(--text)">1.</strong> Click any corridor below to see the council portal + focus suburbs<br>
+      <strong style="color:var(--text)">2.</strong> On the council portal, search by suburb name or use the map tool<br>
+      <strong style="color:var(--text)">3.</strong> Filter for <strong style="color:var(--text)">"Reconfiguring a Lot" (ROL)</strong> — this is QLD's term for subdivision<br>
+      <strong style="color:var(--text)">4.</strong> For PDAs (Flagstone, Yarrabilba, Ripley, Caloundra South) — use the EDQ portal, not the council<br>
+      <strong style="color:var(--text)">5.</strong> Set up PlanningAlerts email notifications for each suburb to get automatic alerts
+    </div>
+  </div>
+
+  <!-- EDQ PRIORITY DEVELOPMENT AREAS -->
+  <div style="background:linear-gradient(135deg,rgba(236,72,153,.06),rgba(139,92,246,.06));border:1px solid rgba(236,72,153,.15);border-radius:12px;padding:18px 22px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;margin:0 0 4px;color:#ec4899">EDQ Priority Development Areas</h3>
+    <p style="font-size:11px;color:var(--dim);margin:0 0 12px">DAs in PDAs are assessed by Economic Development Queensland — NOT the local council. Search the EDQ portal for these areas.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px">
+        <div style="font-weight:600;font-size:13px;color:var(--text)">Greater Flagstone PDA</div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0">7,188 ha · ~50,000 dwellings planned · Logan LGA</div>
+        <div style="font-size:10px;color:#a78bfa;margin-bottom:6px">Suburbs: Flagstone, Jimboomba, New Beith, Greenbank, Munruben</div>
+        <a href="https://www.edq.qld.gov.au/our-approach/land-use-planning-and-infrastructure/development-applications-and-assessment/current-applications-and-approvals" target="_blank" style="font-size:11px;color:#ec4899;text-decoration:none">Search EDQ Applications &#8599;</a>
+      </div>
+      <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px">
+        <div style="font-weight:600;font-size:13px;color:var(--text)">Yarrabilba PDA</div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0">2,222 ha · ~17,000 dwellings planned · Logan LGA</div>
+        <div style="font-size:10px;color:#a78bfa;margin-bottom:6px">Suburbs: Yarrabilba, Stockleigh, Woodhill</div>
+        <a href="https://www.edq.qld.gov.au/projects/yarrabilba/" target="_blank" style="font-size:11px;color:#ec4899;text-decoration:none">Yarrabilba PDA Details &#8599;</a>
+      </div>
+      <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px">
+        <div style="font-weight:600;font-size:13px;color:var(--text)">Ripley Valley PDA</div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0">4,850 ha · ~50,000 dwellings planned · Ipswich LGA</div>
+        <div style="font-size:10px;color:#a78bfa;margin-bottom:6px">Suburbs: Ripley, South Ripley, Deebing Heights, Flinders View</div>
+        <a href="https://www.edq.qld.gov.au/our-approach/land-use-planning-and-infrastructure/development-applications-and-assessment/current-applications-and-approvals" target="_blank" style="font-size:11px;color:#ec4899;text-decoration:none">Search EDQ Applications &#8599;</a>
+      </div>
+      <div style="background:rgba(0,0,0,.2);border-radius:8px;padding:12px">
+        <div style="font-weight:600;font-size:13px;color:var(--text)">Caloundra South PDA (Aura)</div>
+        <div style="font-size:11px;color:var(--dim);margin:4px 0">2,324 ha · ~20,000 dwellings + 15,000 jobs · Sunshine Coast LGA</div>
+        <div style="font-size:10px;color:#a78bfa;margin-bottom:6px">Suburbs: Baringa, Nirimba, Aura, Bells Creek</div>
+        <a href="https://www.edq.qld.gov.au/our-work/priority-development-areas-pda/caloundra-south" target="_blank" style="font-size:11px;color:#ec4899;text-decoration:none">Caloundra South PDA &#8599;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORRIDOR DA TRACKER -->
+  <h3 style="font-size:15px;font-weight:700;margin:0 0 12px">Corridor-by-Corridor DA Sources</h3>
+  <p style="font-size:11px;color:var(--dim);margin:0 0 14px">Each corridor mapped to its council DA portal, focus suburbs for subdivision, and PlanningAlerts links. Click a row to expand suburb details.</p>
+  <div id="da-corridor-grid"></div>
+
+  <!-- PLANNING ALERTS -->
+  <div style="background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(59,130,246,.06));border:1px solid rgba(139,92,246,.15);border-radius:12px;padding:18px 22px;margin-top:20px">
+    <h3 style="font-size:15px;font-weight:700;margin:0 0 4px;color:#8b5cf6">PlanningAlerts — Email Notifications</h3>
+    <p style="font-size:11px;color:var(--dim);margin:0 0 10px">Get automatic email alerts when ANY new DA is lodged near your target suburbs. Free to use. Set up alerts for each corridor.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <a href="https://www.planningalerts.org.au/authorities/logan/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Logan LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Flagstone · Yarrabilba · Park Ridge</div></a>
+      <a href="https://www.planningalerts.org.au/authorities/ipswich/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Ipswich LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Ripley · Springfield · Redbank Plains</div></a>
+      <a href="https://www.planningalerts.org.au/authorities/moreton_bay/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Moreton Bay LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Caboolture · Burpengary · Waraba</div></a>
+      <a href="https://www.planningalerts.org.au/authorities/gold_coast/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Gold Coast LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Coomera · Pimpama · Upper Coomera</div></a>
+      <a href="https://www.planningalerts.org.au/authorities/sunshine_coast/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Sunshine Coast LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Caloundra · Beerwah · Palmview</div></a>
+      <a href="https://www.planningalerts.org.au/authorities/toowoomba/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Toowoomba LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Highfields · Westbrook · Wellcamp</div></a>
+      <a href="https://www.planningalerts.org.au/authorities/scenic_rim/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Scenic Rim LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Beaudesert · Bromelton · Canungra</div></a>
+      <a href="https://www.planningalerts.org.au/authorities/redland/applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Redland LGA &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Thornlands · Redland Bay · Victoria Point</div></a>
+      <a href="https://www.planningalerts.org.au/alerts/signup" target="_blank" style="display:block;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);border-radius:6px;padding:10px;text-decoration:none;color:#a78bfa;font-size:11px;font-weight:600;text-align:center">Set Up Email Alerts &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Free · any address · 2km radius</div></a>
+    </div>
+  </div>
+
+  <!-- OPEN DATA / API -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-top:20px">
+    <h3 style="font-size:15px;font-weight:700;margin:0 0 4px;color:var(--accent)">Open Data &amp; API Access</h3>
+    <p style="font-size:11px;color:var(--dim);margin:0 0 10px">Raw DA datasets for bulk analysis. Download CSVs, query ArcGIS REST APIs, or build automated monitoring.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      <a href="https://data-logancity.opendata.arcgis.com/datasets/50489a44f46b45b5857bcc7f9aa95f20_0/explore" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Logan Undecided DAs (ArcGIS) &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Live dataset · filter by ROL · map view</div></a>
+      <a href="https://data-logancity.opendata.arcgis.com/datasets/2cbef3aeff1048bbb880288825765fb2_0" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Logan Decided DAs (ArcGIS) &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Historical decisions · approval rates</div></a>
+      <a href="https://data-goldcoast.opendata.arcgis.com/datasets?q=Development+Applications+and+Determinations" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Gold Coast DAs (Open Data) &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">Applications + determinations datasets</div></a>
+      <a href="https://datahub.moretonbay.qld.gov.au/datasets/development-applications" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:10px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Moreton Bay DAs (DataHub) &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:2px">All DAs since 2016 · downloadable</div></a>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════ BUYERS ═══════════════════ -->
 <div class="page" id="buyers">
   <div class="buyers-layout">
@@ -1068,6 +1172,8 @@ const titles = {
   'competitors': ['Competitor Tracker', 'Where the big developers are — prospect nearby'],
   'analytics': ['Market Analytics', 'Land values, growth corridors, deal performance'],
   'buyers': ['Buyer Network', 'Registered buyers for novation opportunities'],
+  'targeting': ['Targeting Intelligence', 'Developer scoring algorithm — where to buy, develop, or flip'],
+  'da-tracker': ['DA Tracker', 'Live subdivision applications across all 13 target corridors'],
 };
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
@@ -1358,6 +1464,146 @@ comps.forEach(c => {
       +'<tr id="'+estateId+'" style="display:none;background:rgba(0,0,0,.15)">'
       +'<td colspan="7" style="padding:10px 16px 14px"><div style="font-size:11px;font-weight:600;color:var(--dim);margin-bottom:6px">ACTIVE ESTATES ('+d.estateList.length+')</div><div style="line-height:1.8">'+estatePills+'</div></td>'
       +'</tr>';
+  });
+})();
+
+// ─── DA TRACKER CORRIDOR GRID ───
+(function(){
+  var daCorridors = [
+    {name:'Flagstone-Yarrabilba',score:98,strategy:'DEVELOP',council:'Logan City Council',isPDA:true,
+     portalName:'EDQ Applications Portal',portalUrl:'https://www.edq.qld.gov.au/our-approach/land-use-planning-and-infrastructure/development-applications-and-assessment/current-applications-and-approvals',
+     altPortal:{name:'Logan Dev Enquiry Tool',url:'https://devet.loganhub.com.au/'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/logan/applications',
+     suburbs:['Flagstone','Jimboomba','New Beith','Greenbank','Munruben','Yarrabilba','Stockleigh','Woodhill'],
+     searchTip:'PDA area — search EDQ portal first. For surrounding non-PDA land, use Logan Dev Enquiry Tool and search by suburb. Filter for "Reconfiguring a Lot".',
+     openData:'https://data-logancity.opendata.arcgis.com/datasets/50489a44f46b45b5857bcc7f9aa95f20_0/explore'},
+    {name:'Ripley Valley',score:95,strategy:'DEVELOP',council:'Ipswich City Council',isPDA:true,
+     portalName:'EDQ Applications Portal',portalUrl:'https://www.edq.qld.gov.au/our-approach/land-use-planning-and-infrastructure/development-applications-and-assessment/current-applications-and-approvals',
+     altPortal:{name:'Ipswich Development.i',url:'https://developmenti.ipswich.qld.gov.au/'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/ipswich/applications',
+     suburbs:['Ripley','South Ripley','Deebing Heights','Flinders View','Yamanto','Swanbank'],
+     searchTip:'PDA area — use EDQ portal for PDA-assessed DAs. Ipswich Development.i has ROL applications from Sept 2013. Use Map Search and filter by suburb.',
+     openData:null},
+    {name:'Caboolture West / Waraba',score:89,strategy:'FLIP',council:'Moreton Bay Regional Council',isPDA:false,
+     portalName:'Moreton Bay DA Tracker',portalUrl:'https://www.moretonbay.qld.gov.au/Services/Building-Development/DA-Tracker',
+     altPortal:{name:'Moreton Bay Dev Explorer (ArcGIS)',url:'https://www.arcgis.com/apps/webappviewer/index.html?id=813a272358764b529b43f918d3a17e46'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/moreton_bay/applications',
+     suburbs:['Caboolture','Caboolture South','Upper Caboolture','Wamuran','Rocksberg','Moorina','Waraba'],
+     searchTip:'Use DA Tracker — search by suburb. Filter for "Reconfiguring a Lot". Also check Dev Explorer map for spatial view of all current DAs.',
+     openData:'https://datahub.moretonbay.qld.gov.au/datasets/development-applications'},
+    {name:'Coomera-Pimpama',score:86,strategy:'FLIP',council:'Gold Coast City Council',isPDA:false,
+     portalName:'Gold Coast PD Online',portalUrl:'http://pdonline.goldcoast.qld.gov.au/masterview/modules/applicationmaster/default.aspx?page=home',
+     altPortal:{name:'Gold Coast Planning Hub',url:'https://gchaveyoursay.com.au/industryhub'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/gold_coast/applications',
+     suburbs:['Coomera','Upper Coomera','Pimpama','Ormeau','Ormeau Hills','Willow Vale','Jacobs Well'],
+     searchTip:'Use PD Online Application Search. Search by suburb or address. Application type "ROL" = Reconfiguring a Lot (subdivision).',
+     openData:'https://data-goldcoast.opendata.arcgis.com/datasets?q=Development+Applications'},
+    {name:'Caloundra South / Aura',score:82,strategy:'DEVELOP',council:'Sunshine Coast Council',isPDA:true,
+     portalName:'EDQ Applications Portal',portalUrl:'https://www.edq.qld.gov.au/our-work/priority-development-areas-pda/caloundra-south',
+     altPortal:{name:'Sunshine Coast Development.i',url:'https://developmenti.sunshinecoast.qld.gov.au/'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/sunshine_coast/applications',
+     suburbs:['Baringa','Nirimba','Aura','Bells Creek','Caloundra West','Meridan Plains'],
+     searchTip:'CRITICAL: Caloundra South PDA DAs are NOT on the Sunshine Coast council portal. You MUST use the EDQ portal. For surrounding non-PDA suburbs, use Sunshine Coast Development.i.',
+     openData:null},
+    {name:'Park Ridge-Chambers Flat',score:78,strategy:'FLIP',council:'Logan City Council',isPDA:false,
+     portalName:'Logan Dev Enquiry Tool',portalUrl:'https://devet.loganhub.com.au/',
+     altPortal:{name:'Logan PD Online',url:'https://www.logan.qld.gov.au/planning-and-development/pd-online'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/logan/applications',
+     suburbs:['Park Ridge','Park Ridge South','Chambers Flat','Logan Reserve','Munruben','Crestmead'],
+     searchTip:'Use Dev Enquiry Tool. Search by suburb. Look for "Reconfiguring a Lot" applications. Also check Recently Lodged and On Public Notification filters.',
+     openData:'https://data-logancity.opendata.arcgis.com/datasets/50489a44f46b45b5857bcc7f9aa95f20_0/explore'},
+    {name:'Springfield-Redbank Plains',score:75,strategy:'DEVELOP',council:'Ipswich City Council',isPDA:false,
+     portalName:'Ipswich Development.i',portalUrl:'https://developmenti.ipswich.qld.gov.au/',
+     altPortal:{name:'Ipswich Planning Portal',url:'https://www.ipswichplanning.com.au/development-planning/development-planning'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/ipswich/applications',
+     suburbs:['Springfield','Springfield Lakes','Spring Mountain','Redbank Plains','Bellbird Park','Augustine Heights','Brookwater'],
+     searchTip:'Use Development.i. Map Search is best — zoom to Springfield/Redbank Plains area. Filter by Application Type for ROL. Springfield Structure Plan area applications since 2005.',
+     openData:null},
+    {name:'Highfields',score:72,strategy:'FLIP',council:'Toowoomba Regional Council',isPDA:false,
+     portalName:'Toowoomba Development.i',portalUrl:'https://developmenti.tr.qld.gov.au/',
+     altPortal:{name:'TRC PD Online',url:'https://pdonline.toowoombarc.qld.gov.au/MasterView/Modules/Applicationmaster/default.aspx?page=search'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/toowoomba/applications',
+     suburbs:['Highfields','Meringandan West','Meringandan','Kleinton','Geham','Cabarlah'],
+     searchTip:'Use Development.i or PD Online. Search by suburb. Both systems track ROL applications. Register for notifications on Development.i for automatic alerts.',
+     openData:null},
+    {name:'Southern Thornlands',score:68,strategy:'FLIP',council:'Redland City Council',isPDA:false,
+     portalName:'Redland Development.i',portalUrl:'https://developmenti.redland.qld.gov.au/',
+     altPortal:{name:'Redland PD Online (legacy)',url:'https://pdonline.redland.qld.gov.au/'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/redland/applications',
+     suburbs:['Thornlands','Redland Bay','Victoria Point','Cleveland South','Sheldon'],
+     searchTip:'Use Development.i (replaced PD Online). Search by address or suburb. Filter for Reconfiguring a Lot. Map search available.',
+     openData:null},
+    {name:'Burpengary East-Elimbah',score:66,strategy:'HOLD',council:'Moreton Bay Regional Council',isPDA:false,
+     portalName:'Moreton Bay DA Tracker',portalUrl:'https://www.moretonbay.qld.gov.au/Services/Building-Development/DA-Tracker',
+     altPortal:{name:'Moreton Bay Dev Explorer',url:'https://www.arcgis.com/apps/webappviewer/index.html?id=813a272358764b529b43f918d3a17e46'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/moreton_bay/applications',
+     suburbs:['Burpengary East','Elimbah','Narangba','Burpengary'],
+     searchTip:'Use DA Tracker on Moreton Bay website. Search by suburb. Burpengary East is a key growth node — check frequently for new ROL applications.',
+     openData:'https://datahub.moretonbay.qld.gov.au/datasets/development-applications'},
+    {name:'Beaudesert-Bromelton',score:65,strategy:'HOLD',council:'Scenic Rim Regional Council',isPDA:false,
+     portalName:'Scenic Rim DAP Online',portalUrl:'https://www.scenicrim.qld.gov.au/development-applications-planning-online/DAP-online',
+     altPortal:{name:'Scenic Rim ICON Portal',url:'https://srr-prod-icon.saas.t1cloud.com/Common/Common/Terms.aspx'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/scenic_rim/applications',
+     suburbs:['Beaudesert','Bromelton','Canungra','Tamborine','Tamborine Mountain'],
+     searchTip:'Use DAP Online or Scenic Rim ICON portal. Bromelton is a State Development Area — check state planning portal for SDA applications separately.',
+     openData:null},
+    {name:'Beerwah East',score:63,strategy:'HOLD',council:'Sunshine Coast Council',isPDA:false,
+     portalName:'Sunshine Coast Development.i',portalUrl:'https://developmenti.sunshinecoast.qld.gov.au/',
+     altPortal:{name:'SCC Map Search',url:'https://developmenti.sunshinecoast.qld.gov.au/Home/MapSearch'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/sunshine_coast/applications',
+     suburbs:['Beerwah','Landsborough','Glass House Mountains','Peachester'],
+     searchTip:'Use Development.i Map Search — zoom into Beerwah East area. Filter for ROL applications. Beerwah East is a future growth area under ShapingSEQ.',
+     openData:null},
+    {name:'Wellcamp Employment',score:60,strategy:'HOLD',council:'Toowoomba Regional Council',isPDA:false,
+     portalName:'Toowoomba Development.i',portalUrl:'https://developmenti.tr.qld.gov.au/',
+     altPortal:{name:'TRC PD Online',url:'https://pdonline.toowoombarc.qld.gov.au/MasterView/Modules/Applicationmaster/default.aspx?page=search'},
+     planningAlerts:'https://www.planningalerts.org.au/authorities/toowoomba/applications',
+     suburbs:['Wellcamp','Charlton','Westbrook','Drayton'],
+     searchTip:'Use Development.i. Wellcamp is primarily employment/industrial corridor near airport. Check for both residential ROL and industrial subdivision applications.',
+     openData:null}
+  ];
+  var grid = document.getElementById('da-corridor-grid');
+  if(!grid) return;
+  daCorridors.forEach(function(c,i){
+    var stratColor = c.strategy==='DEVELOP'?'#22c55e':c.strategy==='FLIP'?'#f59e0b':'#3b82f6';
+    var stratBg = c.strategy==='DEVELOP'?'rgba(34,197,94,.12)':c.strategy==='FLIP'?'rgba(245,158,11,.12)':'rgba(59,130,246,.12)';
+    var pdaBadge = c.isPDA ? '<span style="font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(236,72,153,.15);color:#ec4899;font-weight:600;margin-left:6px">PDA</span>' : '';
+    var suburbPills = c.suburbs.map(function(s){return '<span style="display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,.1);color:#fbbf24;margin:2px 3px 2px 0">'+s+'</span>'}).join('');
+    var detailId = 'da-detail-'+i;
+    grid.innerHTML += '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden">'
+      +'<div style="padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="var el=document.getElementById(\''+detailId+'\');el.style.display=el.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.da-arrow\').textContent=el.style.display===\'none\'?\'\u25B6\':\'\u25BC\'">'
+        +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<span class="da-arrow" style="font-size:10px;color:var(--dim)">\u25B6</span>'
+          +'<span style="font-size:12px;font-weight:700;color:var(--accent)">'+c.score+'</span>'
+          +'<span style="font-weight:600;color:var(--text);font-size:13px">'+c.name+'</span>'
+          +pdaBadge
+          +'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:'+stratBg+';color:'+stratColor+';font-weight:600">'+c.strategy+'</span>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--dim)">'+c.council+'</div>'
+      +'</div>'
+      +'<div id="'+detailId+'" style="display:none;padding:0 18px 16px;border-top:1px solid var(--border)">'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">'
+          +'<div>'
+            +'<div style="font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">DA Portal</div>'
+            +'<a href="'+c.portalUrl+'" target="_blank" style="display:block;font-size:12px;color:#f59e0b;text-decoration:none;font-weight:600;margin-bottom:4px">'+c.portalName+' &#8599;</a>'
+            +'<a href="'+c.altPortal.url+'" target="_blank" style="display:block;font-size:11px;color:var(--dim);text-decoration:none">'+c.altPortal.name+' &#8599;</a>'
+          +'</div>'
+          +'<div>'
+            +'<div style="font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Monitoring</div>'
+            +'<a href="'+c.planningAlerts+'" target="_blank" style="display:block;font-size:11px;color:#a78bfa;text-decoration:none;margin-bottom:4px">PlanningAlerts &#8599;</a>'
+            +(c.openData?'<a href="'+c.openData+'" target="_blank" style="display:block;font-size:11px;color:var(--accent);text-decoration:none">Open Data (ArcGIS) &#8599;</a>':'')
+          +'</div>'
+        +'</div>'
+        +'<div style="margin-top:12px">'
+          +'<div style="font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Focus Suburbs ('+c.suburbs.length+')</div>'
+          +'<div style="line-height:1.8">'+suburbPills+'</div>'
+        +'</div>'
+        +'<div style="margin-top:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.1);border-radius:6px;padding:8px 12px">'
+          +'<div style="font-size:10px;font-weight:600;color:#f59e0b;margin-bottom:3px">SEARCH TIP</div>'
+          +'<div style="font-size:11px;color:var(--dim);line-height:1.5">'+c.searchTip+'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
   });
 })();
 
