@@ -462,14 +462,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#8b5cf6"></div>Land Use Classification
         </label>
-        <label class="lp-item" data-layer="pda">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pda',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#3b82f6"></div>Priority Dev Areas
-        </label>
-        <label class="lp-item" data-layer="sda">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('sda',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#06b6d4"></div>State Dev Areas
-        </label>
         <div class="lp-group">Flood Mapping</div>
         <label class="lp-item" data-layer="flood">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood',this.checked)"><span class="lp-slider"></span></div>
@@ -484,22 +476,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#f97316"></div>Bushfire Prone Areas
         </label>
-        <label class="lp-item" data-layer="landslide">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landslide',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#ef4444"></div>Landslide Susceptibility
-        </label>
-        <label class="lp-item" data-layer="acidsoils">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('acidsoils',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#eab308"></div>Acid Sulfate Soils
-        </label>
         <div class="lp-group">Terrain</div>
         <label class="lp-item" data-layer="contours">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#a78bfa"></div>Contours (Elevation)
-        </label>
-        <label class="lp-item" data-layer="geology">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('geology',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#78716c"></div>Geology (Detailed)
         </label>
         <div class="lp-group">Environment</div>
         <label class="lp-item" data-layer="mses">
@@ -510,26 +490,22 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#16a34a"></div>Koala Habitat (SEQ)
         </label>
-        <label class="lp-item" data-layer="heritage">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('heritage',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#b45309"></div>Cultural Heritage
-        </label>
         <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
         <label class="lp-item" data-layer="serviceMarkers">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceMarkers',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#0ea5e9"></div>Water / Sewer / Power
         </label>
         <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
-        <label class="lp-item active" data-layer="pdaMarkers">
-          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
+        <label class="lp-item" data-layer="pdaMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#ec4899"></div>PDA Hotspots
         </label>
-        <label class="lp-item active" data-layer="infraMarkers">
-          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('infraMarkers',this.checked)"><span class="lp-slider"></span></div>
+        <label class="lp-item" data-layer="infraMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('infraMarkers',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#f59e0b"></div>Infrastructure Projects
         </label>
-        <label class="lp-item active" data-layer="devMarkers">
-          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('devMarkers',this.checked)"><span class="lp-slider"></span></div>
+        <label class="lp-item" data-layer="devMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('devMarkers',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#ef4444"></div>Major Dev Estates
         </label>
         <label class="lp-item" data-layer="pfgaMarkers">
@@ -2460,7 +2436,7 @@ function addGrowthIntelligence(mi) {
     );
     marker.addTo(pdaGroup);
   });
-  pdaGroup.addTo(mi);
+  // NOT added to map by default — user toggles on
   if (!window.pdaMarkerLayers) window.pdaMarkerLayers = {};
   window.pdaMarkerLayers[mi._leaflet_id] = pdaGroup;
 
@@ -2482,7 +2458,7 @@ function addGrowthIntelligence(mi) {
     );
     marker.addTo(infraGroup);
   });
-  infraGroup.addTo(mi);
+  // NOT added to map by default — user toggles on
   if (!window.infraMarkerLayers) window.infraMarkerLayers = {};
   window.infraMarkerLayers[mi._leaflet_id] = infraGroup;
 
@@ -2500,7 +2476,7 @@ function addGrowthIntelligence(mi) {
     );
     marker.addTo(devGroup);
   });
-  devGroup.addTo(mi);
+  // NOT added to map by default — user toggles on
   if (!window.devMarkerLayers) window.devMarkerLayers = {};
   window.devMarkerLayers[mi._leaflet_id] = devGroup;
 
