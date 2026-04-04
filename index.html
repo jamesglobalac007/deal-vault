@@ -432,9 +432,13 @@ tr:hover td{background:rgba(255,255,255,.015)}
       </div>
       <div class="lp-body">
         <div class="lp-group" style="color:#d4a017">Focus Areas</div>
+        <label class="lp-item active" data-layer="qldborder">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('qldborder',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#d4a017"></div>QLD State Border
+        </label>
         <label class="lp-item active" data-layer="corridors">
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('corridors',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#d4a017"></div>Growth Corridors
+          <div class="lp-dot" style="background:#06b6d4"></div>Growth Corridors
         </label>
         <div class="lp-group">Cadastral</div>
         <label class="lp-item active" data-layer="cadastral">
@@ -1216,18 +1220,55 @@ setTimeout(() => {
 
 // ── Growth Corridor Gold Perimeter Overlays ──
 function addGrowthCorridors(mi) {
+  // ── QLD State Border (gold) ──
+  const qldBorderCoords = [
+    [-10.68, 142.53], [-10.94, 142.75], [-11.08, 142.35], [-11.82, 142.22],
+    [-12.25, 141.65], [-12.75, 141.70], [-13.85, 141.52], [-15.00, 141.50],
+    [-16.50, 141.40], [-17.75, 141.08], [-19.00, 141.00], [-20.50, 141.00],
+    [-22.00, 141.00], [-24.00, 141.00], [-26.00, 141.00], [-28.00, 141.00],
+    [-29.00, 141.00],
+    [-29.00, 141.50], [-29.00, 142.50], [-29.04, 143.50], [-29.03, 145.00],
+    [-29.00, 147.00], [-29.00, 149.00], [-28.25, 150.30], [-28.65, 151.15],
+    [-28.85, 151.55], [-28.35, 152.40], [-28.23, 153.10], [-28.17, 153.55],
+    [-27.84, 153.60], [-27.50, 153.45], [-27.33, 153.42], [-27.07, 153.35],
+    [-26.80, 153.20], [-26.40, 153.12], [-25.95, 153.10], [-25.50, 153.05],
+    [-25.00, 152.80], [-24.50, 152.30], [-24.08, 151.90], [-23.50, 151.50],
+    [-23.10, 150.80], [-22.50, 150.50], [-22.10, 150.00], [-21.50, 149.50],
+    [-20.70, 149.00], [-20.10, 148.60], [-19.80, 148.10], [-19.30, 147.40],
+    [-19.10, 146.80], [-18.80, 146.50], [-18.30, 146.10], [-17.80, 146.00],
+    [-17.10, 145.90], [-16.50, 145.60], [-16.10, 145.50], [-15.50, 145.30],
+    [-15.00, 145.20], [-14.50, 145.15], [-14.10, 144.50], [-13.70, 143.80],
+    [-13.00, 143.50], [-12.50, 143.30], [-12.00, 143.10], [-11.50, 142.80],
+    [-11.15, 142.55], [-10.68, 142.53]
+  ];
+
+  const qldBorderStyle = {
+    color: '#d4a017', weight: 3, opacity: 0.9,
+    fillColor: '#d4a017', fillOpacity: 0.03,
+    dashArray: null, lineCap: 'round'
+  };
+
+  const qldBorderGroup = L.layerGroup();
+  var qldPoly = L.polygon(qldBorderCoords, qldBorderStyle).addTo(qldBorderGroup);
+  qldPoly.bindTooltip('<div style="background:rgba(212,160,23,.92);color:#0f1419;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">QUEENSLAND</div>', {
+    permanent: false, direction: 'center', className: 'corridor-label'
+  });
+  qldBorderGroup.addTo(mi);
+  if (!window.qldBorderLayers) window.qldBorderLayers = {};
+  window.qldBorderLayers[mi._leaflet_id] = qldBorderGroup;
+
+  // ── Growth Corridors (cyan/teal — distinct from gold state border) ──
   const corridorStyle = {
-    color: '#d4a017', weight: 2.5, opacity: 0.85,
-    fillColor: '#d4a017', fillOpacity: 0.06,
+    color: '#06b6d4', weight: 2.5, opacity: 0.85,
+    fillColor: '#06b6d4', fillOpacity: 0.08,
     dashArray: '8,6', lineCap: 'round'
   };
-  const labelStyle = 'background:rgba(212,160,23,.92);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3)';
+  const labelStyle = 'background:rgba(6,182,212,.92);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3)';
 
-  // SEQ Growth Corridors - outer perimeter covering coast to growth ring
   const corridors = [
     {
       name: 'NORTHERN CORRIDOR',
-      sub: 'Caboolture West · Morayfield · Burpengary · Narangba',
+      sub: 'Caboolture West \u00B7 Morayfield \u00B7 Burpengary \u00B7 Narangba',
       coords: [
         [-26.95, 152.85], [-26.95, 153.12], [-27.10, 153.15],
         [-27.20, 153.12], [-27.25, 153.08], [-27.25, 152.88],
@@ -1236,7 +1277,7 @@ function addGrowthCorridors(mi) {
     },
     {
       name: 'SUNSHINE COAST CORRIDOR',
-      sub: 'Caloundra South · Aura · Palmview · Beerwah',
+      sub: 'Caloundra South \u00B7 Aura \u00B7 Palmview \u00B7 Beerwah',
       coords: [
         [-26.60, 152.90], [-26.60, 153.15], [-26.75, 153.18],
         [-26.88, 153.15], [-26.93, 153.08], [-26.93, 152.93],
@@ -1245,7 +1286,7 @@ function addGrowthCorridors(mi) {
     },
     {
       name: 'WESTERN CORRIDOR',
-      sub: 'Springfield · Ripley Valley · Ipswich · Fernvale',
+      sub: 'Springfield \u00B7 Ripley Valley \u00B7 Ipswich \u00B7 Fernvale',
       coords: [
         [-27.48, 152.50], [-27.48, 152.85], [-27.55, 152.92],
         [-27.65, 152.92], [-27.72, 152.85], [-27.72, 152.60],
@@ -1254,7 +1295,7 @@ function addGrowthCorridors(mi) {
     },
     {
       name: 'SOUTHERN CORRIDOR',
-      sub: 'Flagstone · Yarrabilba · Park Ridge · Logan',
+      sub: 'Flagstone \u00B7 Yarrabilba \u00B7 Park Ridge \u00B7 Logan',
       coords: [
         [-27.62, 152.92], [-27.62, 153.15], [-27.72, 153.22],
         [-27.88, 153.28], [-27.90, 153.18], [-27.88, 153.00],
@@ -1263,11 +1304,20 @@ function addGrowthCorridors(mi) {
     },
     {
       name: 'GOLD COAST NORTHERN',
-      sub: 'Coomera · Pimpama · Ormeau · Upper Coomera',
+      sub: 'Coomera \u00B7 Pimpama \u00B7 Ormeau \u00B7 Upper Coomera',
       coords: [
         [-27.72, 153.22], [-27.72, 153.38], [-27.85, 153.40],
         [-27.95, 153.38], [-27.95, 153.25], [-27.88, 153.20],
         [-27.78, 153.18], [-27.72, 153.22]
+      ]
+    },
+    {
+      name: 'TOOWOOMBA CORRIDOR',
+      sub: 'Highfields \u00B7 Glenvale \u00B7 Westbrook',
+      coords: [
+        [-27.42, 151.82], [-27.42, 152.02], [-27.52, 152.05],
+        [-27.62, 152.02], [-27.62, 151.85], [-27.55, 151.78],
+        [-27.48, 151.78], [-27.42, 151.82]
       ]
     }
   ];
@@ -1275,18 +1325,16 @@ function addGrowthCorridors(mi) {
   const corridorGroup = L.layerGroup();
 
   corridors.forEach(function(c) {
-    // Polygon outline
     var poly = L.polygon(c.coords, corridorStyle).addTo(corridorGroup);
     poly.bindTooltip('<div style="' + labelStyle + '">' + c.name + '</div>', {
       permanent: true, direction: 'center', className: 'corridor-label'
     });
-    // Popup on click with detail
-    poly.bindPopup('<div style="font-size:12px;min-width:180px"><strong style="color:#d4a017">' + c.name + '</strong><br><span style="color:#666;font-size:11px">' + c.sub + '</span><br><br><span style="font-size:10px;color:#888">Growth corridor focus area.<br>Click properties inside for zone & constraint data.</span></div>');
+    poly.bindPopup('<div style="font-size:12px;min-width:180px"><strong style="color:#06b6d4">' + c.name + '</strong><br><span style="color:#666;font-size:11px">' + c.sub + '</span><br><br><span style="font-size:10px;color:#888">Growth corridor focus area.<br>Click properties inside for zone & constraint data.</span></div>');
   });
 
   corridorGroup.addTo(mi);
 
-  // Store reference for layer toggle
+  // Store references for layer toggles
   if (!window.corridorLayers) window.corridorLayers = {};
   window.corridorLayers[mi._leaflet_id] = corridorGroup;
 }
@@ -1531,7 +1579,12 @@ function toggleLayer(layerKey, on) {
   const item = document.querySelector(`.lp-item[data-layer="${layerKey}"]`);
   if (item) item.classList.toggle('active', on);
 
-  // Growth corridors — special handling (not an ArcGIS service)
+  // QLD border & growth corridors — special handling (not ArcGIS services)
+  if (layerKey === 'qldborder') {
+    var qb = window.qldBorderLayers && window.qldBorderLayers[mapFull._leaflet_id];
+    if (qb) { on ? qb.addTo(mapFull) : mapFull.removeLayer(qb); }
+    return;
+  }
   if (layerKey === 'corridors') {
     var cg = window.corridorLayers && window.corridorLayers[mapFull._leaflet_id];
     if (cg) { on ? cg.addTo(mapFull) : mapFull.removeLayer(cg); }
