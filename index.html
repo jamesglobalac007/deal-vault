@@ -995,6 +995,162 @@ tr:hover td{background:rgba(255,255,255,.015)}
       </div>
     </div>
   </div>
+
+  <!-- ═══ FEASIBILITY CALCULATOR ═══ -->
+  <div style="background:linear-gradient(135deg,rgba(0,212,170,.06),rgba(34,197,94,.06));border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:22px 26px;margin-top:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px">
+      <h3 style="font-size:16px;font-weight:700;margin:0;color:var(--accent)">Subdivision Feasibility Calculator</h3>
+      <div style="display:flex;gap:6px">
+        <select id="feas-preset" onchange="applyFeasPreset()" style="background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:4px 8px">
+          <option value="">Load Corridor Preset...</option>
+          <option value="logan">Logan (Flagstone/Yarrabilba)</option>
+          <option value="ipswich">Ipswich (Ripley/Springfield)</option>
+          <option value="moreton">Moreton Bay (Caboolture)</option>
+          <option value="gc">Gold Coast (Coomera/Pimpama)</option>
+          <option value="sunshine">Sunshine Coast (Aura)</option>
+          <option value="toowoomba">Toowoomba (Highfields)</option>
+          <option value="scenic">Scenic Rim (Beaudesert)</option>
+          <option value="redland">Redland (Thornlands)</option>
+        </select>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--dim);margin:0 0 16px">Enter your site details below to model revenue, costs, and residual land value. Pre-loaded defaults from corridor research — adjust to your deal.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <!-- COL 1: SITE & ACQUISITION -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;border-bottom:1px solid rgba(34,197,94,.2);padding-bottom:4px">Site &amp; Acquisition</div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Total Site Area (m2)</label>
+          <input id="feas-site-area" type="number" value="20000" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px;font-weight:600">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Net Developable % (after roads, parks, drainage)</label>
+          <input id="feas-net-pct" type="number" value="65" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Average Lot Size (m2)</label>
+          <input id="feas-lot-size" type="number" value="400" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Land Acquisition ($/m2 englobo)</label>
+          <input id="feas-land-rate" type="number" value="120" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px;font-weight:600">
+        </div>
+        <div style="background:rgba(0,0,0,.2);border-radius:6px;padding:8px 10px;margin-top:4px">
+          <div style="font-size:10px;color:var(--dim)">Estimated Lot Yield</div>
+          <div id="feas-lot-yield" style="font-size:18px;font-weight:700;color:var(--accent)">32</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:2px">Land Cost: <span id="feas-land-total" style="color:#f59e0b;font-weight:600">$2,400,000</span></div>
+          <div style="font-size:10px;color:var(--dim)">Land Cost/Lot: <span id="feas-land-per-lot" style="color:#f59e0b;font-weight:600">$75,000</span></div>
+        </div>
+      </div>
+
+      <!-- COL 2: DEVELOPMENT COSTS -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;border-bottom:1px solid rgba(245,158,11,.2);padding-bottom:4px">Development Costs (per lot)</div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Civil Works ($/lot) — roads, sewer, water, stormwater</label>
+          <input id="feas-civil" type="number" value="55000" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Infrastructure Charges ($/lot)</label>
+          <input id="feas-infra" type="number" value="32000" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">DA / Approval Costs ($/lot)</label>
+          <input id="feas-da" type="number" value="8000" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Professional Fees ($/lot) — survey, planning, legal, project mgmt</label>
+          <input id="feas-prof" type="number" value="12000" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Sales &amp; Marketing (% of revenue)</label>
+          <input id="feas-sales-pct" type="number" value="4" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Finance / Holding Costs (% of total cost)</label>
+          <input id="feas-finance-pct" type="number" value="8" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Contingency (%)</label>
+          <input id="feas-contingency" type="number" value="5" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+      </div>
+
+      <!-- COL 3: REVENUE & RESULTS -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;border-bottom:1px solid rgba(139,92,246,.2);padding-bottom:4px">Revenue &amp; Results</div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">End Lot Sale Price ($)</label>
+          <input id="feas-lot-price" type="number" value="420000" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px;font-weight:600">
+        </div>
+        <div style="margin-bottom:8px">
+          <label style="font-size:10px;color:var(--dim);display:block;margin-bottom:2px">Project Timeline (months)</label>
+          <input id="feas-timeline" type="number" value="24" oninput="calcFeasibility()" style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:6px 10px">
+        </div>
+
+        <!-- RESULTS PANEL -->
+        <div style="background:rgba(0,0,0,.25);border-radius:8px;padding:12px 14px;margin-top:6px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <div><div style="font-size:9px;color:var(--dim);text-transform:uppercase">Total Revenue</div><div id="feas-revenue" style="font-size:16px;font-weight:700;color:#22c55e">$13,440,000</div></div>
+            <div><div style="font-size:9px;color:var(--dim);text-transform:uppercase">Total Costs</div><div id="feas-total-cost" style="font-size:16px;font-weight:700;color:#ef4444">$0</div></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:8px;margin-bottom:8px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div><div style="font-size:9px;color:var(--dim);text-transform:uppercase">Net Profit</div><div id="feas-profit" style="font-size:18px;font-weight:700;color:var(--accent)">$0</div></div>
+              <div><div style="font-size:9px;color:var(--dim);text-transform:uppercase">Profit Margin</div><div id="feas-margin" style="font-size:18px;font-weight:700;color:var(--accent)">0%</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><div style="font-size:9px;color:var(--dim);text-transform:uppercase">ROI</div><div id="feas-roi" style="font-size:15px;font-weight:700;color:#8b5cf6">0%</div></div>
+            <div><div style="font-size:9px;color:var(--dim);text-transform:uppercase">Profit/Lot</div><div id="feas-profit-lot" style="font-size:15px;font-weight:700;color:#8b5cf6">$0</div></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:8px">
+            <div style="font-size:9px;color:var(--dim);text-transform:uppercase;margin-bottom:2px">Dev Margin Signal</div>
+            <div id="feas-signal" style="font-size:13px;font-weight:700;color:#22c55e">—</div>
+          </div>
+        </div>
+
+        <!-- COST BREAKDOWN -->
+        <div style="background:rgba(0,0,0,.15);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:10px">
+          <div style="font-weight:600;color:var(--dim);margin-bottom:4px;text-transform:uppercase;font-size:9px">Cost Breakdown (per lot)</div>
+          <div id="feas-breakdown" style="color:var(--dim);line-height:1.8"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESIDUAL LAND VALUE -->
+    <div style="margin-top:16px;background:rgba(0,0,0,.2);border:1px solid rgba(0,212,170,.15);border-radius:10px;padding:16px 20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <h4 style="font-size:14px;font-weight:700;color:var(--accent);margin:0">Residual Land Value — What Can You Pay?</h4>
+          <p style="font-size:11px;color:var(--dim);margin:4px 0 0">Working backwards: given end lot price and all costs, the maximum you should pay for the land at your target margin.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <label style="font-size:10px;color:var(--dim)">Target Margin %</label>
+          <input id="feas-target-margin" type="number" value="20" oninput="calcFeasibility()" style="width:70px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:5px 8px;text-align:center;font-weight:600">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px">
+        <div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.15);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:9px;color:var(--dim);text-transform:uppercase">Max Land Cost (Total)</div>
+          <div id="feas-rlv-total" style="font-size:18px;font-weight:700;color:var(--accent)">$0</div>
+        </div>
+        <div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.15);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:9px;color:var(--dim);text-transform:uppercase">Max Land $/m2</div>
+          <div id="feas-rlv-sqm" style="font-size:18px;font-weight:700;color:var(--accent)">$0</div>
+        </div>
+        <div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.15);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:9px;color:var(--dim);text-transform:uppercase">Max Land $/ha</div>
+          <div id="feas-rlv-ha" style="font-size:18px;font-weight:700;color:var(--accent)">$0</div>
+        </div>
+        <div style="background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.15);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:9px;color:var(--dim);text-transform:uppercase">Max Land/Lot</div>
+          <div id="feas-rlv-lot" style="font-size:18px;font-weight:700;color:var(--accent)">$0</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════ DA TRACKER ═══════════════════ -->
@@ -1654,6 +1810,161 @@ comps.forEach(c => {
       +'</tr>';
   });
 })();
+
+// ─── FEASIBILITY CALCULATOR ───
+var feasPresets = {
+  logan:     {area:20000,net:65,lotSize:400,landRate:115,civil:160000,infra:31500,da:8000,prof:12000,sales:4,finance:8,contingency:5,lotPrice:350000,timeline:24,margin:20},
+  ipswich:   {area:20000,net:65,lotSize:375,landRate:100,civil:155000,infra:34000,da:8000,prof:12000,sales:4,finance:8,contingency:5,lotPrice:429000,timeline:24,margin:20},
+  moreton:   {area:15000,net:60,lotSize:400,landRate:135,civil:170000,infra:36000,da:9000,prof:13000,sales:4,finance:8,contingency:5,lotPrice:550000,timeline:24,margin:20},
+  gc:        {area:12000,net:60,lotSize:375,landRate:190,civil:180000,infra:43000,da:10000,prof:14000,sales:4,finance:8,contingency:5,lotPrice:430000,timeline:30,margin:20},
+  sunshine:  {area:15000,net:60,lotSize:400,landRate:170,civil:175000,infra:40000,da:9000,prof:13000,sales:4,finance:8,contingency:5,lotPrice:540000,timeline:30,margin:20},
+  toowoomba: {area:25000,net:70,lotSize:500,landRate:75,civil:145000,infra:28500,da:7000,prof:10000,sales:3.5,finance:7,contingency:5,lotPrice:354000,timeline:24,margin:20},
+  scenic:    {area:30000,net:70,lotSize:600,landRate:60,civil:140000,infra:26000,da:7000,prof:10000,sales:3.5,finance:7,contingency:5,lotPrice:497000,timeline:30,margin:20},
+  redland:   {area:10000,net:55,lotSize:400,landRate:225,civil:185000,infra:38500,da:10000,prof:14000,sales:4,finance:8,contingency:5,lotPrice:467000,timeline:24,margin:20}
+};
+
+function applyFeasPreset(){
+  var sel = document.getElementById('feas-preset');
+  if(!sel||!sel.value) return;
+  var p = feasPresets[sel.value];
+  if(!p) return;
+  document.getElementById('feas-site-area').value = p.area;
+  document.getElementById('feas-net-pct').value = p.net;
+  document.getElementById('feas-lot-size').value = p.lotSize;
+  document.getElementById('feas-land-rate').value = p.landRate;
+  document.getElementById('feas-civil').value = p.civil;
+  document.getElementById('feas-infra').value = p.infra;
+  document.getElementById('feas-da').value = p.da;
+  document.getElementById('feas-prof').value = p.prof;
+  document.getElementById('feas-sales-pct').value = p.sales;
+  document.getElementById('feas-finance-pct').value = p.finance;
+  document.getElementById('feas-contingency').value = p.contingency;
+  document.getElementById('feas-lot-price').value = p.lotPrice;
+  document.getElementById('feas-timeline').value = p.timeline;
+  document.getElementById('feas-target-margin').value = p.margin;
+  calcFeasibility();
+}
+
+function calcFeasibility(){
+  // Read inputs
+  var siteArea   = parseFloat(document.getElementById('feas-site-area').value)||0;
+  var netPct     = parseFloat(document.getElementById('feas-net-pct').value)||0;
+  var lotSize    = parseFloat(document.getElementById('feas-lot-size').value)||1;
+  var landRate   = parseFloat(document.getElementById('feas-land-rate').value)||0;
+  var civil      = parseFloat(document.getElementById('feas-civil').value)||0;
+  var infra      = parseFloat(document.getElementById('feas-infra').value)||0;
+  var daFee      = parseFloat(document.getElementById('feas-da').value)||0;
+  var prof       = parseFloat(document.getElementById('feas-prof').value)||0;
+  var salesPct   = parseFloat(document.getElementById('feas-sales-pct').value)||0;
+  var financePct = parseFloat(document.getElementById('feas-finance-pct').value)||0;
+  var contPct    = parseFloat(document.getElementById('feas-contingency').value)||0;
+  var lotPrice   = parseFloat(document.getElementById('feas-lot-price').value)||0;
+  var timeline   = parseFloat(document.getElementById('feas-timeline').value)||24;
+  var targetMarg = parseFloat(document.getElementById('feas-target-margin').value)||20;
+
+  // Calculations
+  var netArea   = siteArea * (netPct/100);
+  var numLots   = Math.floor(netArea / lotSize);
+  if(numLots<1) numLots=1;
+
+  // Land acquisition
+  var landTotal    = siteArea * landRate;
+  var landPerLot   = landTotal / numLots;
+
+  // Development costs per lot
+  var devCostPerLot = civil + infra + daFee + prof;
+
+  // Revenue
+  var grossRevenue = numLots * lotPrice;
+
+  // Percentage-based costs (on gross revenue)
+  var salesCost   = grossRevenue * (salesPct/100);
+  var financeCost = grossRevenue * (financePct/100) * (timeline/24);
+  var contCost    = grossRevenue * (contPct/100);
+
+  // Total costs
+  var totalDevCost  = numLots * devCostPerLot;
+  var totalCost     = landTotal + totalDevCost + salesCost + financeCost + contCost;
+
+  // Profit & margin
+  var profit = grossRevenue - totalCost;
+  var margin = grossRevenue > 0 ? (profit / grossRevenue * 100) : 0;
+  var roi    = totalCost > 0 ? (profit / totalCost * 100) : 0;
+  var profitPerLot = profit / numLots;
+
+  // Signal
+  var signal, sigColor, sigBg;
+  if(margin >= targetMarg){
+    signal='STRONG — PROCEED'; sigColor='#22c55e'; sigBg='rgba(34,197,94,.15)';
+  } else if(margin >= targetMarg * 0.6){
+    signal='MODERATE — REVIEW'; sigColor='#f59e0b'; sigBg='rgba(245,158,11,.15)';
+  } else {
+    signal='TIGHT — CAUTION'; sigColor='#ef4444'; sigBg='rgba(239,68,68,.15)';
+  }
+
+  // Residual Land Value (work backwards from target margin)
+  var targetProfit   = grossRevenue * (targetMarg/100);
+  var maxTotalCost   = grossRevenue - targetProfit;
+  var nonLandCosts   = totalDevCost + salesCost + financeCost + contCost;
+  var rlvTotal       = maxTotalCost - nonLandCosts;
+  if(rlvTotal<0) rlvTotal=0;
+  var rlvPerSqm      = siteArea > 0 ? rlvTotal / siteArea : 0;
+  var rlvPerHa        = rlvPerSqm * 10000;
+  var rlvPerLot       = numLots > 0 ? rlvTotal / numLots : 0;
+
+  // Format helper
+  function fmt(v){
+    if(Math.abs(v)>=1000000) return '$'+( v/1000000).toFixed(2)+'M';
+    if(Math.abs(v)>=1000) return '$'+ Math.round(v).toLocaleString();
+    return '$'+Math.round(v);
+  }
+
+  // Update outputs
+  var el;
+  el=document.getElementById('feas-lot-yield'); if(el) el.textContent = numLots + ' lots';
+  el=document.getElementById('feas-land-total'); if(el) el.textContent = fmt(landTotal);
+  el=document.getElementById('feas-land-per-lot'); if(el) el.textContent = fmt(landPerLot) + '/lot';
+
+  el=document.getElementById('feas-revenue'); if(el) el.textContent = fmt(grossRevenue);
+  el=document.getElementById('feas-total-cost'); if(el) el.textContent = fmt(totalCost);
+  el=document.getElementById('feas-profit'); if(el){el.textContent = fmt(profit); el.style.color=profit>=0?'#22c55e':'#ef4444';}
+  el=document.getElementById('feas-margin'); if(el){el.textContent = margin.toFixed(1)+'%'; el.style.color=margin>=targetMarg?'#22c55e':margin>=targetMarg*0.6?'#f59e0b':'#ef4444';}
+  el=document.getElementById('feas-roi'); if(el) el.textContent = roi.toFixed(1)+'%';
+  el=document.getElementById('feas-profit-lot'); if(el) el.textContent = fmt(profitPerLot);
+
+  el=document.getElementById('feas-signal'); if(el){
+    el.innerHTML='<span style="font-size:13px;font-weight:700;padding:6px 16px;border-radius:8px;background:'+sigBg+';color:'+sigColor+'">'+signal+'</span>';
+  }
+
+  // Cost breakdown per lot
+  el=document.getElementById('feas-breakdown'); if(el){
+    var salesPerLot = salesCost/numLots;
+    var finPerLot   = financeCost/numLots;
+    var contPerLot  = contCost/numLots;
+    var totalPerLot = landPerLot+devCostPerLot+salesPerLot+finPerLot+contPerLot;
+    el.innerHTML = '<table style="width:100%;font-size:11px;color:var(--dim)">'
+      +'<tr><td style="padding:3px 0">Land acquisition</td><td style="text-align:right;color:var(--text);font-weight:600">'+fmt(landPerLot)+'</td></tr>'
+      +'<tr><td style="padding:3px 0">Civil construction</td><td style="text-align:right">'+fmt(civil)+'</td></tr>'
+      +'<tr><td style="padding:3px 0">Infrastructure charges</td><td style="text-align:right">'+fmt(infra)+'</td></tr>'
+      +'<tr><td style="padding:3px 0">DA / approval fees</td><td style="text-align:right">'+fmt(daFee)+'</td></tr>'
+      +'<tr><td style="padding:3px 0">Professional fees</td><td style="text-align:right">'+fmt(prof)+'</td></tr>'
+      +'<tr><td style="padding:3px 0">Sales & marketing</td><td style="text-align:right">'+fmt(salesPerLot)+'</td></tr>'
+      +'<tr><td style="padding:3px 0">Finance costs</td><td style="text-align:right">'+fmt(finPerLot)+'</td></tr>'
+      +'<tr><td style="padding:3px 0">Contingency</td><td style="text-align:right">'+fmt(contPerLot)+'</td></tr>'
+      +'<tr style="border-top:1px solid var(--border)"><td style="padding:5px 0;font-weight:600;color:var(--text)">TOTAL PER LOT</td><td style="text-align:right;font-weight:700;color:var(--accent)">'+fmt(totalPerLot)+'</td></tr>'
+      +'<tr><td style="padding:3px 0;color:#22c55e;font-weight:600">Lot sale price</td><td style="text-align:right;font-weight:700;color:#22c55e">'+fmt(lotPrice)+'</td></tr>'
+      +'</table>';
+  }
+
+  // Residual Land Value
+  el=document.getElementById('feas-rlv-total'); if(el) el.textContent = fmt(rlvTotal);
+  el=document.getElementById('feas-rlv-sqm'); if(el) el.textContent = fmt(rlvPerSqm)+'/m²';
+  el=document.getElementById('feas-rlv-ha'); if(el) el.textContent = fmt(rlvPerHa)+'/ha';
+  el=document.getElementById('feas-rlv-lot'); if(el) el.textContent = fmt(rlvPerLot)+'/lot';
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(calcFeasibility, 100); });
 
 // ─── DA TRACKER CORRIDOR GRID ───
 (function(){
