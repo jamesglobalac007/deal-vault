@@ -329,6 +329,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="nav-item" data-page="analytics"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analytics</div>
       <div class="nav-item" data-page="targeting" style="color:#ec4899"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>Targeting Intel<span class="badge" style="background:#ec4899">NEW</span></div>
       <div class="nav-item" data-page="da-tracker" style="color:#f59e0b"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>DA Tracker<span class="badge" style="background:#f59e0b">NEW</span></div>
+      <div class="nav-item" data-page="revenue" style="color:#22c55e"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Revenue Intel<span class="badge" style="background:#22c55e">NEW</span></div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">Buyers</div>
@@ -883,6 +884,119 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
 </div>
 
+<!-- ═══════════════════ REVENUE INTELLIGENCE ═══════════════════ -->
+<div class="page" id="revenue">
+  <p style="color:var(--dim);font-size:13px;margin-bottom:16px">Current <strong style="color:var(--text)">lot sale prices</strong> and <strong style="color:var(--text)">development site benchmarks</strong> across all 13 target corridors. Data sourced from OpenLot, Oliver Hume, Colliers, REIQ and QLD Government. Use this for feasibility analysis.</p>
+
+  <!-- SEQ MARKET SNAPSHOT -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:var(--accent)">$437K</div>
+      <div style="font-size:10px;color:var(--dim)">SEQ Median Lot Price</div>
+      <div style="font-size:10px;color:#22c55e">+11% QoQ</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#f59e0b">$1,043</div>
+      <div style="font-size:10px;color:var(--dim)">SEQ Median $/m2</div>
+      <div style="font-size:10px;color:#ef4444">First time &gt;$1K</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#ec4899">$167K</div>
+      <div style="font-size:10px;color:var(--dim)">Avg Dev Cost/Lot</div>
+      <div style="font-size:10px;color:#f59e0b">+6% YoY (Colliers)</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#8b5cf6">+27%</div>
+      <div style="font-size:10px;color:var(--dim)">Annual Lot Growth</div>
+      <div style="font-size:10px;color:var(--dim)">12m to Mar 2025</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:22px;font-weight:700;color:#3b82f6">1,200</div>
+      <div style="font-size:10px;color:var(--dim)">SEQ Lots Sold/Qtr</div>
+      <div style="font-size:10px;color:var(--dim)">Mar 2025 quarter</div>
+    </div>
+  </div>
+
+  <!-- LOT PRICE TABLE BY CORRIDOR -->
+  <div style="background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(0,212,170,.08));border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h3 style="font-size:16px;font-weight:700;margin:0;color:#22c55e">Lot Prices by Corridor — Live Market Data</h3>
+        <p style="font-size:12px;color:var(--dim);margin:4px 0 0">Source: OpenLot.com.au · April 2026 · Vacant land lots currently listed for sale</p>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.1)">
+            <th style="text-align:left;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Corridor</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Key Suburb</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Lot Range</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Avg Lot Price</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Avg Size</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">$/m2</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Strategy</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Estates</th>
+          </tr>
+        </thead>
+        <tbody id="rev-lot-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LGA LAND RATE BENCHMARKS -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+    <h3 style="font-size:15px;font-weight:700;margin:0 0 4px;color:#f59e0b">Broadacre / Development Site Benchmarks</h3>
+    <p style="font-size:11px;color:var(--dim);margin:0 0 14px">Englobo (pre-subdivision) land rates for feasibility. Based on Oliver Hume quarterly data, Colliers Cost Per Lot 2024, and recent market transactions.</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.1)">
+            <th style="text-align:left;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase">LGA / Corridor</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase">Englobo $/m2</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase">Englobo $/ha</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase">Civil Cost/Lot</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase">Infra Charges/Lot</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase">End Lot $/m2</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase">Margin Signal</th>
+          </tr>
+        </thead>
+        <tbody id="rev-englobo-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DATA SOURCES -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px">
+    <!-- LOT PRICE SOURCES -->
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(59,130,246,.06));border:1px solid rgba(139,92,246,.15);border-radius:12px;padding:18px 22px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 4px;color:#8b5cf6">Lot Price Data Sources</h3>
+      <p style="font-size:10px;color:var(--dim);margin:0 0 10px">Where to find current and historical lot sales</p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <a href="https://www.openlot.com.au/brisbane" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">OpenLot.com.au &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">1,165 active estates · live lot prices + sizes · FREE</div></a>
+        <a href="https://www.oliverhume.com.au/news/south-east-queensland-land-prices-surge-past-400-000" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Oliver Hume Quarterly Report &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Median lot prices by LGA · $/m2 trends · sales volumes · FREE</div></a>
+        <a href="https://www.reiq.com/resources/media-releases/queensland-property-stands-the-test-of-time-says-reiq" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">REIQ Market Monitor &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Quarterly median prices by LGA · house + land + unit · PAID ($99/qtr)</div></a>
+        <a href="https://sqmresearch.com.au/postcodesnapshot.php" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">SQM Research &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Postcode snapshot reports · asking prices · vacancy rates · FREE/PAID</div></a>
+        <a href="https://www.qgso.qld.gov.au/statistics/theme/industry-development/residential-land-supply-development/residential-development" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">QGSO Residential Development &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Lot approvals · registrations · broadhectare supply · dwelling sales · FREE</div></a>
+        <a href="https://udia.com.au/wp-content/uploads/2025/03/State-Of-The-Land-Report-2025-Final-Report.pdf" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">UDIA State of the Land 2025 &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">National report · lot prices · supply · CoreLogic data · FREE PDF</div></a>
+      </div>
+    </div>
+    <!-- BROADACRE / DEV SITE SOURCES -->
+    <div style="background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(236,72,153,.06));border:1px solid rgba(245,158,11,.15);border-radius:12px;padding:18px 22px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 4px;color:#f59e0b">Development Site Data Sources</h3>
+      <p style="font-size:10px;color:var(--dim);margin:0 0 10px">Where to find broadacre sites, englobo sales, and dev cost data</p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <a href="https://www.commercialrealestate.com.au/for-sale/south-east-queensland-greater-region-qld/development-land/" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">CommercialRealEstate.com.au &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">238+ dev sites for sale in SEQ · filter by price/size · FREE</div></a>
+        <a href="https://www.developmentready.com.au/development-sites-for-sale/qld" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">DevelopmentReady.com.au &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Dev sites for sale QLD · broadacre + infill · agent contacts · FREE</div></a>
+        <a href="https://www.colliers.com.au/en-au/research/cost-per-lot-seq-2024" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">Colliers Cost Per Lot SEQ 2024 &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Civil costs by corridor · $167K avg/lot · infra charges breakdown · FREE PDF</div></a>
+        <a href="https://www.qld.gov.au/environment/land/title/valuation/property-sales" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">QLD Valuer-General Sales Data &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Official property sales records · land valuations · PAID (bulk data)</div></a>
+        <a href="https://www.business.qld.gov.au/running-business/support-services/mapping-data-imagery/queensland-globe/land-valuations" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">QLD Globe Land Valuations &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Interactive map · unimproved land values · parcel-level data · FREE</div></a>
+        <a href="https://www.pricefinder.com.au/" target="_blank" style="display:block;background:rgba(0,0,0,.2);border-radius:6px;padding:8px 12px;text-decoration:none;color:var(--text);font-size:11px;font-weight:600">PriceFinder (CoreLogic) &#8599;<div style="font-size:10px;color:var(--dim);font-weight:400;margin-top:1px">Recent sales · comparable evidence · suburb analytics · PAID ($)</div></a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════ DA TRACKER ═══════════════════ -->
 <div class="page" id="da-tracker">
   <p style="color:var(--dim);font-size:13px;margin-bottom:16px">Track <strong style="color:var(--text)">land subdivision &amp; reconfiguring-a-lot (ROL)</strong> development applications across all 13 target corridors. Direct links to every council DA portal, EDQ for Priority Development Areas, and PlanningAlerts for real-time monitoring.</p>
@@ -1174,6 +1288,7 @@ const titles = {
   'buyers': ['Buyer Network', 'Registered buyers for novation opportunities'],
   'targeting': ['Targeting Intelligence', 'Developer scoring algorithm — where to buy, develop, or flip'],
   'da-tracker': ['DA Tracker', 'Live subdivision applications across all 13 target corridors'],
+  'revenue': ['Revenue Intelligence', 'Lot prices, land rates, and feasibility benchmarks by corridor'],
 };
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
@@ -1463,6 +1578,79 @@ comps.forEach(c => {
       +'</tr>'
       +'<tr id="'+estateId+'" style="display:none;background:rgba(0,0,0,.15)">'
       +'<td colspan="7" style="padding:10px 16px 14px"><div style="font-size:11px;font-weight:600;color:var(--dim);margin-bottom:6px">ACTIVE ESTATES ('+d.estateList.length+')</div><div style="line-height:1.8">'+estatePills+'</div></td>'
+      +'</tr>';
+  });
+})();
+
+// ─── REVENUE INTELLIGENCE DATA ───
+(function(){
+  var lotData = [
+    {corridor:'Flagstone-Yarrabilba',suburb:'Yarrabilba',score:98,strategy:'DEVELOP',lotMin:300000,lotMax:400000,avg:350000,avgSize:450,psqm:778,estates:1,lga:'Logan'},
+    {corridor:'Flagstone-Yarrabilba',suburb:'Flagstone',score:98,strategy:'DEVELOP',lotMin:420000,lotMax:598000,avg:517000,avgSize:450,psqm:1148,estates:1,lga:'Logan'},
+    {corridor:'Flagstone-Yarrabilba',suburb:'Jimboomba',score:98,strategy:'DEVELOP',lotMin:300000,lotMax:649000,avg:482000,avgSize:450,psqm:1071,estates:10,lga:'Logan'},
+    {corridor:'Ripley Valley',suburb:'Ripley',score:95,strategy:'DEVELOP',lotMin:300000,lotMax:631000,avg:429000,avgSize:350,psqm:1226,estates:19,lga:'Ipswich'},
+    {corridor:'Ripley Valley',suburb:'South Ripley',score:95,strategy:'DEVELOP',lotMin:300000,lotMax:631000,avg:464000,avgSize:350,psqm:1326,estates:4,lga:'Ipswich'},
+    {corridor:'Caboolture West',suburb:'Caboolture',score:89,strategy:'FLIP',lotMin:300000,lotMax:699000,avg:511000,avgSize:350,psqm:1460,estates:23,lga:'Moreton Bay'},
+    {corridor:'Caboolture West',suburb:'Burpengary East',score:89,strategy:'FLIP',lotMin:300000,lotMax:635000,avg:470000,avgSize:350,psqm:1343,estates:9,lga:'Moreton Bay'},
+    {corridor:'Coomera-Pimpama',suburb:'Coomera',score:86,strategy:'FLIP',lotMin:300000,lotMax:680000,avg:490000,avgSize:450,psqm:1089,estates:16,lga:'Gold Coast'},
+    {corridor:'Coomera-Pimpama',suburb:'Pimpama',score:86,strategy:'FLIP',lotMin:300000,lotMax:730000,avg:516000,avgSize:450,psqm:1146,estates:14,lga:'Gold Coast'},
+    {corridor:'Coomera-Pimpama',suburb:'Upper Coomera',score:86,strategy:'FLIP',lotMin:300000,lotMax:690000,avg:510000,avgSize:450,psqm:1133,estates:14,lga:'Gold Coast'},
+    {corridor:'Caloundra South/Aura',suburb:'Baringa/Aura',score:82,strategy:'DEVELOP',lotMin:380000,lotMax:580000,avg:480000,avgSize:400,psqm:1200,estates:3,lga:'Sunshine Coast'},
+    {corridor:'Park Ridge-Chambers Flat',suburb:'Park Ridge',score:78,strategy:'FLIP',lotMin:300000,lotMax:529000,avg:425000,avgSize:450,psqm:945,estates:47,lga:'Logan'},
+    {corridor:'Park Ridge-Chambers Flat',suburb:'Logan Reserve',score:78,strategy:'FLIP',lotMin:225000,lotMax:515000,avg:343000,avgSize:450,psqm:763,estates:44,lga:'Logan'},
+    {corridor:'Springfield-Redbank',suburb:'Spring Mountain',score:75,strategy:'DEVELOP',lotMin:300000,lotMax:496000,avg:448000,avgSize:450,psqm:995,estates:8,lga:'Ipswich'},
+    {corridor:'Springfield-Redbank',suburb:'Bellbird Park',score:75,strategy:'DEVELOP',lotMin:300000,lotMax:400000,avg:350000,avgSize:450,psqm:778,estates:9,lga:'Ipswich'},
+    {corridor:'Highfields',suburb:'Highfields',score:72,strategy:'FLIP',lotMin:300000,lotMax:625000,avg:425000,avgSize:600,psqm:708,estates:11,lga:'Toowoomba'},
+    {corridor:'Southern Thornlands',suburb:'Thornlands',score:68,strategy:'FLIP',lotMin:300000,lotMax:670000,avg:526000,avgSize:450,psqm:1169,estates:16,lga:'Redland'},
+    {corridor:'Burpengary East-Elimbah',suburb:'Burpengary East',score:66,strategy:'HOLD',lotMin:300000,lotMax:635000,avg:470000,avgSize:350,psqm:1343,estates:9,lga:'Moreton Bay'},
+    {corridor:'Beaudesert-Bromelton',suburb:'Beaudesert',score:65,strategy:'HOLD',lotMin:300000,lotMax:700000,avg:447000,avgSize:450,psqm:993,estates:7,lga:'Scenic Rim'},
+    {corridor:'Beaudesert-Bromelton',suburb:'Greenbank',score:65,strategy:'HOLD',lotMin:300000,lotMax:465000,avg:419000,avgSize:350,psqm:1197,estates:13,lga:'Logan'}
+  ];
+  var tbody = document.getElementById('rev-lot-tbody');
+  if(!tbody) return;
+  lotData.forEach(function(d,i){
+    var stratColor = d.strategy==='DEVELOP'?'#22c55e':d.strategy==='FLIP'?'#f59e0b':'#3b82f6';
+    var stratBg = d.strategy==='DEVELOP'?'rgba(34,197,94,.12)':d.strategy==='FLIP'?'rgba(245,158,11,.12)':'rgba(59,130,246,.12)';
+    var psqmColor = d.psqm<800?'#22c55e':d.psqm<1100?'#f59e0b':'#ef4444';
+    var rowBg = i%2===0?'rgba(255,255,255,.02)':'transparent';
+    tbody.innerHTML += '<tr style="border-bottom:1px solid rgba(255,255,255,.04);background:'+rowBg+'">'
+      +'<td style="padding:7px 10px;font-size:11px"><span style="color:var(--accent);font-weight:600;margin-right:4px">'+d.score+'</span><span style="color:var(--text)">'+d.corridor+'</span></td>'
+      +'<td style="padding:7px 10px;font-weight:600;color:var(--text);font-size:12px">'+d.suburb+'</td>'
+      +'<td style="padding:7px 10px;text-align:center;font-size:11px;color:var(--dim)">$'+Math.round(d.lotMin/1000)+'K - $'+Math.round(d.lotMax/1000)+'K</td>'
+      +'<td style="padding:7px 10px;text-align:center;font-weight:700;color:var(--accent);font-size:13px">$'+Math.round(d.avg/1000)+'K</td>'
+      +'<td style="padding:7px 10px;text-align:center;font-size:11px;color:var(--dim)">'+d.avgSize+'m\u00B2</td>'
+      +'<td style="padding:7px 10px;text-align:center;font-weight:600;color:'+psqmColor+';font-size:12px">$'+d.psqm+'</td>'
+      +'<td style="padding:7px 10px;text-align:center"><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:'+stratBg+';color:'+stratColor+';font-weight:600">'+d.strategy+'</span></td>'
+      +'<td style="padding:7px 10px;text-align:center;color:var(--dim);font-size:11px">'+d.estates+'</td>'
+      +'</tr>';
+  });
+
+  // Englobo benchmarks
+  var englobo = [
+    {lga:'Logan (Flagstone/Yarrabilba)',engSqm:'$80-150',engHa:'$800K-$1.5M',civil:'$145K-$175K',infra:'$28K-$35K',endSqm:'$778-$1,148',signal:'strong'},
+    {lga:'Ipswich (Ripley/Springfield)',engSqm:'$70-130',engHa:'$700K-$1.3M',civil:'$140K-$170K',infra:'$30K-$38K',endSqm:'$778-$1,326',signal:'strong'},
+    {lga:'Moreton Bay (Caboolture/Burpengary)',engSqm:'$90-180',engHa:'$900K-$1.8M',civil:'$155K-$185K',infra:'$32K-$40K',endSqm:'$1,343-$1,460',signal:'moderate'},
+    {lga:'Gold Coast (Coomera/Pimpama)',engSqm:'$130-250',engHa:'$1.3M-$2.5M',civil:'$165K-$195K',infra:'$38K-$48K',endSqm:'$1,089-$1,146',signal:'tight'},
+    {lga:'Sunshine Coast (Aura/Beerwah)',engSqm:'$120-220',engHa:'$1.2M-$2.2M',civil:'$160K-$190K',infra:'$35K-$45K',endSqm:'$1,200+',signal:'moderate'},
+    {lga:'Toowoomba (Highfields/Wellcamp)',engSqm:'$50-100',engHa:'$500K-$1.0M',civil:'$130K-$160K',infra:'$25K-$32K',endSqm:'$708',signal:'strong'},
+    {lga:'Redland (Thornlands)',engSqm:'$150-300',engHa:'$1.5M-$3.0M',civil:'$170K-$200K',infra:'$35K-$42K',endSqm:'$1,169',signal:'tight'},
+    {lga:'Scenic Rim (Beaudesert)',engSqm:'$40-80',engHa:'$400K-$800K',civil:'$125K-$155K',infra:'$22K-$30K',endSqm:'$993',signal:'strong'}
+  ];
+  var etbody = document.getElementById('rev-englobo-tbody');
+  if(!etbody) return;
+  englobo.forEach(function(d,i){
+    var sigColor = d.signal==='strong'?'#22c55e':d.signal==='moderate'?'#f59e0b':'#ef4444';
+    var sigBg = d.signal==='strong'?'rgba(34,197,94,.12)':d.signal==='moderate'?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)';
+    var sigLabel = d.signal==='strong'?'STRONG MARGIN':d.signal==='moderate'?'MODERATE':'TIGHT';
+    var rowBg = i%2===0?'rgba(255,255,255,.02)':'transparent';
+    etbody.innerHTML += '<tr style="border-bottom:1px solid rgba(255,255,255,.04);background:'+rowBg+'">'
+      +'<td style="padding:7px 10px;font-weight:600;color:var(--text);font-size:12px">'+d.lga+'</td>'
+      +'<td style="padding:7px 10px;text-align:center;color:var(--dim);font-size:12px">'+d.engSqm+'</td>'
+      +'<td style="padding:7px 10px;text-align:center;color:#f59e0b;font-weight:600;font-size:12px">'+d.engHa+'</td>'
+      +'<td style="padding:7px 10px;text-align:center;color:var(--dim);font-size:12px">'+d.civil+'</td>'
+      +'<td style="padding:7px 10px;text-align:center;color:var(--dim);font-size:12px">'+d.infra+'</td>'
+      +'<td style="padding:7px 10px;text-align:center;color:var(--accent);font-weight:600;font-size:12px">'+d.endSqm+'</td>'
+      +'<td style="padding:7px 10px;text-align:center"><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:'+sigBg+';color:'+sigColor+';font-weight:600">'+sigLabel+'</span></td>'
       +'</tr>';
   });
 })();
