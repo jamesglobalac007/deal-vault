@@ -231,9 +231,9 @@ tr:hover td{background:rgba(255,255,255,.015)}
 /* ── PROPERTY INFO PANEL (Landchecker-style) ── */
 .prop-panel{position:absolute;top:0;right:0;width:340px;height:100%;background:rgba(20,23,34,.96);border-left:1px solid var(--border);z-index:1001;overflow-y:auto;transform:translateX(100%);transition:transform .25s ease;backdrop-filter:blur(14px)}
 .prop-panel.open{transform:translateX(0)}
-.prop-panel.open.collapsed{transform:translateX(calc(100% - 28px))}
-.pp-collapse{position:absolute;left:-28px;top:50%;transform:translateY(-50%);width:28px;height:60px;background:rgba(20,23,34,.92);border:1px solid var(--border);border-right:none;border-radius:6px 0 0 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px;z-index:1002;transition:color .2s}
-.pp-collapse:hover{color:var(--accent)}
+.prop-panel.open.collapsed{transform:translateX(calc(100% - 32px))}
+.pp-collapse{position:absolute;left:-32px;top:50%;transform:translateY(-50%);width:32px;height:72px;background:rgba(20,23,34,.95);border:1px solid var(--border);border-right:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:16px;z-index:1002;transition:all .2s;box-shadow:-2px 0 8px rgba(0,0,0,.3)}
+.pp-collapse:hover{color:#fff;background:rgba(0,212,170,.25)}
 .prop-panel.open .pp-collapse{display:flex}
 .prop-panel:not(.open) .pp-collapse{display:none}
 .pp-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(20,23,34,.98);z-index:1}
@@ -431,7 +431,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <div id="map-full"></div>
     <!-- PROPERTY INFO PANEL (Landchecker-style) -->
     <div class="prop-panel" id="propPanel">
-      <button class="pp-collapse" id="ppCollapseBtn" onclick="togglePropCollapse()" title="Toggle panel">&#9654;</button>
+      <button class="pp-collapse" id="ppCollapseBtn" onclick="togglePropCollapse()" title="Hide panel">&#10095;</button>
       <div class="pp-head">
         <h4>Property Details</h4>
         <button class="pp-close" onclick="closePropPanel()">&times;</button>
@@ -3109,10 +3109,10 @@ function togglePropCollapse() {
   var btn = document.getElementById('ppCollapseBtn');
   if (panel.classList.contains('collapsed')) {
     panel.classList.remove('collapsed');
-    btn.innerHTML = '&#9654;';
+    btn.innerHTML = '&#10095;';
   } else {
     panel.classList.add('collapsed');
-    btn.innerHTML = '&#9664;';
+    btn.innerHTML = '&#10094;';
   }
 }
 
