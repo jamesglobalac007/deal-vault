@@ -299,6 +299,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .size-btn:hover{border-color:#d4a017;color:#d4a017}
 .size-btn.active{background:#d4a017;color:#0a0d14;border-color:#d4a017}
 .size-filter-loading{font-size:9px;color:#d4a017;padding:4px 0;animation:pp-spin .8s linear infinite}
+.selected-parcel-glow{filter:drop-shadow(0 0 6px rgba(255,255,255,.5)) drop-shadow(0 0 12px rgba(255,255,255,.25))}
 .pp-loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:12px;gap:8px}
 .pp-spinner{width:16px;height:16px;border:2px solid var(--border);border-top:2px solid var(--accent);border-radius:50%;animation:pp-spin .8s linear infinite}
 @keyframes pp-spin{to{transform:rotate(360deg)}}
@@ -3730,6 +3731,11 @@ function showTrackedList() {
 // ─── PROPERTY INFO PANEL (Landchecker-style) ───
 function closePropPanel() {
   document.getElementById('propPanel').classList.remove('open');
+  // Clear selected parcel highlight
+  if (selectedParcelLayer && window.mapFull) {
+    window.mapFull.removeLayer(selectedParcelLayer);
+    selectedParcelLayer = null;
+  }
 }
 
 function openPropPanel() {
@@ -3855,6 +3861,34 @@ function queryCouncilZone(latlng, lgaName, callback) {
     .catch(function(err){ console.log('Council zone error:', err); callback(null); });
 }
 
+// ─── SELECTED PARCEL HIGHLIGHT ───
+var selectedParcelLayer = null;
+
+function highlightSelectedParcel(geometry) {
+  // Remove previous highlight
+  if (selectedParcelLayer && window.mapFull) {
+    window.mapFull.removeLayer(selectedParcelLayer);
+    selectedParcelLayer = null;
+  }
+  if (!geometry || !geometry.rings || !window.mapFull) return;
+
+  // Convert ArcGIS rings to Leaflet polygon coords (ArcGIS = [lng,lat], Leaflet = [lat,lng])
+  var latlngs = geometry.rings.map(function(ring) {
+    return ring.map(function(pt) { return [pt[1], pt[0]]; });
+  });
+
+  selectedParcelLayer = L.polygon(latlngs, {
+    color: '#ffffff',
+    weight: 3,
+    opacity: 0.95,
+    fillColor: '#ffffff',
+    fillOpacity: 0.08,
+    dashArray: null,
+    interactive: false,
+    className: 'selected-parcel-glow'
+  }).addTo(window.mapFull);
+}
+
 function identifyParcel(latlng) {
   const content = document.getElementById('propContent');
 
@@ -3950,7 +3984,7 @@ function identifyParcel(latlng) {
       geometryType: 'esriGeometryPoint',
       spatialRel: 'esriSpatialRelIntersects',
       outFields: '*',
-      returnGeometry: 'false',
+      returnGeometry: 'true',
       resultRecordCount: '1',
       f: 'json'
     });
@@ -3960,6 +3994,7 @@ function identifyParcel(latlng) {
         console.log('Cadastral query response:', JSON.stringify(data));
         if (data.features && data.features.length > 0) {
           results.cadastral = data.features[0].attributes;
+          results.cadastralGeometry = data.features[0].geometry;
           console.log('Cadastral attrs:', JSON.stringify(data.features[0].attributes));
         }
         checkComplete();
@@ -4057,6 +4092,9 @@ function identifyParcel(latlng) {
 }
 
 function renderPropPanel(latlng, r) {
+  // Highlight selected parcel with white border
+  highlightSelectedParcel(r.cadastralGeometry || null);
+
   const content = document.getElementById('propContent');
   const c = r.cadastral || {};
   const lu = r.landuse || {};
