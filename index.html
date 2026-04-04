@@ -79,7 +79,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .card-body{padding:14px 18px}
 
 /* ── MAP ── */
-#map-dash{height:420px;width:100%}
 #map-full{height:calc(100vh - 140px);width:100%}
 .map-legend{position:absolute;bottom:16px;left:16px;z-index:999;background:rgba(255,255,255,.94);border:1px solid #d1d5db;border-radius:10px;padding:12px 16px;backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(0,0,0,.12);color:#1a1e2e}
 .leg-item{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px}
@@ -343,16 +342,16 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <div class="stat"><div class="stat-label">Novated / Settled</div><div class="stat-val" style="color:var(--novate)">4</div><div class="stat-sub" style="color:var(--dim)">$1.2M profit realised</div></div>
   </div>
   <div class="two-col">
-    <div class="card" style="position:relative">
-      <div class="card-head"><h4>SEQ + Toowoomba — Live Map</h4><span style="font-size:11px;color:var(--dim)">Competitors & opportunities</span></div>
-      <div id="map-dash"></div>
-      <div class="map-legend">
-        <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Competitor Estate</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--identified)"></div>Identified</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--prospecting)"></div>Prospecting</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--option)"></div>Under Option</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--develop)"></div>Develop</div>
-        <div class="leg-item"><div class="leg-dot" style="background:var(--novate)"></div>Novated</div>
+    <div class="card">
+      <div class="card-head"><h4>Pipeline Summary</h4><span style="font-size:11px;color:var(--dim)">Deal stages at a glance</span></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--dim)">Identified</span><span style="font-size:15px;font-weight:700;color:var(--identified)">15</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--dim)">Prospecting</span><span style="font-size:15px;font-weight:700;color:var(--prospecting)">6</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--dim)">Under Option</span><span style="font-size:15px;font-weight:700;color:var(--option)">3</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--dim)">To Develop</span><span style="font-size:15px;font-weight:700;color:var(--develop)">2</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0"><span style="font-size:13px;color:var(--dim)">Novated / Settled</span><span style="font-size:15px;font-weight:700;color:var(--novate)">4</span></div>
+        </div>
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:14px">
@@ -1183,10 +1182,7 @@ function addCadastral(mi) {
   }).addTo(mi);
 }
 
-const map = L.map('map-dash',{zoomControl:false}).setView([-27.6,152.8],9);
-L.tileLayer(tileUrl,tileOpts).addTo(map);
-addCadastral(map);
-L.control.zoom({position:'topright'}).addTo(map);
+// Dashboard map removed — use full map page instead
 
 let mapFull;
 setTimeout(() => {
@@ -1307,8 +1303,6 @@ function addMarkers(mi){
   };
   radarLegend.addTo(mi);
 }
-addMarkers(map);
-
 // ─── DATA LAYER MANAGEMENT ───
 // QLD Government ArcGIS service endpoints
 const qldServices = {
@@ -1544,12 +1538,51 @@ function identifyParcel(latlng) {
     }
   }
 
-  // 0. Address (Layer 0 = Addresses from QLD Address Management Framework)
-  arcgisIdentify(qldServices.cadastral.url, latlng, 'all:0', 15, function(r){
-    if(r) results.address = r[0].attributes;
-    if(r) console.log('Address attrs:', JSON.stringify(r[0].attributes));
-    checkComplete();
-  });
+  // 0. Address — use /query on Layer 0 with a spatial envelope (identify doesn't work for point layers)
+  (function(){
+    var buf = 0.0005; // ~50m buffer around click point
+    var env = {
+      xmin: latlng.lng - buf, ymin: latlng.lat - buf,
+      xmax: latlng.lng + buf, ymax: latlng.lat + buf,
+      spatialReference: {wkid: 4326}
+    };
+    var qp = new URLSearchParams({
+      geometry: JSON.stringify(env),
+      geometryType: 'esriGeometryEnvelope',
+      spatialRel: 'esriSpatialRelIntersects',
+      outFields: '*',
+      returnGeometry: 'true',
+      resultRecordCount: '5',
+      orderByFields: '',
+      f: 'json'
+    });
+    var addrUrl = qldServices.cadastral.url + '/0/query?' + qp.toString();
+    fetch(addrUrl)
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        console.log('Address query response:', JSON.stringify(data));
+        if (data.features && data.features.length > 0) {
+          // Find nearest address point to click
+          var best = data.features[0];
+          var bestDist = 999;
+          data.features.forEach(function(f){
+            if(f.geometry){
+              var dx = f.geometry.x - latlng.lng;
+              var dy = f.geometry.y - latlng.lat;
+              var d = Math.sqrt(dx*dx + dy*dy);
+              if(d < bestDist){ bestDist = d; best = f; }
+            }
+          });
+          results.address = best.attributes;
+          console.log('Address attrs:', JSON.stringify(best.attributes));
+        }
+        checkComplete();
+      })
+      .catch(function(err){
+        console.log('Address query error:', err);
+        checkComplete();
+      });
+  })();
 
   // 1. Cadastral parcels
   arcgisIdentify(qldServices.cadastral.url, latlng, 'all:4', 3, function(r){
@@ -1627,17 +1660,31 @@ function renderPropPanel(latlng, r) {
   const ad = r.address || {};
 
   // Build full street address from QLD Address Management Framework
-  const addrFull = ad.address || ad.ADDRESS || ad.full_address || ad.FULL_ADDRESS || '';
+  // Log all address keys for debugging
+  if (Object.keys(ad).length > 0) console.log('Address field keys:', Object.keys(ad).join(', '));
+  const addrFull = ad.address || ad.ADDRESS || ad.full_address || ad.FULL_ADDRESS || ad.site_addr || ad.SITE_ADDR || ad.display || ad.DISPLAY || '';
   // Try to build from parts if full address not available
-  const houseNum = ad.house_number || ad.HOUSE_NUMBER || ad.strt_numb || ad.STRT_NUMB || ad.number || '';
-  const roadName = ad.road_name || ad.ROAD_NAME || ad.street_name || ad.STREET_NAME || ad.strt_name || ad.STRT_NAME || '';
-  const roadType = ad.road_type || ad.ROAD_TYPE || ad.street_type || ad.STREET_TYPE || ad.strt_type || ad.STRT_TYPE || '';
-  const addrLocality = ad.locality_name || ad.LOCALITY_NAME || ad.locality || ad.LOCALITY || '';
+  const houseNum = ad.house_number || ad.HOUSE_NUMBER || ad.strt_numb || ad.STRT_NUMB || ad.number || ad.NUMBER || ad.num || ad.bdy_numb || '';
+  const roadName = ad.road_name || ad.ROAD_NAME || ad.street_name || ad.STREET_NAME || ad.strt_name || ad.STRT_NAME || ad.street || '';
+  const roadType = ad.road_type || ad.ROAD_TYPE || ad.street_type || ad.STREET_TYPE || ad.strt_type || ad.STRT_TYPE || ad.rdtype || '';
+  const addrLocality = ad.locality_name || ad.LOCALITY_NAME || ad.locality || ad.LOCALITY || ad.suburb || ad.SUBURB || '';
   const addrPostcode = ad.postcode || ad.POSTCODE || ad.pcode || ad.PCODE || '';
   const addrState = 'QLD';
+  // Fallback: if no specific fields matched, try to find any field that looks like an address
+  let autoDetectedAddr = '';
+  if (!addrFull && !houseNum && !roadName && Object.keys(ad).length > 0) {
+    for (var k in ad) {
+      var v = String(ad[k] || '');
+      if (v.length > 5 && /\d/.test(v) && /[a-zA-Z]/.test(v) && (/ ST| RD| AVE| DR| CR| STREET| ROAD| AVENUE| DRIVE| COURT| PLACE| WAY| TCE| TERRACE| PARADE| LN| LANE| BVD| BOULEVARD/i).test(v)) {
+        console.log('Auto-detected address field:', k, '=', v);
+        autoDetectedAddr = v;
+        break;
+      }
+    }
+  }
 
   // Construct display address
-  let streetAddress = addrFull;
+  let streetAddress = addrFull || autoDetectedAddr;
   if (!streetAddress && (houseNum || roadName)) {
     streetAddress = [houseNum, roadName, roadType].filter(Boolean).join(' ');
   }
