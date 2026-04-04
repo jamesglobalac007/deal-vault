@@ -2184,7 +2184,7 @@ function addCadastral(mi) {
   L.esri.dynamicMapLayer({
     url: cadastralService,
     layers: [4], // Layer 4 = Cadastral parcels
-    opacity: 0.5,
+    opacity: 0.75,
     minZoom: 13,
     maxZoom: 19,
     attribution: '© QLD Govt DCDB'
@@ -2889,7 +2889,7 @@ function addMarkers(mi){
 const qldServices = {
   cadastral: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer',
-    layers: [4], opacity: 0.5, minZoom: 13, maxZoom: 19
+    layers: [4], opacity: 0.75, minZoom: 13, maxZoom: 19
   },
   landuse: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandUse/MapServer',
