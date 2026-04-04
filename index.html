@@ -1699,28 +1699,14 @@ function identifyParcel(latlng) {
     checkComplete();
   });
 
-  // 11. SEQ Regional Plan (ShapingSEQ 2023) — Layer 160 in AdminBoundariesFramework
-  (function(){
-    var qp = new URLSearchParams({
-      geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
-      geometryType: 'esriGeometryPoint',
-      spatialRel: 'esriSpatialRelIntersects',
-      outFields: '*',
-      returnGeometry: 'false',
-      resultRecordCount: '1',
-      f: 'json'
-    });
-    fetch('https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer/160/query?' + qp.toString())
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        console.log('SEQ Zone response:', JSON.stringify(data));
-        if (data.features && data.features.length > 0) {
-          results.seqZone = data.features[0].attributes;
-        }
-        checkComplete();
-      })
-      .catch(function(err){ console.log('SEQ Zone query error:', err); checkComplete(); });
-  })();
+  // 11. SEQ Regional Plan Zone (ShapingSEQ 2023) — Layer 157 via identify on AdminBoundariesFramework
+  arcgisIdentify('https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer', latlng, 'all:157', 10, function(r){
+    if(r) {
+      results.seqZone = r[0].attributes;
+      console.log('SEQ Zone attrs:', JSON.stringify(r[0].attributes));
+    }
+    checkComplete();
+  });
 
   // Timeout fallback — render whatever we have after 10s
   setTimeout(function() {
@@ -1811,7 +1797,7 @@ function renderPropPanel(latlng, r) {
   // SEQ Regional Plan Zone (ShapingSEQ 2023)
   const sz = r.seqZone || {};
   if (Object.keys(sz).length > 0) console.log('SEQ Zone keys:', Object.keys(sz).join(', '));
-  const seqZoneName = findField(sz, ['category','cat_desc','zone','zone_name','designation','land_use_category','description','name','type','sub_category']) || null;
+  const seqZoneName = findField(sz, ['Name','name','category','cat_desc','zone','zone_name','designation','land_use_category','description','type','sub_category','value']) || null;
 
   // PDA
   const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.pda_name || r.pda.NAME || r.pda.name || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
