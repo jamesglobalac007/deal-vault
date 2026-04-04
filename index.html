@@ -513,6 +513,27 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#16a34a"></div>Koala Habitat (SEQ)
         </label>
+        <div class="lp-group" style="color:#a3e635">Biodiversity</div>
+        <label class="lp-item" data-layer="bpa">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bpa',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#84cc16"></div>Biodiversity Significance (BPA)
+        </label>
+        <label class="lp-item" data-layer="regveg">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('regveg',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#65a30d"></div>Regulated Vegetation
+        </label>
+        <label class="lp-item" data-layer="recos">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('recos',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#4d7c0f"></div>Regional Ecosystems (Remnant)
+        </label>
+        <label class="lp-item" data-layer="wetlands">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('wetlands',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#0d9488"></div>Wetlands
+        </label>
+        <label class="lp-item" data-layer="biocorridors">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('biocorridors',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#059669"></div>Biodiversity Corridors
+        </label>
         <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
         <label class="lp-item" data-layer="serviceMarkers">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceMarkers',this.checked)"><span class="lp-slider"></span></div>
@@ -2955,6 +2976,26 @@ const qldServices = {
   koala: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Environment/KoalaPlan/MapServer',
     layers: false, opacity: 0.45, minZoom: 10, maxZoom: 19
+  },
+  bpa: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Biota/BiodiversityPlanningAssessments/MapServer',
+    layers: [1], opacity: 0.45, minZoom: 8, maxZoom: 19
+  },
+  regveg: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Biota/VegetationManagement/MapServer',
+    layers: [101], opacity: 0.45, minZoom: 10, maxZoom: 19
+  },
+  recos: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Biota/RegionalEcosystemMapping/MapServer',
+    layers: [2], opacity: 0.4, minZoom: 10, maxZoom: 19
+  },
+  wetlands: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Biota/Wetlands/MapServer',
+    layers: false, opacity: 0.45, minZoom: 10, maxZoom: 19
+  },
+  biocorridors: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Biota/StatewideBiodiversityCorridors/MapServer',
+    layers: false, opacity: 0.4, minZoom: 8, maxZoom: 19
   },
   heritage: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/CulturalHeritageBoundaries/MapServer',
