@@ -2842,7 +2842,8 @@ const qldServices = {
   },
   flood: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/ComprehensiveStudies/MapServer',
-    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
+    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19,
+    blueOverride: true
   },
   flood1pct: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/FloodStudies/MapServer',
@@ -2850,7 +2851,8 @@ const qldServices = {
   },
   floodplain: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer',
-    layers: [15], opacity: 0.45, minZoom: 8, maxZoom: 19
+    layers: [15], opacity: 0.45, minZoom: 8, maxZoom: 19,
+    blueOverride: true
   },
   bushfire: {
     url: 'https://tiles.arcgis.com/tiles/vkTwD8kHw2woKBqV/arcgis/rest/services/Bushfire_Prone_Areas/MapServer',
@@ -2957,6 +2959,23 @@ function toggleLayer(layerKey, on) {
             weight: 0.5,
             fillColor: '#3b82f6',
             fillOpacity: 0.35
+          };
+        }
+      });
+    } else if (svc.blueOverride) {
+      // Flood layers — use featureLayer with forced blue styling
+      var floodLayerId = (svc.layers && svc.layers.length) ? svc.layers[0] : 0;
+      layer = L.esri.featureLayer({
+        url: svc.url + '/' + floodLayerId,
+        opacity: svc.opacity,
+        minZoom: svc.minZoom || 8,
+        maxZoom: svc.maxZoom || 19,
+        style: function() {
+          return {
+            color: '#1e40af',
+            weight: 0.8,
+            fillColor: '#3b82f6',
+            fillOpacity: 0.30
           };
         }
       });
