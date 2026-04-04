@@ -1894,6 +1894,28 @@ function renderPropPanel(latlng, r) {
   const councilZonePrecinct = cz.precinct || null;
   if (councilZoneName) console.log('Council Zone:', councilZoneName, '| Precinct:', councilZonePrecinct);
 
+  // Zone categorization — highlight residential, rural, industrial
+  function categorizeZone(zoneName) {
+    if (!zoneName) return { cat: 'unknown', label: '', color: '#7a8194', bg: 'rgba(107,114,128,.15)', icon: '' };
+    var z = zoneName.toLowerCase();
+    // Residential
+    if (z.match(/residential|dwelling|housing|neighbourhood|suburban|urban residential|character residential|next gen|emerging community/))
+      return { cat: 'residential', label: 'RESIDENTIAL', color: '#00d4aa', bg: 'rgba(0,212,170,.18)', icon: '\u{1F3E0}' };
+    // Rural
+    if (z.match(/rural|rural residential|farming|agriculture|cropping|grazing|horticulture|pastoral/))
+      return { cat: 'rural', label: 'RURAL', color: '#f59e0b', bg: 'rgba(245,158,11,.18)', icon: '\u{1F333}' };
+    // Industrial
+    if (z.match(/industr|manufacturing|enterprise|employment|business|trade|warehouse|logistics|low impact|medium impact|high impact|special industry/))
+      return { cat: 'industrial', label: 'INDUSTRIAL', color: '#8b5cf6', bg: 'rgba(139,92,246,.18)', icon: '\u{1F3ED}' };
+    // Commercial (secondary interest)
+    if (z.match(/commercial|centre|retail|mixed use|principal centre|major centre|district centre|local centre|specialised centre|neighbourhood centre/))
+      return { cat: 'commercial', label: 'COMMERCIAL', color: '#3b82f6', bg: 'rgba(59,130,246,.15)', icon: '' };
+    // Other
+    return { cat: 'other', label: zoneName.split(' ').slice(0,2).join(' ').toUpperCase(), color: '#7a8194', bg: 'rgba(107,114,128,.12)', icon: '' };
+  }
+  const zoneCat = categorizeZone(councilZoneName);
+  const isTargetZone = zoneCat.cat === 'residential' || zoneCat.cat === 'rural' || zoneCat.cat === 'industrial';
+
   // PDA
   const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.pda_name || r.pda.NAME || r.pda.name || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
 
@@ -1940,21 +1962,28 @@ function renderPropPanel(latlng, r) {
   html += `<div class="pp-section">
     <div class="pp-section-title">Planning Information</div>
     <div class="pp-grid">
-      <div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Planning Scheme Zone</div><div class="pp-field-val pp-zone" style="background:${councilZoneName ? 'rgba(0,212,170,.15);color:#00d4aa;font-size:13px;font-weight:600' : 'rgba(107,114,128,.15);color:#7a8194'}">${councilZoneName || (seqZoneName ? seqZoneName + ' (Regional)' : '—')}</div></div>
+      <div class="pp-field" style="grid-column:1/-1">
+        <div class="pp-field-label">Planning Scheme Zone</div>
+        <div class="pp-field-val pp-zone" style="background:${councilZoneName ? zoneCat.bg + ';color:' + zoneCat.color + ';font-size:13px;font-weight:600' : 'rgba(107,114,128,.15);color:#7a8194'}">
+          ${councilZoneName ? (isTargetZone ? '<span style="display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;margin-right:6px;background:' + zoneCat.color + ';color:#0f1419">' + zoneCat.label + '</span>' : '') + councilZoneName : (seqZoneName ? seqZoneName + ' (Regional)' : '—')}
+        </div>
+      </div>
       ${councilZonePrecinct && councilZonePrecinct !== 'None' ? '<div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Zone Precinct</div><div class="pp-field-val">' + councilZonePrecinct + '</div></div>' : ''}
       <div class="pp-field"><div class="pp-field-label">SEQ Regional Plan</div><div class="pp-field-val pp-zone" style="background:${seqZoneName ? 'rgba(34,197,94,.15);color:#22c55e' : 'rgba(107,114,128,.15);color:#7a8194'}">${seqZoneName || '—'}</div></div>
       <div class="pp-field"><div class="pp-field-label">Land Use (ALUMC)</div><div class="pp-field-val pp-zone" style="background:rgba(139,92,246,.15);color:#8b5cf6">${landUseClass}</div></div>
       <div class="pp-field"><div class="pp-field-label">Priority Dev Area</div><div class="pp-field-val">${pdaName || 'Not in PDA'}</div></div>
     </div>`;
+  // Zone category tags
   if (councilZoneName) {
-    html += `<div style="margin-top:8px"><span class="pp-overlay-tag" style="background:rgba(0,212,170,.12);color:#00d4aa">${councilZoneName}</span>`;
-    if (seqZoneName) html += ` <span class="pp-overlay-tag" style="background:rgba(34,197,94,.12);color:#22c55e">${seqZoneName}</span>`;
-    html += `</div>`;
+    html += '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">';
+    html += '<span class="pp-overlay-tag" style="background:' + zoneCat.bg + ';color:' + zoneCat.color + ';font-weight:600">' + councilZoneName + '</span>';
+    if (seqZoneName) html += ' <span class="pp-overlay-tag" style="background:rgba(34,197,94,.12);color:#22c55e">' + seqZoneName + '</span>';
+    html += '</div>';
   }
   if (pdaName) {
-    html += `<div style="margin-top:4px"><span class="pp-overlay-tag" style="background:rgba(59,130,246,.12);color:#3b82f6">${pdaName}</span></div>`;
+    html += '<div style="margin-top:4px"><span class="pp-overlay-tag" style="background:rgba(59,130,246,.12);color:#3b82f6">' + pdaName + '</span></div>';
   }
-  html += `</div>`;
+  html += '</div>';
 
   // Koala habitat
   const koalaStatus = r.koala ? 'Habitat Identified' : 'Unaffected';
