@@ -477,7 +477,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
         </label>
         <label class="lp-item" data-layer="flood1pct">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood1pct',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#1e40af"></div>1% AEP (1-in-100yr)
+          <div class="lp-dot" style="background:#1e40af"></div>Flood Studies
         </label>
         <label class="lp-item" data-layer="floodplain">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodplain',this.checked)"><span class="lp-slider"></span></div>
@@ -2845,11 +2845,11 @@ const qldServices = {
     layers: [14], opacity: 0.45, minZoom: 8, maxZoom: 19
   },
   flood: {
-    url: 'https://services8.arcgis.com/g9mppFwSsmIw9E0Z/arcgis/rest/services/Queensland_floodplain_assessment_overlay/FeatureServer',
-    isFeature: true, opacity: 0.5, minZoom: 8, maxZoom: 19
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/ComprehensiveStudies/MapServer',
+    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
   },
   flood1pct: {
-    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/BasinOnePercentAEP/MapServer',
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/FloodStudies/MapServer',
     layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
   },
   floodplain: {
