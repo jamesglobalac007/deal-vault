@@ -1499,12 +1499,12 @@ function identifyParcel(latlng) {
 
   // Results accumulator
   const results = {
-    cadastral: null, landuse: null, pda: null,
+    address: null, cadastral: null, landuse: null, pda: null,
     flood: null, floodplain: null, contour: null, mses: null,
     koala: null, heritage: null, acid: null
   };
   let completed = 0;
-  const total = 10;
+  const total = 11;
 
   function checkComplete() {
     completed++;
@@ -1516,6 +1516,13 @@ function identifyParcel(latlng) {
       renderPropPanel(latlng, results);
     }
   }
+
+  // 0. Address (Layer 0 = Addresses from QLD Address Management Framework)
+  arcgisIdentify(qldServices.cadastral.url, latlng, 'all:0', 15, function(r){
+    if(r) results.address = r[0].attributes;
+    if(r) console.log('Address attrs:', JSON.stringify(r[0].attributes));
+    checkComplete();
+  });
 
   // 1. Cadastral parcels
   arcgisIdentify(qldServices.cadastral.url, latlng, 'all:4', 3, function(r){
@@ -1590,6 +1597,30 @@ function renderPropPanel(latlng, r) {
   const content = document.getElementById('propContent');
   const c = r.cadastral || {};
   const lu = r.landuse || {};
+  const ad = r.address || {};
+
+  // Build full street address from QLD Address Management Framework
+  const addrFull = ad.address || ad.ADDRESS || ad.full_address || ad.FULL_ADDRESS || '';
+  // Try to build from parts if full address not available
+  const houseNum = ad.house_number || ad.HOUSE_NUMBER || ad.strt_numb || ad.STRT_NUMB || ad.number || '';
+  const roadName = ad.road_name || ad.ROAD_NAME || ad.street_name || ad.STREET_NAME || ad.strt_name || ad.STRT_NAME || '';
+  const roadType = ad.road_type || ad.ROAD_TYPE || ad.street_type || ad.STREET_TYPE || ad.strt_type || ad.STRT_TYPE || '';
+  const addrLocality = ad.locality_name || ad.LOCALITY_NAME || ad.locality || ad.LOCALITY || '';
+  const addrPostcode = ad.postcode || ad.POSTCODE || ad.pcode || ad.PCODE || '';
+  const addrState = 'QLD';
+
+  // Construct display address
+  let streetAddress = addrFull;
+  if (!streetAddress && (houseNum || roadName)) {
+    streetAddress = [houseNum, roadName, roadType].filter(Boolean).join(' ');
+  }
+  let fullAddress = '';
+  if (streetAddress) {
+    fullAddress = streetAddress;
+    if (addrLocality) fullAddress += ', ' + addrLocality;
+    fullAddress += ', ' + addrState;
+    if (addrPostcode) fullAddress += ' ' + addrPostcode;
+  }
 
   // Extract key fields from cadastral — DCDB uses lowercase field names
   const lotPlan = c.lotplan || c.LOTPLAN || c.LOT_PLAN || c.Lot_Plan || '—';
@@ -1636,8 +1667,9 @@ function renderPropPanel(latlng, r) {
 
   // Address / Lot Plan header
   html += `<div class="pp-addr">
-    <h3>${locality !== '—' ? locality : 'Selected Parcel'}</h3>
+    ${fullAddress ? '<h3 style="font-size:15px;margin-bottom:4px">' + fullAddress + '</h3>' : '<h3>' + (locality !== '—' ? locality : 'Selected Parcel') + '</h3>'}
     <div class="pp-lotplan">${lotPlan !== '—' ? 'Lot ' + lotPlan : lot !== '—' ? 'Lot ' + lot + ' on ' + plan : 'Lat ' + latlng.lat.toFixed(5) + ', Lng ' + latlng.lng.toFixed(5)}</div>
+    ${fullAddress && locality !== '—' ? '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + locality + (lga !== '—' ? ' — ' + lga : '') + '</div>' : ''}
   </div>`;
 
   // Property Details section
