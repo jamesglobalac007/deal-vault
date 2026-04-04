@@ -1591,25 +1591,28 @@ function renderPropPanel(latlng, r) {
   const c = r.cadastral || {};
   const lu = r.landuse || {};
 
-  // Extract key fields from cadastral (DCDB field names)
-  const lotPlan = c.LOTPLAN || c.LOT_PLAN || c.Lot_Plan || c.LOTNUMBER || c.Lot_Plan_Desc || '—';
-  const lot = c.LOT || c.LOTNUMBER || c.Lot || c.LOT_NUMBER || '—';
-  const plan = c.PLAN || c.PLANNUMBER || c.Plan || c.PLAN_NUMBER || '—';
-  const area = c.AREA_M2 || c.SHAPE_Area || c.AREA || c.Shape_Area || c.AREA_HA || (c.SHAPE && c.SHAPE.area) || c.O_SHAPE_Area || null;
+  // Extract key fields from cadastral — DCDB uses lowercase field names
+  const lotPlan = c.lotplan || c.LOTPLAN || c.LOT_PLAN || c.Lot_Plan || '—';
+  const lot = c.lot || c.LOT || c.LOTNUMBER || '—';
+  const plan = c.plan || c.PLAN || c.PLANNUMBER || '—';
+  // Area: DCDB doesn't have a direct area field — use Shape_Area or st_area
+  const area = c.Shape_Area || c.SHAPE_Area || c.shape_Area || c['st_area(shape)'] || c.AREA_M2 || c.AREA || (c.Shape && c.Shape.area) || (c.SHAPE && c.SHAPE.area) || null;
   const areaDisplay = area ? (area > 10000 ? (area/10000).toFixed(2) + ' ha' : Math.round(area).toLocaleString() + ' m\u00B2') : '—';
-  const tenure = c.TENURE || c.TENURE_DESC || c.Tenure || c.COVER_TY || '—';
-  const lga = c.LGA || c.LOCAL_GOVERNMENT || c.LGA_NAME || c.SHIRE_NAME || c.LOC_AUTH || '—';
-  const locality = c.LOCALITY || c.LOCALITY_NAME || c.Locality || c.LOC_NAME || '—';
-  const segParcel = c.SEG_PARCEL || c.PARCEL_TYPE || c.SEGMENT_PARCEL || '—';
+  const tenure = c.tenure || c.TENURE || c.Tenure || '—';
+  const lga = c.shire_name || c.SHIRE_NAME || c.LGA || c.LGA_NAME || c.LOCAL_GOVERNMENT || '—';
+  const locality = c.locality || c.LOCALITY || c.LOCALITY_NAME || c.Locality || '—';
+  const segParcel = c.segment_parcel || c.SEG_PARCEL || c.parcel_typ || c.PARCEL_TYPE || '—';
+  const coverType = c.cover_typ || c.COVER_TYP || c.COVER_TYPE || '—';
 
-  // Log cadastral data for debugging (check browser console)
-  if (Object.keys(c).length > 0) console.log('Cadastral data:', c);
+  // Log ALL returned data for debugging (check browser console F12)
+  console.log('Cadastral attrs:', JSON.stringify(c));
+  console.log('Land use attrs:', JSON.stringify(lu));
 
-  // Land use
-  const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.LU_DESC || lu.DESCRIPTION || lu.Land_Use || '—';
+  // Land use — ALUMC fields
+  const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.Secondary || lu.Tertiary || lu.Primary || lu.COMMODITY || lu.DESCRIPTION || '—';
 
   // PDA
-  const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.NAME || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
+  const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.pda_name || r.pda.NAME || r.pda.name || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
 
   // Flood status
   const floodStatus = r.flood ? 'Potentially Affected' : 'Unaffected';
@@ -1619,8 +1622,9 @@ function renderPropPanel(latlng, r) {
   const fpStatus = r.floodplain ? 'In Floodplain' : 'Outside Floodplain';
   const fpClass = r.floodplain ? 'moderate' : 'clear';
 
-  // Elevation
-  const elevation = r.contour ? (r.contour.ELEVATION || r.contour.CONTOUR || r.contour.ELEV_M || '—') : '—';
+  // Elevation — SRTM 10m contour fields
+  const elevation = r.contour ? (r.contour.ELEVATION || r.contour.elevation || r.contour.CONTOUR || r.contour.contour || r.contour.ELEV_M || r.contour.HEIGHT || r.contour.height || '—') : '—';
+  if (r.contour) console.log('Contour attrs:', JSON.stringify(r.contour));
 
   // MSES (environmental)
   const msesStatus = r.mses && r.mses.length > 0 ? 'Affected' : 'Unaffected';
@@ -1643,7 +1647,9 @@ function renderPropPanel(latlng, r) {
       <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
       <div class="pp-field"><div class="pp-field-label">Tenure</div><div class="pp-field-val">${tenure}</div></div>
       <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
-      <div class="pp-field"><div class="pp-field-label">LGA</div><div class="pp-field-val">${lga}</div></div>
+      <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Parcel Type</div><div class="pp-field-val">${segParcel}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Cover Type</div><div class="pp-field-val">${coverType}</div></div>
       <div class="pp-field"><div class="pp-field-label">Elevation</div><div class="pp-field-val">${elevation !== '—' ? elevation + 'm AHD' : '—'}</div></div>
       <div class="pp-field"><div class="pp-field-label">Coordinates</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:10px">${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}</div></div>
     </div>
