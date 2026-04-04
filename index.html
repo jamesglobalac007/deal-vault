@@ -1531,6 +1531,68 @@ function arcgisIdentify(serviceUrl, latlng, layerSpec, tolerance, callback) {
     });
 }
 
+// ─── COUNCIL ZONE SERVICES ───
+// Maps LGA name (from cadastral shire_name or address local_authority) to zone FeatureServer
+const councilZoneServices = {
+  'Brisbane City': {
+    url: 'https://services2.arcgis.com/dEKgZETqwmDAh1rP/arcgis/rest/services/Zoning_opendata/FeatureServer/0',
+    zoneField: 'LVL2_ZONE', codeField: 'ZONE_CODE', precinctField: 'ZONE_PREC_DESC'
+  },
+  'Gold Coast City': {
+    url: 'https://services-ap1.arcgis.com/lnVW0dLI3fvST2hd/arcgis/rest/services/City_Plan_Version_12_Open_Data/FeatureServer/4',
+    zoneField: 'ZONE', codeField: 'LVL1_ZONE', precinctField: 'ZONE_PRECINCT'
+  },
+  'Moreton Bay Regional': {
+    url: 'https://services-ap1.arcgis.com/152ojN3Ts9H3cdtl/arcgis/rest/services/ZM_Zones_Dissolved_WebMercator_OpenData/FeatureServer/0',
+    zoneField: 'LVL1_ZONE', codeField: 'LP_PREC', precinctField: 'ZONE_PREC'
+  },
+  'Sunshine Coast Regional': {
+    url: 'https://services-ap1.arcgis.com/YQyt7djuXN7rQyg4/arcgis/rest/services/PlanningScheme_Zoning_SCC/FeatureServer/5',
+    zoneField: 'DESCRIPT', codeField: 'HEADING', precinctField: 'LABEL'
+  },
+  'Noosa Shire': {
+    url: 'https://services2.arcgis.com/tQg86iShPXJPWQWw/arcgis/rest/services/DSP_Noosa_Plan_Zones/FeatureServer/0',
+    zoneField: 'New_Noosa_Plan_Zones', codeField: 'Label', precinctField: 'GroupName'
+  }
+};
+
+// Fuzzy match LGA name to council zone service
+function findCouncilZoneService(lgaName) {
+  if (!lgaName || lgaName === '—') return null;
+  var lga = lgaName.toLowerCase();
+  for (var key in councilZoneServices) {
+    if (lga.indexOf(key.split(' ')[0].toLowerCase()) !== -1) return councilZoneServices[key];
+  }
+  return null;
+}
+
+// Query council zone for a point
+function queryCouncilZone(latlng, lgaName, callback) {
+  var svc = findCouncilZoneService(lgaName);
+  if (!svc) { callback(null); return; }
+  var qp = new URLSearchParams({
+    geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
+    geometryType: 'esriGeometryPoint',
+    spatialRel: 'esriSpatialRelIntersects',
+    outFields: '*',
+    returnGeometry: 'false',
+    resultRecordCount: '1',
+    f: 'json'
+  });
+  fetch(svc.url + '/query?' + qp.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.features && data.features.length > 0) {
+        var attrs = data.features[0].attributes;
+        var zone = attrs[svc.zoneField] || attrs[svc.codeField] || null;
+        var precinct = attrs[svc.precinctField] || null;
+        console.log('Council zone attrs:', JSON.stringify(attrs));
+        callback({zone: zone, precinct: precinct, council: lgaName, raw: attrs});
+      } else { callback(null); }
+    })
+    .catch(function(err){ console.log('Council zone error:', err); callback(null); });
+}
+
 function identifyParcel(latlng) {
   const content = document.getElementById('propContent');
 
@@ -1542,10 +1604,11 @@ function identifyParcel(latlng) {
   const results = {
     address: null, cadastral: null, landuse: null, pda: null,
     flood: null, floodplain: null, contour: null, mses: null,
-    koala: null, heritage: null, acid: null, seqZone: null
+    koala: null, heritage: null, acid: null, seqZone: null, councilZone: null
   };
   let completed = 0;
-  const total = 12;
+  const total = 13;
+  let zoneQueryFired = false;
 
   function checkComplete() {
     completed++;
@@ -1553,7 +1616,21 @@ function identifyParcel(latlng) {
     if (completed < total) {
       content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying... (' + completed + '/' + total + ' services)</div>';
     }
+    // Fire council zone query as soon as we know the LGA
+    if (!zoneQueryFired) {
+      var lgaName = null;
+      if (results.cadastral) lgaName = results.cadastral.shire_name || results.cadastral.SHIRE_NAME;
+      if (!lgaName && results.address) lgaName = results.address.local_authority || results.address.LOCAL_AUTHORITY;
+      if (lgaName) {
+        zoneQueryFired = true;
+        queryCouncilZone(latlng, lgaName, function(zoneData){
+          results.councilZone = zoneData;
+          checkComplete();
+        });
+      }
+    }
     if (completed >= total) {
+      // If zone query never fired (no LGA found), just render
       renderPropPanel(latlng, results);
     }
   }
@@ -1799,6 +1876,12 @@ function renderPropPanel(latlng, r) {
   if (Object.keys(sz).length > 0) console.log('SEQ Zone keys:', Object.keys(sz).join(', '));
   const seqZoneName = findField(sz, ['Name','name','category','cat_desc','zone','zone_name','designation','land_use_category','description','type','sub_category','value']) || null;
 
+  // Council Planning Scheme Zone
+  const cz = r.councilZone || {};
+  const councilZoneName = cz.zone || null;
+  const councilZonePrecinct = cz.precinct || null;
+  if (councilZoneName) console.log('Council Zone:', councilZoneName, '| Precinct:', councilZonePrecinct);
+
   // PDA
   const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.pda_name || r.pda.NAME || r.pda.name || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
 
@@ -1845,15 +1928,19 @@ function renderPropPanel(latlng, r) {
   html += `<div class="pp-section">
     <div class="pp-section-title">Planning Information</div>
     <div class="pp-grid">
-      <div class="pp-field"><div class="pp-field-label">SEQ Regional Plan Zone</div><div class="pp-field-val pp-zone" style="background:${seqZoneName ? 'rgba(34,197,94,.15);color:#22c55e' : 'rgba(107,114,128,.15);color:#7a8194'}">${seqZoneName || '—'}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Land Use</div><div class="pp-field-val pp-zone" style="background:rgba(139,92,246,.15);color:#8b5cf6">${landUseClass}</div></div>
+      <div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Planning Scheme Zone</div><div class="pp-field-val pp-zone" style="background:${councilZoneName ? 'rgba(0,212,170,.15);color:#00d4aa;font-size:13px;font-weight:600' : 'rgba(107,114,128,.15);color:#7a8194'}">${councilZoneName || (seqZoneName ? seqZoneName + ' (Regional)' : '—')}</div></div>
+      ${councilZonePrecinct && councilZonePrecinct !== 'None' ? '<div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Zone Precinct</div><div class="pp-field-val">' + councilZonePrecinct + '</div></div>' : ''}
+      <div class="pp-field"><div class="pp-field-label">SEQ Regional Plan</div><div class="pp-field-val pp-zone" style="background:${seqZoneName ? 'rgba(34,197,94,.15);color:#22c55e' : 'rgba(107,114,128,.15);color:#7a8194'}">${seqZoneName || '—'}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Land Use (ALUMC)</div><div class="pp-field-val pp-zone" style="background:rgba(139,92,246,.15);color:#8b5cf6">${landUseClass}</div></div>
       <div class="pp-field"><div class="pp-field-label">Priority Dev Area</div><div class="pp-field-val">${pdaName || 'Not in PDA'}</div></div>
     </div>`;
-  if (pdaName) {
-    html += `<div style="margin-top:8px"><span class="pp-overlay-tag" style="background:rgba(59,130,246,.12);color:#3b82f6">${pdaName}</span></div>`;
+  if (councilZoneName) {
+    html += `<div style="margin-top:8px"><span class="pp-overlay-tag" style="background:rgba(0,212,170,.12);color:#00d4aa">${councilZoneName}</span>`;
+    if (seqZoneName) html += ` <span class="pp-overlay-tag" style="background:rgba(34,197,94,.12);color:#22c55e">${seqZoneName}</span>`;
+    html += `</div>`;
   }
-  if (seqZoneName) {
-    html += `<div style="margin-top:4px"><span class="pp-overlay-tag" style="background:rgba(34,197,94,.12);color:#22c55e">${seqZoneName}</span></div>`;
+  if (pdaName) {
+    html += `<div style="margin-top:4px"><span class="pp-overlay-tag" style="background:rgba(59,130,246,.12);color:#3b82f6">${pdaName}</span></div>`;
   }
   html += `</div>`;
 
