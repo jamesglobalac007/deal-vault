@@ -536,8 +536,23 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
         <label class="lp-item" data-layer="serviceMarkers">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceMarkers',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#0ea5e9"></div>Water / Sewer / Power
+          <div class="lp-dot" style="background:#0ea5e9"></div>Major Plants &amp; Facilities
         </label>
+        <label class="lp-item" data-layer="energexHV">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('energexHV',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#f59e0b"></div>Power Lines (HV Network)
+        </label>
+        <label class="lp-item" data-layer="energexLV">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('energexLV',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#fbbf24"></div>Power Lines (LV / Street)
+        </label>
+        <label class="lp-item" data-layer="energexSubs">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('energexSubs',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#f97316"></div>Substations
+        </label>
+        <div style="padding:4px 12px 8px;font-size:10px;color:#94a3b8;line-height:1.4">
+          <span style="color:#0ea5e9">&#9432;</span> Water &amp; sewer network maps linked in property panel under Service Connections
+        </div>
         <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
         <label class="lp-item" data-layer="pdaMarkers">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
@@ -3007,6 +3022,20 @@ const qldServices = {
   localities: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer',
     layers: [8], opacity: 0.35, minZoom: 10, maxZoom: 19
+  },
+  energexHV: {
+    url: 'https://services.arcgis.com/bfVzktoY0OhzQCDj/ArcGIS/rest/services/Network_Energex/FeatureServer/1',
+    isFeature: true, opacity: 0.7, minZoom: 12, maxZoom: 19,
+    featureStyle: { color: '#f59e0b', weight: 1.5, opacity: 0.7 }
+  },
+  energexLV: {
+    url: 'https://services.arcgis.com/bfVzktoY0OhzQCDj/ArcGIS/rest/services/Network_Energex/FeatureServer/5',
+    isFeature: true, opacity: 0.6, minZoom: 15, maxZoom: 19,
+    featureStyle: { color: '#fbbf24', weight: 1, opacity: 0.6 }
+  },
+  energexSubs: {
+    url: 'https://services.arcgis.com/bfVzktoY0OhzQCDj/ArcGIS/rest/services/Network_Energex/FeatureServer/8',
+    isFeature: true, opacity: 0.8, minZoom: 12, maxZoom: 19
   }
 };
 
@@ -3072,21 +3101,15 @@ function toggleLayer(layerKey, on) {
         maxZoom: svc.maxZoom || 19
       });
     } else if (svc.isFeature) {
-      // FeatureServer layer (e.g. QFAO flood overlay with styled polygons)
+      // FeatureServer layer — URL already includes layer ID
+      var fStyle = svc.featureStyle || { color: '#3b82f6', weight: 0.5, fillColor: '#3b82f6', fillOpacity: 0.35 };
       layer = L.esri.featureLayer({
-        url: svc.url + '/0',
+        url: svc.url,
         opacity: svc.opacity,
         minZoom: svc.minZoom || 8,
         maxZoom: svc.maxZoom || 19,
-        style: function(feature) {
-          // Graduated blue for flood zones — darker = higher risk
-          var sub = (feature.properties && feature.properties.sub_name) || '';
-          return {
-            color: '#1e40af',
-            weight: 0.5,
-            fillColor: '#3b82f6',
-            fillOpacity: 0.35
-          };
+        style: function() {
+          return fStyle;
         }
       });
     } else if (svc.blueOverride) {
@@ -3225,6 +3248,43 @@ function getCouncilMappingLinks(lga, latlng, lot, plan, lotPlan) {
       label: 'QLD Planning Portal',
       url: 'https://planning.statedevelopment.qld.gov.au/planning-framework/plan-making/browse-planning-schemes'
     });
+  }
+
+  return links;
+}
+
+function getUtilityProviderLinks(lga) {
+  var links = [];
+  var lgaU = (lga || '').toUpperCase();
+
+  // Water & Sewer providers based on LGA
+  if (lgaU.indexOf('BRISBANE') !== -1 || lgaU.indexOf('IPSWICH') !== -1 || lgaU.indexOf('LOCKYER') !== -1 || lgaU.indexOf('SCENIC') !== -1 || lgaU.indexOf('SOMERSET') !== -1) {
+    links.push({ label: 'Urban Utilities', url: 'https://quu.maps.arcgis.com/apps/webappviewer/index.html?id=3d33e3db46894d46a9cffca08eae68b9', icon: '💧', desc: 'Water & sewer network map' });
+  } else if (lgaU.indexOf('MORETON') !== -1 || lgaU.indexOf('SUNSHINE') !== -1 || lgaU.indexOf('NOOSA') !== -1) {
+    links.push({ label: 'Unitywater', url: 'https://datahub.moretonbay.qld.gov.au/maps/22128ae7c633439badcb3d9fe2f39d37', icon: '💧', desc: 'Water network map' });
+    links.push({ label: 'Unitywater Sewer', url: 'https://datahub.moretonbay.qld.gov.au/maps/d0b5e3cd4d8b453a83120102e276902a', icon: '🟤', desc: 'Sewer network map' });
+  } else if (lgaU.indexOf('GOLD COAST') !== -1) {
+    links.push({ label: 'GC Water & Sewer', url: 'https://data-goldcoast.opendata.arcgis.com/', icon: '💧', desc: 'Gold Coast water & sewer data' });
+  } else if (lgaU.indexOf('LOGAN') !== -1) {
+    links.push({ label: 'Urban Utilities', url: 'https://quu.maps.arcgis.com/apps/webappviewer/index.html?id=3d33e3db46894d46a9cffca08eae68b9', icon: '💧', desc: 'Water & sewer network map' });
+  } else if (lgaU.indexOf('REDLAND') !== -1) {
+    links.push({ label: 'Urban Utilities', url: 'https://quu.maps.arcgis.com/apps/webappviewer/index.html?id=3d33e3db46894d46a9cffca08eae68b9', icon: '💧', desc: 'Water & sewer network map' });
+  } else if (lgaU.indexOf('TOOWOOMBA') !== -1) {
+    links.push({ label: 'TRC Water & Sewer', url: 'https://mapping.tr.qld.gov.au/TRCPortal/', icon: '💧', desc: 'Toowoomba water & sewer' });
+  }
+
+  // Electricity — Energex for SEQ, Ergon for Toowoomba region
+  if (lgaU.indexOf('TOOWOOMBA') !== -1 || lgaU.indexOf('LOCKYER') !== -1 || lgaU.indexOf('SOMERSET') !== -1) {
+    links.push({ label: 'Ergon Energy', url: 'https://www.ergon.com.au/network/network-management/network-maps', icon: '⚡', desc: 'Power network map' });
+  } else {
+    links.push({ label: 'Energex Network', url: 'https://www.energex.com.au/our-network/network-maps', icon: '⚡', desc: 'Power network map' });
+  }
+
+  // Stormwater — council managed
+  if (lgaU.indexOf('BRISBANE') !== -1) {
+    links.push({ label: 'BCC Stormwater', url: 'https://data.brisbane.qld.gov.au/explore/dataset/stormwater-pipe-existing/', icon: '🌊', desc: 'Stormwater drainage network' });
+  } else if (lgaU.indexOf('SUNSHINE') !== -1) {
+    links.push({ label: 'SC Stormwater', url: 'https://data.sunshinecoast.qld.gov.au/maps/a678040caad84caf9c1e179f1bd5922b', icon: '🌊', desc: 'Stormwater drainage network' });
   }
 
   return links;
@@ -3813,6 +3873,18 @@ function renderPropPanel(latlng, r) {
         cl.label + '</a>';
     });
     html += '</div>';
+  }
+
+  // Utility provider links (water, sewer, power, stormwater)
+  var utilLinks = getUtilityProviderLinks(lga);
+  if (utilLinks.length > 0) {
+    html += '<div style="margin-bottom:12px"><div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:5px">Service Connections</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:5px">';
+    utilLinks.forEach(function(ul) {
+      html += '<a href="' + ul.url + '" target="_blank" rel="noopener" title="' + ul.desc + '" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:5px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);color:#0ea5e9;font-size:10px;font-weight:600;text-decoration:none;transition:all .15s;cursor:pointer" onmouseover="this.style.background=\'rgba(14,165,233,.2)\'" onmouseout="this.style.background=\'rgba(14,165,233,.1)\'">' +
+        '<span style="font-size:11px">' + ul.icon + '</span>' + ul.label + '</a>';
+    });
+    html += '</div></div>';
   }
 
   // Prominent zone badge (right after address)
