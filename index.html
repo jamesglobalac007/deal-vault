@@ -3487,9 +3487,9 @@ function removeTrackedProp(lotPlan) {
 function drawTrackedBorders() {
   if (!trackedLayerVisible) return;
   // Draw on main map
-  if (window.mapFull) drawTrackedOnMap(mapFull);
+  if (mapFull) drawTrackedOnMap(mapFull);
   // Draw on competitor map
-  if (window.compMap) drawTrackedOnMap(compMap);
+  if (compMap) drawTrackedOnMap(compMap);
 }
 
 function drawTrackedOnMap(mi) {
@@ -3602,8 +3602,8 @@ function toggleSizeFilter(minSqm) {
 
   // If same filter clicked or Off, remove existing
   if (minSqm === 0 || minSqm === activeSizeFilter) {
-    if (sizeFilterLayer && window.mapFull) {
-      window.mapFull.removeLayer(sizeFilterLayer);
+    if (sizeFilterLayer && mapFull) {
+      mapFull.removeLayer(sizeFilterLayer);
       sizeFilterLayer = null;
     }
     activeSizeFilter = 0;
@@ -3615,8 +3615,8 @@ function toggleSizeFilter(minSqm) {
   activeSizeFilter = minSqm;
 
   // Remove old layer
-  if (sizeFilterLayer && window.mapFull) {
-    window.mapFull.removeLayer(sizeFilterLayer);
+  if (sizeFilterLayer && mapFull) {
+    mapFull.removeLayer(sizeFilterLayer);
     sizeFilterLayer = null;
   }
 
@@ -3628,10 +3628,10 @@ function toggleSizeFilter(minSqm) {
 }
 
 function fetchSizeParcels(minSqm) {
-  if (!window.mapFull || activeSizeFilter !== minSqm) return;
+  if (!mapFull || activeSizeFilter !== minSqm) return;
 
-  var bounds = window.mapFull.getBounds();
-  var zoom = window.mapFull.getZoom();
+  var bounds = mapFull.getBounds();
+  var zoom = mapFull.getZoom();
   if (zoom < 13) {
     document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#f59e0b">Zoom in to see parcels (min zoom 13)</span>';
     return;
@@ -3662,8 +3662,8 @@ function fetchSizeParcels(minSqm) {
     .then(function(data) {
       if (activeSizeFilter !== minSqm) return; // filter changed while loading
       // Remove old layer
-      if (sizeFilterLayer && window.mapFull) {
-        window.mapFull.removeLayer(sizeFilterLayer);
+      if (sizeFilterLayer && mapFull) {
+        mapFull.removeLayer(sizeFilterLayer);
       }
 
       var group = L.layerGroup();
@@ -3708,7 +3708,7 @@ function fetchSizeParcels(minSqm) {
       }
 
       sizeFilterLayer = group;
-      sizeFilterLayer.addTo(window.mapFull);
+      sizeFilterLayer.addTo(mapFull);
       document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#00d4aa">' + count + ' parcel' + (count !== 1 ? 's' : '') + ' found</span>';
       console.log('Size filter: ' + count + ' parcels >= ' + minSqm + ' m\u00B2 in view');
     })
@@ -3921,11 +3921,11 @@ var selectedParcelLayer = null;
 
 function fetchAndHighlightParcel(latlng) {
   // Remove previous highlight but don't clear — just replace
-  if (selectedParcelLayer && window.mapFull) {
-    window.mapFull.removeLayer(selectedParcelLayer);
+  if (selectedParcelLayer && mapFull) {
+    mapFull.removeLayer(selectedParcelLayer);
     selectedParcelLayer = null;
   }
-  if (!window.mapFull || !latlng) return;
+  if (!mapFull || !latlng) return;
 
   // Standalone query JUST for geometry — completely independent of property panel
   var url = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/4/query';
@@ -3967,12 +3967,12 @@ function fetchAndHighlightParcel(latlng) {
           fillOpacity: 0.07,
           interactive: false
         }
-      }).addTo(window.mapFull);
+      }).addTo(mapFull);
 
       // Zoom to parcel
       var bounds = selectedParcelLayer.getBounds();
       if (bounds && bounds.isValid()) {
-        window.mapFull.fitBounds(bounds, {padding: [80, 80], maxZoom: 18, animate: true, duration: 0.5});
+        mapFull.fitBounds(bounds, {padding: [80, 80], maxZoom: 18, animate: true, duration: 0.5});
       }
       console.log('[Parcel highlight] Drew parcel outline OK');
     })
