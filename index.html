@@ -278,7 +278,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .map-zoom-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
 .map-zoom-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid rgba(20,23,34,.9);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .map-style-toggle{position:absolute;top:12px;right:12px;z-index:1002;display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.map-style-btn{padding:6px 12px;font-size:10px;font-weight:600;background:rgba(20,23,34,.92);backdrop-filter:blur(10px);color:var(--dim);border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.map-style-btn{padding:8px 10px;font-size:10px;font-weight:600;background:rgba(20,23,34,.92);backdrop-filter:blur(10px);color:var(--dim);border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
 .map-style-btn:hover{color:var(--text)}
 .map-style-btn.active{background:var(--accent);color:#0a0d14}
 .pp-actions{padding:12px 16px;display:flex;flex-direction:column;gap:6px}
@@ -455,17 +455,17 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('corridors',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#22c55e"></div>Growth Zones
         </label>
-        <div class="lp-group">Cadastral</div>
+        <div class="lp-group" style="color:#9ca3af">Cadastral</div>
         <label class="lp-item active" data-layer="cadastral">
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('cadastral',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#6b7280"></div>Parcel Boundaries
         </label>
-        <div class="lp-group">Planning</div>
+        <div class="lp-group" style="color:#a78bfa">Planning</div>
         <label class="lp-item" data-layer="landuse">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#8b5cf6"></div>Land Use (Current Use)
         </label>
-        <div class="lp-group flood-expand-header" onclick="toggleFloodDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none">
+        <div class="lp-group flood-expand-header" onclick="toggleFloodDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#60a5fa">
           <span>Flood Mapping</span>
           <span id="floodChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
         </div>
@@ -494,17 +494,17 @@ tr:hover td{background:rgba(255,255,255,.015)}
             <span style="color:#60a5fa">&#9432;</span> Detailed Cat 1–5 hazard categories available via council mapping links in property panel
           </div>
         </div>
-        <div class="lp-group">Hazards</div>
+        <div class="lp-group" style="color:#f97316">Hazards</div>
         <label class="lp-item" data-layer="bushfire">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#f97316"></div>Bushfire Prone Areas
         </label>
-        <div class="lp-group">Terrain</div>
+        <div class="lp-group" style="color:#a78bfa">Terrain</div>
         <label class="lp-item" data-layer="contours">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#a78bfa"></div>Contours (Elevation)
         </label>
-        <div class="lp-group">Environment</div>
+        <div class="lp-group" style="color:#22c55e">Environment &amp; Biodiversity</div>
         <label class="lp-item" data-layer="mses">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('mses',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#22c55e"></div>Environmental (MSES)
@@ -513,7 +513,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#16a34a"></div>Koala Habitat (SEQ)
         </label>
-        <div class="lp-group" style="color:#a3e635">Biodiversity</div>
         <label class="lp-item" data-layer="bpa">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bpa',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#84cc16"></div>Biodiversity Significance (BPA)
