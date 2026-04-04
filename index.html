@@ -465,15 +465,35 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#8b5cf6"></div>Land Use (Current Use)
         </label>
-        <div class="lp-group">Flood Mapping</div>
-        <label class="lp-item" data-layer="flood">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#3b82f6"></div>Flood Hazard Zones
-        </label>
-        <label class="lp-item" data-layer="floodplain">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodplain',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#60a5fa"></div>Floodplain Overlay
-        </label>
+        <div class="lp-group flood-expand-header" onclick="toggleFloodDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none">
+          <span>Flood Mapping</span>
+          <span id="floodChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
+        </div>
+        <div id="floodDropdown" style="display:none">
+          <label class="lp-item" data-layer="flood">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#1e40af"></div>Comprehensive Studies
+          </label>
+          <label class="lp-item" data-layer="floodRapid">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodRapid',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#2563eb"></div>Rapid Hazard Assessment
+          </label>
+          <label class="lp-item" data-layer="floodHistoric">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodHistoric',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#3b82f6"></div>Historic Flood Lines
+          </label>
+          <label class="lp-item" data-layer="floodplain">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodplain',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#60a5fa"></div>Floodplain Overlay
+          </label>
+          <label class="lp-item" data-layer="floodInland">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodInland',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#93c5fd"></div>Inland Flood Waters
+          </label>
+          <div style="padding:4px 12px 8px;font-size:10px;color:#94a3b8;line-height:1.4">
+            <span style="color:#60a5fa">&#9432;</span> Detailed Cat 1–5 hazard categories available via council mapping links in property panel
+          </div>
+        </div>
         <div class="lp-group">Hazards</div>
         <label class="lp-item" data-layer="bushfire">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
@@ -2886,16 +2906,27 @@ const qldServices = {
   flood: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/ComprehensiveStudies/MapServer',
     layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19,
-    blueOverride: true
+    blueOverride: true, blueColor: '#1e3a8a', blueFill: '#1e40af', blueFillOpacity: 0.35
   },
-  flood1pct: {
-    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/FloodStudies/MapServer',
-    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
+  floodRapid: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/RapidHazardAssessment/MapServer',
+    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19,
+    blueOverride: true, blueColor: '#1e40af', blueFill: '#2563eb', blueFillOpacity: 0.30
+  },
+  floodHistoric: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/HistoricFloodLines/MapServer',
+    layers: false, opacity: 0.45, minZoom: 8, maxZoom: 19,
+    blueOverride: true, blueColor: '#2563eb', blueFill: '#3b82f6', blueFillOpacity: 0.25
   },
   floodplain: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer',
     layers: [15], opacity: 0.45, minZoom: 8, maxZoom: 19,
-    blueOverride: true
+    blueOverride: true, blueColor: '#3b82f6', blueFill: '#60a5fa', blueFillOpacity: 0.22
+  },
+  floodInland: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/InlandWaters/MapServer',
+    layers: false, opacity: 0.4, minZoom: 8, maxZoom: 19,
+    blueOverride: true, blueColor: '#60a5fa', blueFill: '#93c5fd', blueFillOpacity: 0.18
   },
   bushfire: {
     url: 'https://tiles.arcgis.com/tiles/vkTwD8kHw2woKBqV/arcgis/rest/services/Bushfire_Prone_Areas/MapServer',
@@ -2941,6 +2972,18 @@ const qldServices = {
 
 // Active layer references for the full map
 const activeLayers = {};
+
+function toggleFloodDropdown() {
+  var dd = document.getElementById('floodDropdown');
+  var chev = document.getElementById('floodChevron');
+  if (dd.style.display === 'none') {
+    dd.style.display = 'block';
+    chev.style.transform = 'rotate(180deg)';
+  } else {
+    dd.style.display = 'none';
+    chev.style.transform = 'rotate(0deg)';
+  }
+}
 
 function toggleLayer(layerKey, on) {
   if (!mapFull) return;
@@ -3007,8 +3050,11 @@ function toggleLayer(layerKey, on) {
         }
       });
     } else if (svc.blueOverride) {
-      // Flood layers — use featureLayer with forced blue styling
+      // Flood layers — use featureLayer with graduated blue styling per category
       var floodLayerId = (svc.layers && svc.layers.length) ? svc.layers[0] : 0;
+      var bColor = svc.blueColor || '#1e40af';
+      var bFill = svc.blueFill || '#3b82f6';
+      var bFillOp = svc.blueFillOpacity || 0.30;
       layer = L.esri.featureLayer({
         url: svc.url + '/' + floodLayerId,
         opacity: svc.opacity,
@@ -3016,10 +3062,10 @@ function toggleLayer(layerKey, on) {
         maxZoom: svc.maxZoom || 19,
         style: function() {
           return {
-            color: '#1e40af',
+            color: bColor,
             weight: 0.8,
-            fillColor: '#3b82f6',
-            fillOpacity: 0.30
+            fillColor: bFill,
+            fillOpacity: bFillOp
           };
         }
       });
