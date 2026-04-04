@@ -294,6 +294,11 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .tracked-tooltip{background:rgba(15,18,28,.92)!important;border:1px solid var(--border)!important;color:var(--text)!important;font-size:10px!important;padding:4px 8px!important;border-radius:4px!important;box-shadow:0 2px 8px rgba(0,0,0,.4)!important}
 .tracked-tooltip .leaflet-tooltip-arrow{display:none}
 .tracked-count-badge{position:absolute;top:8px;right:8px;background:#3b82f6;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;z-index:1002;display:none}
+.size-filter-bar{display:flex;gap:4px;flex-wrap:wrap}
+.size-btn{padding:4px 9px;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--dim);transition:all .15s;letter-spacing:.3px}
+.size-btn:hover{border-color:#d4a017;color:#d4a017}
+.size-btn.active{background:#d4a017;color:#0a0d14;border-color:#d4a017}
+.size-filter-loading{font-size:9px;color:#d4a017;padding:4px 0;animation:pp-spin .8s linear infinite}
 .pp-loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:12px;gap:8px}
 .pp-spinner{width:16px;height:16px;border:2px solid var(--border);border-top:2px solid var(--accent);border-radius:50%;animation:pp-spin .8s linear infinite}
 @keyframes pp-spin{to{transform:rotate(360deg)}}
@@ -548,6 +553,16 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('cadastral',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#6b7280"></div><div class="lp-label">Parcel Boundaries<span class="lp-desc">Property boundaries &amp; lot lines</span></div>
         </label>
+        <div class="lp-item" style="flex-direction:column;align-items:flex-start;padding:6px 14px 10px">
+          <div style="font-size:9px;color:#d4a017;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">&#128270; Land Size Filter</div>
+          <div class="size-filter-bar" id="sizeFilterBar">
+            <button class="size-btn" onclick="toggleSizeFilter(0)" data-size="0">Off</button>
+            <button class="size-btn" onclick="toggleSizeFilter(4000)" data-size="4000">4,000m²+</button>
+            <button class="size-btn" onclick="toggleSizeFilter(4047)" data-size="4047">1 Acre+</button>
+            <button class="size-btn" onclick="toggleSizeFilter(10000)" data-size="10000">1 Ha+</button>
+            <button class="size-btn" onclick="toggleSizeFilter(20000)" data-size="20000">2 Ha+</button>
+          </div>
+        </div>
         <div class="lp-group" style="color:#a78bfa">Planning</div>
         <label class="lp-item" data-layer="landuse">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
@@ -3564,6 +3579,94 @@ function showTrackingModal(lotPlan, address, lat, lng, lga, zone, area) {
 
   html += '</div>';
   modal.innerHTML = html;
+}
+
+// ─── LAND SIZE FILTER ───
+var activeSizeFilter = 0;
+var sizeFilterLayer = null;
+var sizeFilterLoading = false;
+
+function toggleSizeFilter(minSqm) {
+  // Update button states
+  document.querySelectorAll('.size-btn').forEach(function(b) {
+    b.classList.toggle('active', parseInt(b.dataset.size) === minSqm);
+  });
+
+  // If same filter clicked or Off, remove existing
+  if (minSqm === 0 || minSqm === activeSizeFilter) {
+    if (sizeFilterLayer && window.mapFull) {
+      window.mapFull.removeLayer(sizeFilterLayer);
+      sizeFilterLayer = null;
+    }
+    activeSizeFilter = 0;
+    document.querySelectorAll('.size-btn[data-size="0"]').forEach(function(b){ b.classList.add('active'); });
+    return;
+  }
+
+  activeSizeFilter = minSqm;
+
+  // Remove old layer
+  if (sizeFilterLayer && window.mapFull) {
+    window.mapFull.removeLayer(sizeFilterLayer);
+    sizeFilterLayer = null;
+  }
+
+  // Use esri featureLayer with a where clause to only load parcels >= threshold
+  // DCDB Layer 4 has lot_area field in square metres
+  var cadastralUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/4';
+
+  // Pick colour based on size tier
+  var fillColor, borderColor, fillOpacity;
+  if (minSqm >= 20000) {
+    fillColor = '#f59e0b'; borderColor = '#d97706'; fillOpacity = 0.30;
+  } else if (minSqm >= 10000) {
+    fillColor = '#f59e0b'; borderColor = '#d97706'; fillOpacity = 0.25;
+  } else if (minSqm >= 4000) {
+    fillColor = '#eab308'; borderColor = '#ca8a04'; fillOpacity = 0.20;
+  } else {
+    fillColor = '#eab308'; borderColor = '#ca8a04'; fillOpacity = 0.18;
+  }
+
+  sizeFilterLayer = L.esri.featureLayer({
+    url: cadastralUrl,
+    where: 'lot_area >= ' + minSqm,
+    minZoom: 13,
+    maxZoom: 19,
+    style: function(feature) {
+      // Graduated colour — bigger parcels get more intense
+      var a = (feature.properties && feature.properties.lot_area) ? feature.properties.lot_area : minSqm;
+      var intensity = Math.min(1, a / 40000); // scale 0-1 over 4ha
+      var fo = fillOpacity + (intensity * 0.15);
+      return {
+        color: borderColor,
+        weight: 2,
+        opacity: 0.85,
+        fillColor: fillColor,
+        fillOpacity: Math.min(fo, 0.45)
+      };
+    },
+    onEachFeature: function(feature, layer) {
+      var p = feature.properties || {};
+      var areaSqm = p.lot_area || 0;
+      var areaDisp = areaSqm > 10000 ? (areaSqm / 10000).toFixed(2) + ' ha' : Math.round(areaSqm).toLocaleString() + ' m\u00B2';
+      var lotplan = p.lotplan || p.lot_plan || (p.lot && p.plan ? p.lot + '/' + p.plan : '');
+      layer.bindTooltip(
+        '<div style="font-size:11px;font-weight:700;color:#f59e0b">' + areaDisp + '</div>' +
+        (lotplan ? '<div style="font-size:10px;color:#e2e8f0">' + lotplan + '</div>' : '') +
+        (p.shire_name ? '<div style="font-size:9px;color:#94a3b8">' + p.shire_name + '</div>' : ''),
+        {className: 'tracked-tooltip', direction: 'top', offset: [0, -5], sticky: true}
+      );
+    }
+  });
+
+  sizeFilterLayer.addTo(window.mapFull);
+
+  // Count feedback
+  sizeFilterLayer.on('load', function() {
+    var count = 0;
+    sizeFilterLayer.eachFeature(function() { count++; });
+    console.log('Size filter: ' + count + ' parcels >= ' + minSqm + ' m² in view');
+  });
 }
 
 // Toggle tracked property layer visibility
