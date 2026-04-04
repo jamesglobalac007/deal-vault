@@ -258,6 +258,18 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .pp-overlay-tag{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;margin:2px;background:rgba(245,158,11,.12);color:#f59e0b}
 .corridor-label{background:none!important;border:none!important;box-shadow:none!important;padding:0!important}
 .corridor-label::before{display:none}
+
+/* ── Map Navigation Controls ── */
+.map-nav{position:absolute;bottom:24px;left:16px;z-index:1002;display:flex;flex-direction:column;align-items:center;gap:4px;user-select:none}
+.map-nav-row{display:flex;gap:4px;align-items:center}
+.map-nav-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:rgba(20,23,34,.92);backdrop-filter:blur(10px);color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.map-nav-btn:hover{background:rgba(0,212,170,.15);border-color:var(--accent);color:var(--accent)}
+.map-nav-btn:active{transform:scale(.92);background:rgba(0,212,170,.25)}
+.map-nav-btn.zoom-btn{width:44px;height:44px;font-size:22px;font-weight:700;border-radius:12px}
+.map-nav-btn.home-btn{width:36px;height:36px;font-size:14px;border-radius:50%;background:rgba(0,212,170,.12);color:var(--accent);border-color:rgba(0,212,170,.3)}
+.map-nav-btn.home-btn:hover{background:rgba(0,212,170,.25)}
+.map-nav-zoom{display:flex;flex-direction:column;gap:3px;margin-left:12px}
+.map-nav-label{font-size:8px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);text-align:center;margin-top:2px}
 .pp-actions{padding:12px 16px;display:flex;flex-direction:column;gap:6px}
 .pp-actions .btn{width:100%;justify-content:center}
 .pp-loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:12px;gap:8px}
@@ -1196,9 +1208,9 @@ setTimeout(() => {
   mapFull = L.map('map-full',{zoomControl:false}).setView([-27.6,152.8],9);
   L.tileLayer(tileUrl,tileOpts).addTo(mapFull);
   // Cadastral managed via layer panel — don't use addCadastral here
-  L.control.zoom({position:'topright'}).addTo(mapFull);
   addMarkers(mapFull);
   addGrowthCorridors(mapFull);
+  addMapNavControls(mapFull);
   initFullMapLayers(); // Wire up layer panel + property click
 }, 200);
 
@@ -1277,6 +1289,54 @@ function addGrowthCorridors(mi) {
   // Store reference for layer toggle
   if (!window.corridorLayers) window.corridorLayers = {};
   window.corridorLayers[mi._leaflet_id] = corridorGroup;
+}
+
+// ── Map Navigation Controls (zoom + directional pan) ──
+function addMapNavControls(mi) {
+  var panAmount = 0.15; // degrees to pan per click
+
+  var container = L.DomUtil.create('div', 'map-nav');
+  L.DomEvent.disableClickPropagation(container);
+  L.DomEvent.disableScrollPropagation(container);
+
+  // Up arrow
+  container.innerHTML = '<div class="map-nav-row">' +
+    '<div class="map-nav-btn" onclick="mapPan(\'up\')" title="Pan Up">&#9650;</div>' +
+    '</div>' +
+    '<div class="map-nav-row">' +
+    '<div class="map-nav-btn" onclick="mapPan(\'left\')" title="Pan Left">&#9664;</div>' +
+    '<div class="map-nav-btn home-btn" onclick="mapHome()" title="Reset View">&#8962;</div>' +
+    '<div class="map-nav-btn" onclick="mapPan(\'right\')" title="Pan Right">&#9654;</div>' +
+    '<div class="map-nav-zoom">' +
+    '<div class="map-nav-btn zoom-btn" onclick="mapZoom(1)" title="Zoom In">+</div>' +
+    '<div class="map-nav-btn zoom-btn" onclick="mapZoom(-1)" title="Zoom Out">&minus;</div>' +
+    '</div>' +
+    '</div>' +
+    '<div class="map-nav-row">' +
+    '<div class="map-nav-btn" onclick="mapPan(\'down\')" title="Pan Down">&#9660;</div>' +
+    '</div>';
+
+  // Append to map container
+  mi.getContainer().appendChild(container);
+
+  // Pan functions
+  window.mapPan = function(dir) {
+    var c = mi.getCenter();
+    var z = mi.getZoom();
+    var step = panAmount / Math.pow(2, z - 9); // Scale pan to zoom level
+    switch(dir) {
+      case 'up':    mi.panTo([c.lat + step, c.lng]); break;
+      case 'down':  mi.panTo([c.lat - step, c.lng]); break;
+      case 'left':  mi.panTo([c.lat, c.lng - step]); break;
+      case 'right': mi.panTo([c.lat, c.lng + step]); break;
+    }
+  };
+  window.mapZoom = function(delta) {
+    mi.setZoom(mi.getZoom() + delta);
+  };
+  window.mapHome = function() {
+    mi.setView([-27.6, 152.8], 9);
+  };
 }
 
 const markers = [
