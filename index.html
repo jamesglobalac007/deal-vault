@@ -502,6 +502,27 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('heritage',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#b45309"></div>Cultural Heritage
         </label>
+        <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
+        <label class="lp-item active" data-layer="pdaMarkers">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ec4899"></div>PDA Hotspots
+        </label>
+        <label class="lp-item active" data-layer="infraMarkers">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('infraMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#f59e0b"></div>Infrastructure Projects
+        </label>
+        <label class="lp-item active" data-layer="devMarkers">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('devMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ef4444"></div>Major Dev Estates
+        </label>
+        <label class="lp-item" data-layer="pfgaMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pfgaMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#a855f7"></div>Future Growth Areas
+        </label>
+        <label class="lp-item" data-layer="cat1Markers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('cat1Markers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#14b8a6"></div>Cat 1 Dev Areas
+        </label>
         <div class="lp-group">Boundaries</div>
         <label class="lp-item" data-layer="lga">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('lga',this.checked)"><span class="lp-slider"></span></div>
@@ -521,6 +542,9 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div class="leg-item"><div class="leg-dot" style="background:var(--develop)"></div>Develop / Hold</div>
       <div class="leg-item"><div class="leg-dot" style="background:var(--novate)"></div>Novated to Buyer</div>
       <div class="leg-item"><div class="leg-dot" style="background:rgba(34,197,94,.4);border:2px solid #22c55e"></div>Growth Corridor</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ec4899"></div>PDA Hotspot</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div>Infrastructure</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div>Developer Estate</div>
       <div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;font-size:10px;color:#6b7280">Toggle data layers via panel (top right)</div>
     </div>
   </div>
@@ -1210,6 +1234,7 @@ setTimeout(() => {
   // Cadastral managed via layer panel — don't use addCadastral here
   addMarkers(mapFull);
   addGrowthCorridors(mapFull);
+  addGrowthIntelligence(mapFull);
   addMapNavControls(mapFull);
   initFullMapLayers(); // Wire up layer panel + property click
 }, 200);
@@ -1275,6 +1300,189 @@ function addGrowthCorridors(mi) {
   // Store references for layer toggles
   if (!window.corridorLayers) window.corridorLayers = {};
   window.corridorLayers[mi._leaflet_id] = corridorGroup;
+}
+
+// ── GROWTH INTELLIGENCE: PDAs, Infrastructure, Developer Estates, PFGAs, Cat 1 Areas ──
+// All coordinates verified via QLD Gov / EDQ / TMR sources (April 2026 research)
+
+const pdaDatabase = [
+  { name: 'Waraba (Caboolture West)', lat: -27.065, lng: 152.865, council: 'Moreton Bay', hectares: 2900, dwellings: 30000, population: 70000, declared: 'Aug 2024', status: 'Active — structure planning', corridor: 'Northern' },
+  { name: 'Greater Flagstone', lat: -27.833, lng: 152.942, council: 'Logan', hectares: 7188, dwellings: 51500, population: 120000, declared: '2010', status: 'Active — 25,636 lots unlocked via CIF', corridor: 'Southern' },
+  { name: 'Ripley Valley', lat: -27.682, lng: 152.735, council: 'Ipswich', hectares: 4680, dwellings: 48750, population: 131000, declared: '2010', status: 'Active — 9,100 new lots via CIF', corridor: 'Western' },
+  { name: 'Caloundra South (Aura)', lat: -26.825, lng: 153.015, council: 'Sunshine Coast', hectares: 2323, dwellings: 20000, population: 50000, declared: '2010', status: 'Active — Stockland Aura selling', corridor: 'Coastal North' },
+  { name: 'Yarrabilba', lat: -27.800, lng: 153.090, council: 'Logan', hectares: 2222, dwellings: 20000, population: 45000, declared: '2010', status: 'Active — Stockland/Supalai acquired', corridor: 'Southern' },
+  { name: 'Southern Thornlands', lat: -27.573, lng: 153.265, council: 'Redland', hectares: 890, dwellings: 8000, population: 18000, declared: 'Apr 2025', status: 'New PDA — ILUP in effect', corridor: 'Bayside' },
+  { name: 'Woolloongabba', lat: -27.487, lng: 153.034, council: 'Brisbane', hectares: 52, dwellings: 5500, population: 10000, declared: 'Sep 2023', status: 'Active — Cross River Rail station precinct', corridor: 'Metro' },
+  { name: 'Northshore Hamilton', lat: -27.440, lng: 153.065, council: 'Brisbane', hectares: 304, dwellings: 12000, population: 22000, declared: '2008', status: 'Active — waterfront precinct', corridor: 'Metro' },
+  { name: 'Bowen Hills', lat: -27.449, lng: 153.032, council: 'Brisbane', hectares: 35, dwellings: 4000, population: 7000, declared: '2014', status: 'Active — RNA showgrounds precinct', corridor: 'Metro' },
+  { name: 'Coomera Town Centre', lat: -27.858, lng: 153.305, council: 'Gold Coast', hectares: 290, dwellings: 6000, population: 14000, declared: '2015', status: 'Active — Westfield/retail + residential', corridor: 'Northern Gold Coast' },
+  { name: 'Maroochydore City Centre', lat: -26.655, lng: 153.090, council: 'Sunshine Coast', hectares: 53, dwellings: 2800, population: 6000, declared: '2015', status: 'Active — SunCentral new CBD', corridor: 'Coastal North' },
+  { name: 'Fitzgibbon', lat: -27.346, lng: 153.027, council: 'Brisbane', hectares: 120, dwellings: 3000, population: 7500, declared: '2011', status: 'Substantially complete', corridor: 'Metro' }
+];
+
+const infraDatabase = [
+  { name: 'Cross River Rail', lat: -27.472, lng: 153.025, type: 'Rail', budget: '$7.85B', status: 'Opening 2026', desc: '10.2km rail line, 5.9km twin tunnels, 4 new underground stations. Game-changer for Brisbane inner-city density', corridor: 'Metro' },
+  { name: 'The Wave Stage 1 (Rail)', lat: -26.755, lng: 152.960, type: 'Rail', budget: '$5.5–7B', status: 'Construction starting 2026', desc: 'New dual-track rail Beerwah to Caloundra. Opens up Sunshine Coast hinterland for development', corridor: 'Coastal North' },
+  { name: 'Coomera Connector (M9)', lat: -27.890, lng: 153.315, type: 'Road', budget: '$3.5B', status: 'Stage 1 North open Dec 2025', desc: '45km north-south motorway Loganholme to Nerang. Relieves M1 congestion, unlocks Gold Coast hinterland', corridor: 'Gold Coast' },
+  { name: 'Gold Coast Light Rail Stage 3', lat: -28.08, lng: 153.44, type: 'Light Rail', budget: '$1.2B', status: 'Opening mid-2026', desc: 'Broadbeach South to Burleigh Heads extension. Stage 4 (to airport) cancelled Sep 2025', corridor: 'Gold Coast' },
+  { name: 'Bruce Highway Upgrade Program', lat: -26.70, lng: 152.97, type: 'Road', budget: '$9B', status: '8 complete, 17 underway, 13 from 2026', desc: 'Massive safety and capacity upgrades Gympie to Brisbane. Key section: Anzac Ave to Caboolture-Bribie Island Rd', corridor: 'Northern' },
+  { name: 'Brisbane Metro', lat: -27.468, lng: 153.027, type: 'Bus Rapid Transit', budget: '$1.2B', status: 'Stage 1 open 2025', desc: 'Electric metro buses through Cultural Centre to UQ and Royal Brisbane Hospital. High-frequency network', corridor: 'Metro' },
+  { name: 'Inland Rail (QLD section)', lat: -27.56, lng: 152.35, type: 'Freight Rail', budget: '$10.3B (national)', status: 'Under construction', desc: 'Melbourne-Brisbane freight rail via Toowoomba. Intermodal at Ebenezer (Ipswich). Opens industrial/employment land', corridor: 'Western' },
+  { name: 'Gateway Motorway / Bruce Hwy North', lat: -27.22, lng: 153.02, type: 'Road', budget: '$2.4B', status: 'Planning/construction', desc: 'Moreton Bay to North Brisbane road upgrade. Supports Waraba PDA and northern growth corridor access', corridor: 'Northern' },
+  { name: 'Catalyst Infrastructure Fund — SEQ', lat: -27.60, lng: 152.90, type: 'Funding', budget: '$150M+', status: 'Active grants 2025', desc: 'QLD/Federal fund accelerating trunk infrastructure in PDAs: 37,250 new homes enabled across Waraba, Flagstone, Ripley, Yarrabilba', corridor: 'SEQ-wide' },
+  { name: 'Brisbane 2032 Olympics', lat: -27.470, lng: 153.023, type: 'Olympics', budget: '$7B+', status: 'Planning — venues confirmed', desc: 'Major catalyst for SEQ infrastructure, transport, and urban renewal. Venue precincts at Gabba, Northshore, Gold Coast, Sunshine Coast', corridor: 'SEQ-wide' }
+];
+
+const devEstatesDatabase = [
+  { name: 'Stockland Aura', lat: -26.830, lng: 153.020, developer: 'Stockland', lots: 20000, desc: 'Largest masterplanned community in Australia. Within Caloundra South PDA', type: 'Masterplanned' },
+  { name: 'Stockland Newport', lat: -27.205, lng: 153.095, developer: 'Stockland', lots: 3000, desc: 'Award-winning waterfront community, Moreton Bay. QLD best masterplanned 2024', type: 'Masterplanned' },
+  { name: 'Stockland Rivermont', lat: -27.060, lng: 152.870, developer: 'Stockland', lots: 2050, desc: 'New community in Waraba PDA. 175ha with Halcyon over-50s', type: 'Masterplanned' },
+  { name: 'Stockland/Supalai Yarrabilba', lat: -27.798, lng: 153.088, developer: 'Stockland/Supalai', lots: 15600, desc: 'Massive southern corridor estate. Acquired from Lendlease Nov 2024', type: 'Masterplanned' },
+  { name: 'Springfield Rise (Stockland)', lat: -27.655, lng: 152.907, developer: 'Stockland/Supalai', lots: 5000, desc: 'Springfield/Greater Springfield corridor. Acquired from Lendlease', type: 'Masterplanned' },
+  { name: 'Kinma Valley (Stockland)', lat: -27.085, lng: 152.975, developer: 'Stockland/Supalai', lots: 3500, desc: 'Moreton Bay region community. Acquired from Lendlease', type: 'Masterplanned' },
+  { name: 'Lendlease Elliot Springs', lat: -19.305, lng: 146.745, developer: 'Lendlease', lots: 8000, desc: 'Townsville major community — remained with Lendlease', type: 'Masterplanned' },
+  { name: 'Peet Flagstone', lat: -27.830, lng: 152.950, developer: 'Peet / AVID', lots: 10000, desc: 'Within Greater Flagstone PDA. Multiple developer parcels', type: 'Masterplanned' },
+  { name: 'QM Properties Ripley', lat: -27.680, lng: 152.740, developer: 'QM Properties', lots: 8000, desc: 'Major landholding within Ripley Valley PDA', type: 'Masterplanned' },
+  { name: 'Villaworld / AVID Bahrs Scrub', lat: -27.750, lng: 153.160, developer: 'AVID Property Group', lots: 2500, desc: 'Logan corridor between Flagstone and Yarrabilba', type: 'Masterplanned' },
+  { name: 'Mirvac Gainsborough Greens', lat: -27.735, lng: 153.200, developer: 'Mirvac', lots: 3200, desc: 'Pimpama corridor near M1 and Coomera Connector', type: 'Masterplanned' },
+  { name: 'Coomera Waters (Villa World)', lat: -27.865, lng: 153.303, developer: 'Villa World', lots: 1800, desc: 'Near Coomera Town Centre PDA and Coomera Connector', type: 'Waterfront' },
+  { name: 'Stockland Pallara', lat: -27.615, lng: 153.045, developer: 'Stockland', lots: 1500, desc: 'South Brisbane infill community near Acacia Ridge', type: 'Infill' },
+  { name: 'Nirimba (QM Properties)', lat: -27.665, lng: 152.745, developer: 'QM Properties', lots: 4000, desc: 'Within Ripley Valley PDA - early stages', type: 'Masterplanned' }
+];
+
+const pfgaDatabase = [
+  { name: 'Wellcamp (Employment)', lat: -27.56, lng: 151.78, council: 'Toowoomba', type: 'Employment/Industrial', desc: 'Near Wellcamp Airport + Inland Rail intermodal. Major employment land post-2046' },
+  { name: 'Westbrook', lat: -27.61, lng: 151.85, council: 'Toowoomba', type: 'Residential', desc: 'Urban expansion added to footprint in ShapingSEQ 2023' },
+  { name: 'Highfields', lat: -27.46, lng: 151.95, council: 'Toowoomba', type: 'Residential', desc: 'Northern Toowoomba growth area. Fast-growing suburb' },
+  { name: 'Lanefield/Grandchester', lat: -27.69, lng: 152.46, council: 'Ipswich', type: 'Residential', desc: 'South-west Ipswich corridor along rail' },
+  { name: 'Glamorgan Vale', lat: -27.48, lng: 152.59, council: 'Somerset', type: 'Residential', desc: 'Eastern Somerset near Fernvale growth area' },
+  { name: 'Halls Creek', lat: -26.73, lng: 152.92, council: 'Sunshine Coast', type: 'Residential', desc: 'Only PFGA on Sunshine Coast. Identified since 2009. Near The Wave rail corridor' },
+  { name: 'South Logan (Industrial)', lat: -27.78, lng: 153.05, council: 'Logan', type: 'Employment/Industrial', desc: 'Industrial employment land between Flagstone and Logan CBD' },
+  { name: 'Buccan', lat: -27.75, lng: 153.15, council: 'Logan', type: 'Residential', desc: 'Between Yarrabilba PDA and Bahrs Scrub developments' },
+  { name: 'Stapylton (Industrial)', lat: -27.76, lng: 153.27, council: 'Gold Coast', type: 'Employment/Industrial', desc: 'Northern Gold Coast industrial/logistics land near M1' },
+  { name: 'Mundoolun', lat: -27.88, lng: 153.10, council: 'Logan', type: 'Residential', desc: 'South of Yarrabilba. Long-term residential growth post-2046' },
+  { name: 'Beaudesert East', lat: -27.97, lng: 153.02, council: 'Scenic Rim', type: 'Residential', desc: 'Eastern expansion of Beaudesert township' }
+];
+
+const cat1DevAreas = [
+  { name: 'Burpengary East', lat: -27.16, lng: 153.00, council: 'Moreton Bay', desc: 'Structure planning required before development. Near Bruce Hwy and rail' },
+  { name: 'Elimbah', lat: -27.00, lng: 152.95, council: 'Moreton Bay', type: 'Residential', desc: 'Northern Moreton Bay near Waraba PDA. Structure planning underway' },
+  { name: 'Narangba', lat: -27.20, lng: 152.97, council: 'Moreton Bay', desc: 'Close to existing urban edge. Structure planning required' },
+  { name: 'Yandina', lat: -26.56, lng: 152.95, council: 'Sunshine Coast', desc: 'Hinterland expansion area. Added to urban footprint in ShapingSEQ 2023' },
+  { name: 'Southern Thornlands', lat: -27.57, lng: 153.26, council: 'Redland', desc: 'Elevated to full PDA in April 2025. Now under ILUP' }
+];
+
+// ── Render Growth Intelligence Markers ──
+function addGrowthIntelligence(mi) {
+  // Custom icon creator
+  function makeIcon(emoji, bgColor, size) {
+    return L.divIcon({
+      html: '<div style="background:' + bgColor + ';width:' + size + 'px;height:' + size + 'px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:' + (size * 0.5) + 'px;box-shadow:0 2px 8px rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.9);cursor:pointer">' + emoji + '</div>',
+      className: '', iconSize: [size, size], iconAnchor: [size/2, size/2]
+    });
+  }
+
+  // ── PDA Markers ──
+  var pdaGroup = L.layerGroup();
+  pdaDatabase.forEach(function(pda) {
+    var marker = L.marker([pda.lat, pda.lng], { icon: makeIcon('🏗️', '#ec4899', 32) });
+    var dwellingsStr = pda.dwellings ? pda.dwellings.toLocaleString() + ' dwellings' : 'TBC';
+    var popStr = pda.population ? pda.population.toLocaleString() + ' people' : '';
+    marker.bindPopup(
+      '<div style="min-width:260px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:14px;font-weight:700;margin-bottom:4px;color:#ec4899">' + pda.name + ' PDA</div>' +
+      '<div style="font-size:11px;color:#666;margin-bottom:8px">' + pda.council + ' · ' + pda.corridor + ' Corridor · Declared ' + pda.declared + '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">' +
+        '<div style="background:#fdf2f8;padding:6px 8px;border-radius:6px"><div style="font-size:9px;color:#888;text-transform:uppercase">Hectares</div><div style="font-size:14px;font-weight:700">' + pda.hectares.toLocaleString() + '</div></div>' +
+        '<div style="background:#fdf2f8;padding:6px 8px;border-radius:6px"><div style="font-size:9px;color:#888;text-transform:uppercase">Dwellings</div><div style="font-size:14px;font-weight:700;color:#ec4899">' + dwellingsStr + '</div></div>' +
+      '</div>' +
+      (popStr ? '<div style="font-size:11px;color:#666">Projected population: <strong>' + popStr + '</strong></div>' : '') +
+      '<div style="font-size:11px;margin-top:6px;padding:6px 8px;background:#f8f8f8;border-radius:4px;color:#333">' + pda.status + '</div>' +
+      '</div>', { maxWidth: 320 }
+    );
+    marker.addTo(pdaGroup);
+  });
+  pdaGroup.addTo(mi);
+  if (!window.pdaMarkerLayers) window.pdaMarkerLayers = {};
+  window.pdaMarkerLayers[mi._leaflet_id] = pdaGroup;
+
+  // ── Infrastructure Markers ──
+  var infraGroup = L.layerGroup();
+  infraDatabase.forEach(function(proj) {
+    var typeEmoji = proj.type === 'Rail' ? '🚆' : proj.type === 'Road' ? '🛣️' : proj.type === 'Light Rail' ? '🚊' : proj.type === 'Olympics' ? '🏅' : proj.type === 'Funding' ? '💰' : '🏗️';
+    var marker = L.marker([proj.lat, proj.lng], { icon: makeIcon(typeEmoji, '#f59e0b', 28) });
+    marker.bindPopup(
+      '<div style="min-width:260px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:14px;font-weight:700;margin-bottom:2px;color:#f59e0b">' + proj.name + '</div>' +
+      '<div style="font-size:11px;color:#666;margin-bottom:8px">' + proj.type + ' · ' + proj.corridor + ' Corridor</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+        '<div style="background:#fef3c7;padding:6px 10px;border-radius:6px;flex:1"><div style="font-size:9px;color:#888;text-transform:uppercase">Budget</div><div style="font-size:14px;font-weight:700;color:#d97706">' + proj.budget + '</div></div>' +
+        '<div style="background:#fef3c7;padding:6px 10px;border-radius:6px;flex:1"><div style="font-size:9px;color:#888;text-transform:uppercase">Status</div><div style="font-size:12px;font-weight:600">' + proj.status + '</div></div>' +
+      '</div>' +
+      '<div style="font-size:11px;color:#333;line-height:1.5">' + proj.desc + '</div>' +
+      '</div>', { maxWidth: 340 }
+    );
+    marker.addTo(infraGroup);
+  });
+  infraGroup.addTo(mi);
+  if (!window.infraMarkerLayers) window.infraMarkerLayers = {};
+  window.infraMarkerLayers[mi._leaflet_id] = infraGroup;
+
+  // ── Developer Estate Markers ──
+  var devGroup = L.layerGroup();
+  devEstatesDatabase.forEach(function(dev) {
+    var marker = L.marker([dev.lat, dev.lng], { icon: makeIcon('🏘️', '#ef4444', 26) });
+    marker.bindPopup(
+      '<div style="min-width:240px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:14px;font-weight:700;margin-bottom:2px;color:#ef4444">' + dev.name + '</div>' +
+      '<div style="font-size:11px;color:#666;margin-bottom:8px">' + dev.developer + ' · ' + dev.type + '</div>' +
+      '<div style="background:#fef2f2;padding:6px 10px;border-radius:6px;margin-bottom:6px"><div style="font-size:9px;color:#888;text-transform:uppercase">Total Lots</div><div style="font-size:16px;font-weight:700;color:#ef4444">' + dev.lots.toLocaleString() + '</div></div>' +
+      '<div style="font-size:11px;color:#333;line-height:1.5">' + dev.desc + '</div>' +
+      '</div>', { maxWidth: 300 }
+    );
+    marker.addTo(devGroup);
+  });
+  devGroup.addTo(mi);
+  if (!window.devMarkerLayers) window.devMarkerLayers = {};
+  window.devMarkerLayers[mi._leaflet_id] = devGroup;
+
+  // ── PFGA Markers (off by default) ──
+  var pfgaGroup = L.layerGroup();
+  pfgaDatabase.forEach(function(pfga) {
+    var marker = L.marker([pfga.lat, pfga.lng], { icon: makeIcon('🔮', '#a855f7', 24) });
+    marker.bindPopup(
+      '<div style="min-width:220px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:13px;font-weight:700;color:#a855f7">' + pfga.name + '</div>' +
+      '<div style="font-size:10px;color:#666;margin-bottom:6px">PFGA · ' + pfga.council + ' · ' + pfga.type + '</div>' +
+      '<div style="font-size:11px;color:#333;line-height:1.5;background:#f5f3ff;padding:6px 8px;border-radius:4px">' + pfga.desc + '</div>' +
+      '<div style="font-size:10px;color:#888;margin-top:6px;font-style:italic">Potential Future Growth Area — post-2046 investigation</div>' +
+      '</div>', { maxWidth: 280 }
+    );
+    marker.addTo(pfgaGroup);
+  });
+  // NOT added to map by default (toggle on)
+  if (!window.pfgaMarkerLayers) window.pfgaMarkerLayers = {};
+  window.pfgaMarkerLayers[mi._leaflet_id] = pfgaGroup;
+
+  // ── Category 1 Dev Areas (off by default) ──
+  var cat1Group = L.layerGroup();
+  cat1DevAreas.forEach(function(area) {
+    var marker = L.marker([area.lat, area.lng], { icon: makeIcon('📋', '#14b8a6', 24) });
+    marker.bindPopup(
+      '<div style="min-width:220px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:13px;font-weight:700;color:#14b8a6">' + area.name + '</div>' +
+      '<div style="font-size:10px;color:#666;margin-bottom:6px">Cat 1 SEQ Dev Area · ' + area.council + '</div>' +
+      '<div style="font-size:11px;color:#333;line-height:1.5;background:#f0fdfa;padding:6px 8px;border-radius:4px">' + area.desc + '</div>' +
+      '<div style="font-size:10px;color:#888;margin-top:6px;font-style:italic">Structure planning required before MCU/RoL approval</div>' +
+      '</div>', { maxWidth: 280 }
+    );
+    marker.addTo(cat1Group);
+  });
+  // NOT added to map by default
+  if (!window.cat1MarkerLayers) window.cat1MarkerLayers = {};
+  window.cat1MarkerLayers[mi._leaflet_id] = cat1Group;
+
+  console.log('Growth Intelligence loaded: ' + pdaDatabase.length + ' PDAs, ' + infraDatabase.length + ' infrastructure, ' + devEstatesDatabase.length + ' estates, ' + pfgaDatabase.length + ' PFGAs, ' + cat1DevAreas.length + ' Cat 1 areas');
 }
 
 // ── Map Navigation Controls (zoom + directional pan) ──
@@ -1521,6 +1729,20 @@ function toggleLayer(layerKey, on) {
   if (layerKey === 'corridors') {
     var cg = window.corridorLayers && window.corridorLayers[mapFull._leaflet_id];
     if (cg) { on ? cg.addTo(mapFull) : mapFull.removeLayer(cg); }
+    return;
+  }
+
+  // Growth Intelligence layers — special handling
+  var intelligenceLayers = {
+    'pdaMarkers': window.pdaMarkerLayers,
+    'infraMarkers': window.infraMarkerLayers,
+    'devMarkers': window.devMarkerLayers,
+    'pfgaMarkers': window.pfgaMarkerLayers,
+    'cat1Markers': window.cat1MarkerLayers
+  };
+  if (intelligenceLayers[layerKey]) {
+    var lg = intelligenceLayers[layerKey][mapFull._leaflet_id];
+    if (lg) { on ? lg.addTo(mapFull) : mapFull.removeLayer(lg); }
     return;
   }
 
@@ -2036,18 +2258,18 @@ function renderPropPanel(latlng, r) {
   // ── ShapingSEQ 2023 Growth Data by LGA ──
   // Dwelling supply targets (2021-2046), consolidation/expansion split, key growth areas
   const shapingSEQ = {
-    'BRISBANE': { dwellings: 282000, consolPct: 88, expandPct: 12, keyAreas: 'Northshore Hamilton, Woolloongabba, Bowen Hills, Cross River Rail corridor, Carseldine Village', type: 'Metro Core' },
-    'GOLD COAST': { dwellings: 158800, consolPct: 69, expandPct: 31, keyAreas: 'Coomera, Pimpama, Ormeau, Merrimac, Surfers Paradise infill, Southport CBD', type: 'Coastal Growth' },
-    'SUNSHINE COAST': { dwellings: 84800, consolPct: 60, expandPct: 40, keyAreas: 'Caloundra South (Aura), Palmview, Beerwah East, Maroochydore CBD', type: 'Coastal Growth' },
-    'MORETON BAY': { dwellings: 100000, consolPct: 55, expandPct: 45, keyAreas: 'Waraba (Caboolture West) PDA, North Lakes, Morayfield, Burpengary East, Dakabin', type: 'Northern Growth' },
-    'LOGAN': { dwellings: 57700, consolPct: 52, expandPct: 48, keyAreas: 'Flagstone PDA, Yarrabilba PDA, Park Ridge, Meadowbrook, Logan Central', type: 'Southern Growth' },
-    'IPSWICH': { dwellings: 66200, consolPct: 40, expandPct: 60, keyAreas: 'Ripley Valley PDA, Springfield, Redbank Plains, Rosewood, Walloon', type: 'Western Growth' },
-    'REDLAND': { dwellings: 14200, consolPct: 80, expandPct: 20, keyAreas: 'Redland Bay, Cleveland, Capalaba, Victoria Point', type: 'Bayside Infill' },
+    'BRISBANE': { dwellings: 155200, consolPct: 92, expandPct: 8, keyAreas: 'Northshore Hamilton PDA, Woolloongabba PDA, Bowen Hills PDA, Cross River Rail corridor, Carseldine Village, Albion, Newstead', type: 'Metro Core' },
+    'GOLD COAST': { dwellings: 161700, consolPct: 69, expandPct: 31, keyAreas: 'Coomera Town Centre PDA, Pimpama, Ormeau, Merrimac, Surfers Paradise infill, Southport CBD, Coomera Connector corridor', type: 'Coastal Growth' },
+    'SUNSHINE COAST': { dwellings: 85000, consolPct: 60, expandPct: 40, keyAreas: 'Caloundra South (Aura) PDA, Palmview, Beerwah East, Maroochydore CBD, The Wave rail corridor, Yandina Cat 1', type: 'Coastal Growth' },
+    'MORETON BAY': { dwellings: 123000, consolPct: 55, expandPct: 45, keyAreas: 'Waraba (Caboolture West) PDA, North Lakes, Morayfield, Burpengary East Cat 1, Elimbah Cat 1, Narangba Cat 1, Dakabin', type: 'Northern Growth' },
+    'LOGAN': { dwellings: 108400, consolPct: 42, expandPct: 58, keyAreas: 'Greater Flagstone PDA (51,500 dwellings), Yarrabilba PDA (20,000 dwellings), Park Ridge, Meadowbrook, Logan Central', type: 'Southern Growth' },
+    'IPSWICH': { dwellings: 107900, consolPct: 35, expandPct: 65, keyAreas: 'Ripley Valley PDA (48,750 dwellings), Springfield, Redbank Plains, Rosewood, Walloon', type: 'Western Growth' },
+    'REDLAND': { dwellings: 14200, consolPct: 75, expandPct: 25, keyAreas: 'Southern Thornlands PDA (890ha, declared Apr 2025), Redland Bay, Cleveland, Capalaba, Victoria Point', type: 'Bayside Infill' },
     'NOOSA': { dwellings: 9200, consolPct: 75, expandPct: 25, keyAreas: 'Noosaville, Tewantin, Cooroy, Pomona', type: 'Hinterland' },
-    'SOMERSET': { dwellings: 5500, consolPct: 35, expandPct: 65, keyAreas: 'Fernvale, Lowood, Esk, Kilcoy', type: 'Rural Growth' },
-    'LOCKYER VALLEY': { dwellings: 7800, consolPct: 40, expandPct: 60, keyAreas: 'Gatton, Laidley, Plainland, Withcott', type: 'Rural Growth' },
-    'SCENIC RIM': { dwellings: 8500, consolPct: 35, expandPct: 65, keyAreas: 'Beaudesert, Boonah, Tamborine Mountain, Canungra', type: 'Rural Growth' },
-    'TOOWOOMBA': { dwellings: 28000, consolPct: 50, expandPct: 50, keyAreas: 'Highfields, Glenvale, Westbrook, Charlton, Torrington', type: 'Inland City' }
+    'SOMERSET': { dwellings: 5500, consolPct: 35, expandPct: 65, keyAreas: 'Fernvale, Lowood, Esk, Kilcoy, Glamorgan Vale PFGA', type: 'Rural Growth' },
+    'LOCKYER VALLEY': { dwellings: 7800, consolPct: 40, expandPct: 60, keyAreas: 'Gatton, Laidley, Plainland, Withcott, Lanefield/Grandchester PFGA', type: 'Rural Growth' },
+    'SCENIC RIM': { dwellings: 8500, consolPct: 35, expandPct: 65, keyAreas: 'Beaudesert, Boonah, Tamborine Mountain, Canungra, Glen Eagle expansion, Beaudesert East PFGA', type: 'Rural Growth' },
+    'TOOWOOMBA': { dwellings: 28000, consolPct: 50, expandPct: 50, keyAreas: 'Highfields PFGA, Glenvale, Westbrook PFGA, Wellcamp PFGA (employment), Charlton, Torrington, Meringandan', type: 'Inland City' }
   };
 
   function getShapingSEQData(lgaName) {
