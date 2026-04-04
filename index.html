@@ -4046,6 +4046,7 @@ function identifyParcel(latlng) {
       spatialRel: 'esriSpatialRelIntersects',
       outFields: '*',
       returnGeometry: 'true',
+      outSR: '4326',
       resultRecordCount: '1',
       f: 'json'
     });
