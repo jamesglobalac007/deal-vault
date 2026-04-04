@@ -1604,17 +1604,52 @@ function identifyParcel(latlng) {
       });
   })();
 
-  // 1. Cadastral parcels (tolerance 10 for reliable parcel hits)
-  arcgisIdentify(qldServices.cadastral.url, latlng, 'all:4', 10, function(r){
-    if(r) results.cadastral = r[0].attributes;
-    checkComplete();
-  });
+  // 1. Cadastral parcels — use /query with point geometry (identify was returning empty)
+  (function(){
+    var qp = new URLSearchParams({
+      geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
+      geometryType: 'esriGeometryPoint',
+      spatialRel: 'esriSpatialRelIntersects',
+      outFields: '*',
+      returnGeometry: 'false',
+      resultRecordCount: '1',
+      f: 'json'
+    });
+    fetch(qldServices.cadastral.url + '/4/query?' + qp.toString())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        console.log('Cadastral query response:', JSON.stringify(data));
+        if (data.features && data.features.length > 0) {
+          results.cadastral = data.features[0].attributes;
+          console.log('Cadastral attrs:', JSON.stringify(data.features[0].attributes));
+        }
+        checkComplete();
+      })
+      .catch(function(err){ console.log('Cadastral query error:', err); checkComplete(); });
+  })();
 
-  // 2. Land use
-  arcgisIdentify(qldServices.landuse.url, latlng, 'all', 5, function(r){
-    if(r) results.landuse = r[0].attributes;
-    checkComplete();
-  });
+  // 2. Land use — use /query with point geometry
+  (function(){
+    var qp = new URLSearchParams({
+      geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
+      geometryType: 'esriGeometryPoint',
+      spatialRel: 'esriSpatialRelIntersects',
+      outFields: '*',
+      returnGeometry: 'false',
+      resultRecordCount: '1',
+      f: 'json'
+    });
+    fetch(qldServices.landuse.url + '/0/query?' + qp.toString())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        console.log('Land use query response:', JSON.stringify(data));
+        if (data.features && data.features.length > 0) {
+          results.landuse = data.features[0].attributes;
+        }
+        checkComplete();
+      })
+      .catch(function(err){ console.log('Land use query error:', err); checkComplete(); });
+  })();
 
   // 3. PDA
   arcgisIdentify(qldServices.pda.url, latlng, 'all', 5, function(r){
@@ -1733,22 +1768,21 @@ function renderPropPanel(latlng, r) {
     return null;
   }
 
-  // Extract key fields from cadastral using smart matching
-  const lotPlan = findField(c, ['lotplan','lot_plan','lotplan_id','LOTPLAN','LOT_PLAN']) || '—';
-  const lot = findField(c, ['lot','lot_number','lotnumber','LOT','LOTNUMBER']) || '—';
-  const plan = findField(c, ['plan','plan_number','plannumber','PLAN','PLANNUMBER','plan_type']) || '—';
+  // Extract key fields — cadastral first, then address as fallback
+  const lotPlan = findField(c, ['lotplan','lot_plan']) || findField(ad, ['lotplan','lot_plan']) || '—';
+  const lot = findField(c, ['lot','lot_number']) || findField(ad, ['lot']) || '—';
+  const plan = findField(c, ['plan','plan_number']) || findField(ad, ['plan']) || '—';
 
-  // Area: try multiple field patterns — DCDB may use O_SHAPE or Shape_Area or similar
-  const areaRaw = findField(c, ['Shape_Area','SHAPE_Area','shape_area','st_area(shape)','AREA_M2','area','AREA','O_SHAPE','shape.area','shape.starea','lot_area','LOT_AREA','PARCEL_AREA','parcel_area','calc_area','CALC_AREA']);
-  // Also check if Shape object has area
-  const area = areaRaw || (c.Shape && typeof c.Shape === 'object' ? c.Shape.area || c.Shape.Area : null) || (c.SHAPE && typeof c.SHAPE === 'object' ? c.SHAPE.area || c.SHAPE.Area : null) || null;
+  // Land size: DCDB Layer 4 field is "lot_area" (m²)
+  const area = findField(c, ['lot_area','shape_area','st_area(shape)','area_m2','area','calc_area','excl_area']) || null;
   const areaDisplay = area ? (parseFloat(area) > 10000 ? (parseFloat(area)/10000).toFixed(2) + ' ha' : Math.round(parseFloat(area)).toLocaleString() + ' m\u00B2') : '—';
 
-  const tenure = findField(c, ['tenure','TENURE','Tenure','tenure_type']) || '—';
-  const lga = findField(c, ['shire_name','SHIRE_NAME','lga','LGA','lga_name','LGA_NAME','local_government','LOCAL_GOVERNMENT','council','COUNCIL','lga_code']) || '—';
-  const locality = findField(c, ['locality','LOCALITY','locality_name','LOCALITY_NAME','suburb','SUBURB','loc_name']) || '—';
-  const segParcel = findField(c, ['segment_parcel','SEG_PARCEL','parcel_typ','PARCEL_TYPE','parcel_type','PAR_TYPE','seg_par','PARTYP']) || '—';
-  const coverType = findField(c, ['cover_typ','COVER_TYP','COVER_TYPE','cover_type','covtyp','COV_TYP']) || '—';
+  const tenure = findField(c, ['tenure']) || '—';
+  // LGA: cadastral uses "shire_name", address uses "local_authority"
+  const lga = findField(c, ['shire_name','lga','lga_name']) || findField(ad, ['local_authority','lga']) || '—';
+  const locality = findField(c, ['locality']) || findField(ad, ['locality']) || '—';
+  const segParcel = findField(c, ['parcel_typ','parcel_type']) || '—';
+  const coverType = findField(c, ['cover_typ','cover_type']) || '—';
 
   // Land use — ALUMC fields
   const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.Secondary || lu.Tertiary || lu.Primary || lu.COMMODITY || lu.DESCRIPTION || '—';
@@ -1958,7 +1992,7 @@ function doLogin() {
       document.querySelector('.top-actions').prepend(badge);
     }
     // Fix map rendering after unhide
-    setTimeout(() => { map.invalidateSize(); }, 200);
+    setTimeout(() => { if(typeof mapFull !== 'undefined') mapFull.invalidateSize(); }, 200);
   } else {
     err.style.display = 'block';
     document.getElementById('loginPass').value = '';
