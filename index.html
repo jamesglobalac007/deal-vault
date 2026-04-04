@@ -432,10 +432,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
       </div>
       <div class="lp-body">
         <div class="lp-group" style="color:#d4a017">Focus Areas</div>
-        <label class="lp-item active" data-layer="qldborder">
-          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('qldborder',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#d4a017"></div>QLD State Border
-        </label>
         <label class="lp-item active" data-layer="corridors">
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('corridors',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#06b6d4"></div>Growth Zones
@@ -1220,165 +1216,61 @@ setTimeout(() => {
 
 // ── Growth Corridor Gold Perimeter Overlays ──
 function addGrowthCorridors(mi) {
-  // ── QLD State Border (gold) — official border from QLD Gov ArcGIS + simplified coastline ──
-  const qldBorderCoords = [
-    // Western border (NT/QLD) going south
-    [-16.539,137.995],[-25.997,137.999],
-    // SA corner
-    [-25.996,140.999],[-28.999,140.999],
-    // NSW border going east (from QLD Gov MapServer Layer 201)
-    [-28.999,148.958],[-28.957,149.032],[-28.842,149.081],[-28.71,149.297],
-    [-28.696,149.387],[-28.595,149.452],[-28.574,149.503],[-28.573,149.587],
-    [-28.634,149.704],[-28.609,149.721],[-28.614,149.977],[-28.581,150.015],
-    [-28.55,150.153],[-28.574,150.213],[-28.537,150.29],[-28.664,150.442],
-    [-28.677,150.632],[-28.634,150.751],[-28.741,151.01],[-28.844,151.044],
-    [-28.837,151.103],[-28.939,151.275],[-29.099,151.279],[-29.179,151.338],
-    [-29.178,151.394],[-29.126,151.453],[-28.953,151.548],
-    // NSW border continuing to coast
-    [-28.867,151.726],[-28.959,151.777],[-28.962,151.831],[-28.908,151.85],
-    [-28.929,151.916],[-28.907,152.011],[-28.732,152.042],[-28.708,152.076],
-    [-28.665,152.01],[-28.519,151.955],[-28.525,152.017],[-28.433,152.16],
-    [-28.449,152.217],[-28.363,152.309],[-28.367,152.388],[-28.259,152.463],
-    [-28.263,152.534],[-28.306,152.526],[-28.339,152.58],[-28.269,152.614],
-    [-28.312,152.64],[-28.364,152.751],[-28.31,152.88],[-28.358,153.108],
-    [-28.25,153.177],[-28.249,153.357],[-28.157,153.477],[-28.165,153.552],
-    // QLD coastline going north (simplified)
-    [-28.16,153.55],[-27.95,153.43],[-27.7,153.4],[-27.47,153.42],
-    [-27.37,153.4],[-27.2,153.32],[-27.07,153.35],[-26.95,153.18],
-    [-26.8,153.15],[-26.55,153.1],[-26.3,153.08],[-25.95,153.05],
-    [-25.65,153.02],[-25.3,152.95],[-25.0,152.85],[-24.85,152.6],
-    [-24.5,152.3],[-24.15,151.95],[-23.85,151.65],[-23.55,151.3],
-    [-23.25,150.9],[-23.0,150.7],[-22.5,150.45],[-22.05,149.9],
-    [-21.5,149.5],[-20.8,149.1],[-20.25,148.7],[-19.9,148.25],
-    [-19.5,147.6],[-19.25,147.0],[-19.05,146.75],[-18.65,146.4],
-    [-18.25,146.1],[-17.7,146.05],[-17.15,145.95],[-16.7,145.72],
-    [-16.25,145.5],[-15.75,145.3],[-15.25,145.2],[-14.75,145.15],
-    [-14.4,144.55],[-14.1,144.1],[-13.6,143.8],[-13.0,143.45],
-    [-12.5,143.2],[-12.0,142.95],[-11.5,142.75],[-11.15,142.55],
-    [-10.9,142.6],[-10.68,142.53],
-    // Gulf of Carpentaria coast back to NT border
-    [-10.85,142.2],[-11.5,142.1],[-12.25,141.7],[-13.0,141.6],
-    [-14.0,141.55],[-15.0,141.45],[-16.0,141.2],[-16.539,137.995]
-  ];
+  // ── Growth Zones — real LGA boundaries from QLD Gov ArcGIS ──
 
-  const qldBorderStyle = {
-    color: '#d4a017', weight: 3, opacity: 0.9,
-    fillColor: '#d4a017', fillOpacity: 0.03,
-    dashArray: null, lineCap: 'round'
-  };
-
-  const qldBorderGroup = L.layerGroup();
-  var qldPoly = L.polygon(qldBorderCoords, qldBorderStyle).addTo(qldBorderGroup);
-  qldPoly.bindTooltip('<div style="background:rgba(212,160,23,.92);color:#0f1419;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">QUEENSLAND</div>', {
-    permanent: false, direction: 'center', className: 'corridor-label'
-  });
-  qldBorderGroup.addTo(mi);
-  if (!window.qldBorderLayers) window.qldBorderLayers = {};
-  window.qldBorderLayers[mi._leaflet_id] = qldBorderGroup;
-
-  // ── Growth Corridors (cyan/teal — distinct from gold state border) ──
-  const corridorStyle = {
-    color: '#06b6d4', weight: 2.5, opacity: 0.85,
-    fillColor: '#06b6d4', fillOpacity: 0.08,
-    dashArray: '8,6', lineCap: 'round'
-  };
-  const labelStyle = 'background:rgba(6,182,212,.92);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3)';
-
-  // ── PRIME GROWTH ZONE (inner, solid cyan) — active growth corridors ──
-  const primeCoords = [
-    // Bundaberg coast
-    [-24.75, 152.40], [-24.75, 152.60], [-24.85, 152.70],
-    // Coast south — Hervey Bay, Maryborough
-    [-25.20, 152.88], [-25.50, 152.98], [-25.75, 153.03],
-    // Gympie / Noosa coast
-    [-26.20, 153.08], [-26.45, 153.12],
-    // Sunshine Coast coast
-    [-26.65, 153.16], [-26.80, 153.16],
-    // Moreton Bay coast
-    [-26.98, 153.15], [-27.15, 153.22], [-27.30, 153.32],
-    // Brisbane / Redlands coast
-    [-27.45, 153.40], [-27.55, 153.38],
-    // Logan / Gold Coast coast
-    [-27.75, 153.42], [-27.90, 153.44], [-28.05, 153.44],
-    [-28.17, 153.40],
-    // Gold Coast south (Coolangatta)
-    [-28.17, 153.25],
-    // Inland — Nerang, Beaudesert
-    [-28.08, 153.05], [-28.00, 152.88],
-    // Scenic Rim
-    [-27.95, 152.65], [-27.85, 152.45],
-    // Lockyer — Gatton
-    [-27.68, 152.25], [-27.58, 152.10],
-    // Toowoomba
-    [-27.50, 151.90], [-27.45, 151.80],[-27.38, 151.80],
-    [-27.32, 151.92],
-    // North through Somerset
-    [-27.20, 152.08], [-27.05, 152.20],
-    // Up through Gympie hinterland
-    [-26.70, 152.40], [-26.40, 152.45],
-    [-26.00, 152.35], [-25.55, 152.20],
-    [-25.10, 152.10], [-24.85, 152.15],
-    [-24.75, 152.40]
-  ];
-
-  // ── OPPORTUNITY RING (outer, dashed) — still worth looking, near corridors ──
-  const outerCoords = [
-    // Wider north — inland from Bundaberg
-    [-24.55, 152.05], [-24.55, 152.65], [-24.70, 152.80],
-    // Wider coast south
-    [-25.10, 153.00], [-25.45, 153.08], [-25.80, 153.12],
-    // Wide Sunshine Coast
-    [-26.25, 153.18], [-26.55, 153.22], [-26.80, 153.24],
-    // Wide Moreton Bay
-    [-27.00, 153.25], [-27.20, 153.38], [-27.35, 153.45],
-    // Wide Brisbane east
-    [-27.50, 153.48], [-27.65, 153.48],
-    // Wide Gold Coast
-    [-27.85, 153.50], [-28.00, 153.52], [-28.17, 153.50],
-    [-28.22, 153.35],
-    // South-west push — hinterland
-    [-28.20, 153.05], [-28.15, 152.80],
-    // Deep Scenic Rim / Boonah
-    [-28.10, 152.50], [-28.00, 152.20],
-    // West of Lockyer — past Gatton
-    [-27.80, 151.90], [-27.65, 151.70],
-    // West of Toowoomba
-    [-27.50, 151.55], [-27.35, 151.55],
-    [-27.20, 151.65], [-27.10, 151.82],
-    // North-west — Esk, Kilcoy
-    [-26.95, 152.00], [-26.75, 152.10],
-    // Wide inland from Gympie
-    [-26.40, 152.15], [-26.00, 152.05],
-    [-25.50, 151.90], [-25.00, 151.85],
-    [-24.70, 151.95], [-24.55, 152.05]
-  ];
+  // ── Load real LGA boundaries from QLD Gov ArcGIS for growth zones ──
+  const primeCouncils = ['BRISBANE','GOLD COAST','LOGAN','MORETON BAY','SUNSHINE COAST',
+    'NOOSA','IPSWICH','REDLAND','SOMERSET','LOCKYER VALLEY','SCENIC RIM','TOOWOOMBA'];
+  const outerCouncils = ['GYMPIE','FRASER COAST','BUNDABERG'];
+  const allCouncils = [...primeCouncils, ...outerCouncils];
 
   const primeStyle = {
-    color: '#06b6d4', weight: 2.5, opacity: 0.9,
-    fillColor: '#06b6d4', fillOpacity: 0.07,
+    color: '#06b6d4', weight: 2, opacity: 0.85,
+    fillColor: '#06b6d4', fillOpacity: 0.06,
     dashArray: null, lineCap: 'round'
   };
   const outerStyle = {
-    color: '#06b6d4', weight: 1.5, opacity: 0.5,
+    color: '#06b6d4', weight: 1.5, opacity: 0.45,
     fillColor: '#06b6d4', fillOpacity: 0.03,
     dashArray: '10,8', lineCap: 'round'
   };
 
   const corridorGroup = L.layerGroup();
-
-  // Outer ring first (underneath)
-  var outerPoly = L.polygon(outerCoords, outerStyle).addTo(corridorGroup);
-  outerPoly.bindTooltip('<div style="background:rgba(6,182,212,.75);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">OPPORTUNITY RING \u00B7 Near Growth</div>', {
-    permanent: false, direction: 'center', className: 'corridor-label', sticky: true
-  });
-
-  // Prime zone on top
-  var primePoly = L.polygon(primeCoords, primeStyle).addTo(corridorGroup);
-  primePoly.bindTooltip('<div style="background:rgba(6,182,212,.92);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">PRIME GROWTH ZONE</div>', {
-    permanent: false, direction: 'center', className: 'corridor-label', sticky: true
-  });
-
   corridorGroup.addTo(mi);
+
+  // Fetch LGA boundaries
+  var whereClause = allCouncils.map(function(c){ return "abbrev_name='" + c + "'"; }).join(' OR ');
+  var qp = new URLSearchParams({
+    where: whereClause,
+    outFields: 'abbrev_name',
+    returnGeometry: 'true',
+    maxAllowableOffset: '0.008',
+    outSR: '4326',
+    f: 'json'
+  });
+  var lgaUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer/11/query?' + qp.toString();
+
+  fetch(lgaUrl).then(function(r){ return r.json(); }).then(function(data){
+    if (!data.features) return;
+    data.features.forEach(function(f){
+      var name = f.attributes.abbrev_name;
+      var isPrime = primeCouncils.indexOf(name) !== -1;
+      var style = isPrime ? primeStyle : outerStyle;
+
+      if (f.geometry && f.geometry.rings) {
+        var latlngs = f.geometry.rings.map(function(ring){
+          return ring.map(function(c){ return [c[1], c[0]]; });
+        });
+        var poly = L.polygon(latlngs, style).addTo(corridorGroup);
+        var label = isPrime ? 'PRIME \u00B7 ' + name : 'EXTENDED \u00B7 ' + name;
+        var tipBg = isPrime ? 'rgba(6,182,212,.92)' : 'rgba(6,182,212,.7)';
+        poly.bindTooltip('<div style="background:' + tipBg + ';color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">' + label + '</div>', {
+          permanent: false, direction: 'center', className: 'corridor-label', sticky: true
+        });
+      }
+    });
+    console.log('Growth zones loaded: ' + data.features.length + ' LGAs');
+  }).catch(function(err){ console.log('Growth zone load error:', err); });
 
   // Store references for layer toggles
   if (!window.corridorLayers) window.corridorLayers = {};
@@ -1625,12 +1517,7 @@ function toggleLayer(layerKey, on) {
   const item = document.querySelector(`.lp-item[data-layer="${layerKey}"]`);
   if (item) item.classList.toggle('active', on);
 
-  // QLD border & growth corridors — special handling (not ArcGIS services)
-  if (layerKey === 'qldborder') {
-    var qb = window.qldBorderLayers && window.qldBorderLayers[mapFull._leaflet_id];
-    if (qb) { on ? qb.addTo(mapFull) : mapFull.removeLayer(qb); }
-    return;
-  }
+  // Growth zones — special handling (not an ArcGIS service)
   if (layerKey === 'corridors') {
     var cg = window.corridorLayers && window.corridorLayers[mapFull._leaflet_id];
     if (cg) { on ? cg.addTo(mapFull) : mapFull.removeLayer(cg); }
