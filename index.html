@@ -1553,6 +1553,18 @@ const councilZoneServices = {
   'Noosa Shire': {
     url: 'https://services2.arcgis.com/tQg86iShPXJPWQWw/arcgis/rest/services/DSP_Noosa_Plan_Zones/FeatureServer/0',
     zoneField: 'New_Noosa_Plan_Zones', codeField: 'Label', precinctField: 'GroupName'
+  },
+  'Townsville City': {
+    url: 'https://services6.arcgis.com/3VCE6mezZtwKJeIR/arcgis/rest/services/TCC_City_Planning_Scheme_Zoning_GDA2020/FeatureServer/0',
+    zoneField: 'LVL2_ZONE', codeField: 'LVL1_ZONE', precinctField: 'ZONE_PREC'
+  },
+  'Ipswich City': {
+    url: 'https://services3.arcgis.com/bMcI7aKgIy0360Q8/arcgis/rest/services/ICC_Ipswich_Planning_Scheme_Zones_geojson/FeatureServer/0',
+    zoneField: 'NAME', codeField: 'CODE', precinctField: 'LABEL'
+  },
+  'Logan City': {
+    url: 'https://arcgis.lcc.wspdigital.com/server/rest/services/LoganHub/Logan_Planning_Scheme_v9_2_TLPI_No_1_2024_20250527/MapServer/368',
+    zoneField: 'Zone', codeField: 'Zone', precinctField: null, isMapServer: true
   }
 };
 
