@@ -231,6 +231,11 @@ tr:hover td{background:rgba(255,255,255,.015)}
 /* ── PROPERTY INFO PANEL (Landchecker-style) ── */
 .prop-panel{position:absolute;top:0;right:0;width:340px;height:100%;background:rgba(20,23,34,.96);border-left:1px solid var(--border);z-index:1001;overflow-y:auto;transform:translateX(100%);transition:transform .25s ease;backdrop-filter:blur(14px)}
 .prop-panel.open{transform:translateX(0)}
+.prop-panel.open.collapsed{transform:translateX(calc(100% - 28px))}
+.pp-collapse{position:absolute;left:-28px;top:50%;transform:translateY(-50%);width:28px;height:60px;background:rgba(20,23,34,.92);border:1px solid var(--border);border-right:none;border-radius:6px 0 0 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px;z-index:1002;transition:color .2s}
+.pp-collapse:hover{color:var(--accent)}
+.prop-panel.open .pp-collapse{display:flex}
+.prop-panel:not(.open) .pp-collapse{display:none}
 .pp-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(20,23,34,.98);z-index:1}
 .pp-head h4{font-size:13px;font-weight:700;color:var(--text)}
 .pp-close{background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
@@ -405,18 +410,32 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <button class="chip" data-mf="option">Under Option</button>
     <button class="chip" data-mf="develop">Develop</button>
     <button class="chip" data-mf="novate">Novated</button>
-    <span style="margin-left:auto;display:flex;gap:6px">
-      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.6,152.8],9)">SEQ</button>
-      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.56,151.95],12)">Toowoomba</button>
-      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.7,153.0],11)">Logan/Flagstone</button>
-      <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.6,152.75],12)">Ripley</button>
-      <button class="btn btn-p btn-sm" id="radarToggle" onclick="toggleRadar()" style="margin-left:8px">Radar ON</button>
+    <span style="margin-left:auto;display:flex;gap:6px;align-items:center">
+      <button class="btn btn-p btn-sm" id="radarToggle" onclick="toggleRadar()">Radar ON</button>
     </span>
+  </div>
+  <div id="corridor-nav" style="display:flex;gap:4px;padding:6px 12px;background:var(--bg-card);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap;scrollbar-width:thin">
+    <button class="btn btn-o btn-sm" onclick="mapFull.setView([-27.6,152.8],9)" style="flex-shrink:0;font-size:10px">SEQ Overview</button>
+    <span style="width:1px;background:var(--border);margin:0 4px;flex-shrink:0"></span>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44" onclick="flyToCorridor(0)">Flagstone <span style="opacity:.6">98</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44" onclick="flyToCorridor(1)">Ripley <span style="opacity:.6">95</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44" onclick="flyToCorridor(2)">Waraba <span style="opacity:.6">89</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44" onclick="flyToCorridor(3)">Coomera <span style="opacity:.6">86</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44" onclick="flyToCorridor(4)">Aura <span style="opacity:.6">82</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44" onclick="flyToCorridor(5)">Park Ridge <span style="opacity:.6">78</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44" onclick="flyToCorridor(6)">Springfield <span style="opacity:.6">75</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44" onclick="flyToCorridor(7)">Highfields <span style="opacity:.6">72</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44" onclick="flyToCorridor(11)">Thornlands <span style="opacity:.6">68</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#3b82f622;color:#3b82f6;border:1px solid #3b82f644" onclick="flyToCorridor(12)">Burpengary <span style="opacity:.6">66</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#3b82f622;color:#3b82f6;border:1px solid #3b82f644" onclick="flyToCorridor(8)">Beaudesert <span style="opacity:.6">65</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#3b82f622;color:#3b82f6;border:1px solid #3b82f644" onclick="flyToCorridor(9)">Beerwah <span style="opacity:.6">63</span></button>
+    <button class="btn btn-sm" style="flex-shrink:0;font-size:10px;background:#3b82f622;color:#3b82f6;border:1px solid #3b82f644" onclick="flyToCorridor(10)">Wellcamp <span style="opacity:.6">60</span></button>
   </div>
   <div style="position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)">
     <div id="map-full"></div>
     <!-- PROPERTY INFO PANEL (Landchecker-style) -->
     <div class="prop-panel" id="propPanel">
+      <button class="pp-collapse" id="ppCollapseBtn" onclick="togglePropCollapse()" title="Toggle panel">&#9654;</button>
       <div class="pp-head">
         <h4>Property Details</h4>
         <button class="pp-close" onclick="closePropPanel()">&times;</button>
@@ -1588,55 +1607,55 @@ function addGrowthIntelligence(mi) {
     { name: 'Flagstone-Yarrabilba', score: 98, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.12,
       bounds: [[-27.77,152.88],[-27.77,153.13],[-27.87,153.13],[-27.87,152.88]],
       center: [-27.82, 153.00], label: 'FLAGSTONE-YARRABILBA', sub: '71,500 lots · 2 PDAs · Score 98',
-      flyTo: [-27.82, 153.00, 12] },
+      flyTo: [-27.82, 153.00, 10] },
     { name: 'Ripley Valley', score: 95, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.12,
       bounds: [[-27.62,152.68],[-27.62,152.80],[-27.73,152.80],[-27.73,152.68]],
       center: [-27.68, 152.74], label: 'RIPLEY VALLEY', sub: '48,750 lots · Inland Rail · Score 95',
-      flyTo: [-27.68, 152.74, 12] },
+      flyTo: [-27.68, 152.74, 10] },
     { name: 'Caboolture West / Waraba', score: 89, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.10,
       bounds: [[-27.01,152.80],[-27.01,152.93],[-27.11,152.93],[-27.11,152.80]],
       center: [-27.06, 152.87], label: 'WARABA / CAB WEST', sub: '15,000+ lots · New PDA · Score 89',
-      flyTo: [-27.06, 152.87, 12] },
+      flyTo: [-27.06, 152.87, 10] },
     { name: 'Coomera-Pimpama', score: 86, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.10,
       bounds: [[-27.80,153.25],[-27.80,153.38],[-27.92,153.38],[-27.92,153.25]],
       center: [-27.86, 153.31], label: 'COOMERA-PIMPAMA', sub: 'GC growth spine · Score 86',
-      flyTo: [-27.86, 153.31, 12] },
+      flyTo: [-27.86, 153.31, 10] },
     { name: 'Caloundra South / Aura', score: 82, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.10,
       bounds: [[-26.77,152.96],[-26.77,153.08],[-26.87,153.08],[-26.87,152.96]],
       center: [-26.82, 153.02], label: 'AURA / CALOUNDRA SOUTH', sub: 'Aust largest MPC · Score 82',
-      flyTo: [-26.82, 153.02, 12] },
+      flyTo: [-26.82, 153.02, 10] },
     { name: 'Park Ridge-Chambers Flat', score: 78, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.08,
       bounds: [[-27.68,153.02],[-27.68,153.13],[-27.76,153.13],[-27.76,153.02]],
       center: [-27.72, 153.07], label: 'PARK RIDGE', sub: '+19.1% growth · Score 78',
-      flyTo: [-27.72, 153.07, 13] },
+      flyTo: [-27.72, 153.07, 11] },
     { name: 'Springfield-Redbank Plains', score: 75, strategy: 'DEVELOP', color: '#22c55e', fillOpacity: 0.08,
       bounds: [[-27.62,152.87],[-27.62,152.97],[-27.70,152.97],[-27.70,152.87]],
       center: [-27.66, 152.92], label: 'SPRINGFIELD', sub: 'Ipswich PT corridor · Score 75',
-      flyTo: [-27.66, 152.92, 13] },
+      flyTo: [-27.66, 152.92, 11] },
     { name: 'Highfields', score: 72, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.08,
       bounds: [[-27.42,151.90],[-27.42,152.00],[-27.50,152.00],[-27.50,151.90]],
       center: [-27.46, 151.95], label: 'HIGHFIELDS', sub: 'PFGA + Bypass · Score 72',
-      flyTo: [-27.46, 151.95, 13] },
+      flyTo: [-27.46, 151.95, 11] },
     { name: 'Beaudesert-Bromelton', score: 65, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
       bounds: [[-27.93,152.88],[-27.93,153.06],[-28.03,153.06],[-28.03,152.88]],
       center: [-27.98, 152.97], label: 'BEAUDESERT', sub: 'SDA + 2 PFGAs · Score 65',
-      flyTo: [-27.98, 152.97, 12] },
+      flyTo: [-27.98, 152.97, 10] },
     { name: 'Beerwah East', score: 63, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
       bounds: [[-26.82,152.92],[-26.82,153.00],[-26.90,153.00],[-26.90,152.92]],
       center: [-26.86, 152.96], label: 'BEERWAH EAST', sub: 'Cat 2 + Rail · Score 63',
-      flyTo: [-26.86, 152.96, 13] },
+      flyTo: [-26.86, 152.96, 11] },
     { name: 'Wellcamp Employment', score: 60, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
       bounds: [[-27.52,151.73],[-27.52,151.85],[-27.62,151.85],[-27.62,151.73]],
       center: [-27.57, 151.79], label: 'WELLCAMP', sub: 'Inland Rail + Airport · Score 60',
-      flyTo: [-27.57, 151.79, 12] },
+      flyTo: [-27.57, 151.79, 10] },
     { name: 'Southern Thornlands', score: 68, strategy: 'FLIP', color: '#f59e0b', fillOpacity: 0.08,
       bounds: [[-27.54,153.23],[-27.54,153.30],[-27.60,153.30],[-27.60,153.23]],
       center: [-27.57, 153.27], label: 'STH THORNLANDS', sub: 'New PDA Apr 2025 · Score 68',
-      flyTo: [-27.57, 153.27, 13] },
+      flyTo: [-27.57, 153.27, 11] },
     { name: 'Burpengary East-Elimbah', score: 66, strategy: 'HOLD', color: '#3b82f6', fillOpacity: 0.07,
       bounds: [[-27.10,152.93],[-27.10,153.03],[-27.19,153.03],[-27.19,152.93]],
       center: [-27.15, 152.98], label: 'BURPENGARY E', sub: 'Cat 1 pre-rezoning · Score 66',
-      flyTo: [-27.15, 152.98, 13] }
+      flyTo: [-27.15, 152.98, 11] }
   ];
 
   corridorZones.forEach(function(cz) {
@@ -2083,7 +2102,22 @@ function closePropPanel() {
 }
 
 function openPropPanel() {
-  document.getElementById('propPanel').classList.add('open');
+  var panel = document.getElementById('propPanel');
+  panel.classList.add('open');
+  panel.classList.remove('collapsed');
+  document.getElementById('ppCollapseBtn').innerHTML = '&#9654;';
+}
+
+function togglePropCollapse() {
+  var panel = document.getElementById('propPanel');
+  var btn = document.getElementById('ppCollapseBtn');
+  if (panel.classList.contains('collapsed')) {
+    panel.classList.remove('collapsed');
+    btn.innerHTML = '&#9654;';
+  } else {
+    panel.classList.add('collapsed');
+    btn.innerHTML = '&#9664;';
+  }
 }
 
 // Direct REST API identify — bypasses CORS issues with JSONP fallback
@@ -2635,6 +2669,18 @@ function renderPropPanel(latlng, r) {
     ${fullAddress && locality !== '—' ? '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + locality + (lga !== '—' ? ' — ' + lga : '') + '</div>' : ''}
   </div>`;
 
+  // Prominent zone badge (right after address)
+  if (councilZoneName) {
+    html += `<div style="margin-bottom:12px;padding:8px 12px;background:${zoneCat.bg};border:1px solid ${zoneCat.color}33;border-radius:8px;display:flex;align-items:center;gap:8px">
+      ${zoneCat.icon ? '<span style="font-size:18px">' + zoneCat.icon + '</span>' : ''}
+      <div style="flex:1">
+        <div style="font-size:10px;color:${zoneCat.color};font-weight:700;letter-spacing:.5px">ZONE</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${councilZoneName}</div>
+      </div>
+      <span style="background:${zoneCat.color};color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700">${zoneCat.label}</span>
+    </div>`;
+  }
+
   // Property Details section
   html += `<div class="pp-section">
     <div class="pp-section-title">Property Details</div>
@@ -2642,7 +2688,6 @@ function renderPropPanel(latlng, r) {
       <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
       <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
       <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Parcel Type</div><div class="pp-field-val">${segParcel}</div></div>
       <div class="pp-field"><div class="pp-field-label">Elevation</div><div class="pp-field-val">${elevation !== '—' ? elevation + 'm AHD' : '—'}</div></div>
     </div>
   </div>`;
@@ -3082,12 +3127,12 @@ function toggleRadar(){
 // Fly to LGA center from targeting table
 window.flyToLGA = function(lgaName) {
   var lgaCenters = {
-    'Logan': [-27.64, 153.10, 11], 'Ipswich': [-27.62, 152.76, 11],
-    'Moreton Bay': [-27.12, 152.95, 10], 'Gold Coast': [-27.95, 153.35, 10],
-    'Sunshine Coast': [-26.72, 153.00, 10], 'Toowoomba': [-27.56, 151.95, 11],
-    'Scenic Rim': [-28.00, 153.00, 10], 'Lockyer Valley': [-27.55, 152.35, 11],
-    'Somerset': [-27.35, 152.55, 10], 'Brisbane': [-27.47, 153.03, 11],
-    'Redland': [-27.55, 153.27, 12], 'Noosa': [-26.40, 153.00, 11]
+    'Logan': [-27.64, 153.10, 10], 'Ipswich': [-27.62, 152.76, 10],
+    'Moreton Bay': [-27.12, 152.95, 9], 'Gold Coast': [-27.95, 153.35, 9],
+    'Sunshine Coast': [-26.72, 153.00, 9], 'Toowoomba': [-27.56, 151.95, 10],
+    'Scenic Rim': [-28.00, 153.00, 9], 'Lockyer Valley': [-27.55, 152.35, 10],
+    'Somerset': [-27.35, 152.55, 9], 'Brisbane': [-27.47, 153.03, 10],
+    'Redland': [-27.55, 153.27, 11], 'Noosa': [-26.40, 153.00, 10]
   };
   var coords = lgaCenters[lgaName];
   if (!coords || !mapFull) return;
