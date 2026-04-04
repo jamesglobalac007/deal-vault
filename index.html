@@ -438,7 +438,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
         </label>
         <label class="lp-item active" data-layer="corridors">
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('corridors',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#06b6d4"></div>Growth Corridors
+          <div class="lp-dot" style="background:#06b6d4"></div>Growth Zones
         </label>
         <div class="lp-group">Cadastral</div>
         <label class="lp-item active" data-layer="cadastral">
@@ -1284,56 +1284,98 @@ function addGrowthCorridors(mi) {
   };
   const labelStyle = 'background:rgba(6,182,212,.92);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3)';
 
-  const corridors = [
-    {
-      name: 'GROWTH FOCUS ZONE',
-      sub: 'Bundaberg to Gold Coast \u00B7 Toowoomba to Coast \u00B7 All SEQ + Wide Bay corridors',
-      coords: [
-        // Bundaberg (top, coast side)
-        [-24.65, 152.45], [-24.70, 152.55], [-24.80, 152.70],
-        // Coast south past Hervey Bay / Maryborough
-        [-25.20, 152.90], [-25.50, 153.00], [-25.75, 153.05],
-        // Sunshine Coast coast
-        [-26.30, 153.10], [-26.55, 153.14], [-26.70, 153.18],
-        // Moreton Bay / Redcliffe coast
-        [-26.95, 153.18], [-27.15, 153.25], [-27.30, 153.35],
-        // Brisbane east coast / Redlands
-        [-27.45, 153.42], [-27.55, 153.40],
-        // South to Gold Coast coast
-        [-27.75, 153.42], [-27.90, 153.45], [-28.05, 153.45],
-        [-28.17, 153.42],
-        // Gold Coast southern tip (Coolangatta)
-        [-28.17, 153.30],
-        // Inland from Gold Coast — Nerang, Beaudesert
-        [-28.10, 153.10], [-28.05, 152.95],
-        // Scenic Rim — Boonah
-        [-28.05, 152.70], [-28.00, 152.40],
-        // Lockyer Valley — Gatton, Laidley
-        [-27.80, 152.05], [-27.65, 151.85],
-        // Toowoomba west edge
-        [-27.55, 151.68], [-27.40, 151.68],
-        // Toowoomba north
-        [-27.30, 151.80], [-27.25, 152.00],
-        // Up through Somerset / Esk
-        [-27.10, 152.15], [-26.90, 152.20],
-        // Inland from Gympie / Mary Valley
-        [-26.50, 152.30], [-26.10, 152.20],
-        // Inland from Bundaberg
-        [-25.50, 152.10], [-25.10, 152.00],
-        // Back to Bundaberg start
-        [-24.80, 152.10], [-24.65, 152.45]
-      ]
-    }
+  // ── PRIME GROWTH ZONE (inner, solid cyan) — active growth corridors ──
+  const primeCoords = [
+    // Bundaberg coast
+    [-24.75, 152.40], [-24.75, 152.60], [-24.85, 152.70],
+    // Coast south — Hervey Bay, Maryborough
+    [-25.20, 152.88], [-25.50, 152.98], [-25.75, 153.03],
+    // Gympie / Noosa coast
+    [-26.20, 153.08], [-26.45, 153.12],
+    // Sunshine Coast coast
+    [-26.65, 153.16], [-26.80, 153.16],
+    // Moreton Bay coast
+    [-26.98, 153.15], [-27.15, 153.22], [-27.30, 153.32],
+    // Brisbane / Redlands coast
+    [-27.45, 153.40], [-27.55, 153.38],
+    // Logan / Gold Coast coast
+    [-27.75, 153.42], [-27.90, 153.44], [-28.05, 153.44],
+    [-28.17, 153.40],
+    // Gold Coast south (Coolangatta)
+    [-28.17, 153.25],
+    // Inland — Nerang, Beaudesert
+    [-28.08, 153.05], [-28.00, 152.88],
+    // Scenic Rim
+    [-27.95, 152.65], [-27.85, 152.45],
+    // Lockyer — Gatton
+    [-27.68, 152.25], [-27.58, 152.10],
+    // Toowoomba
+    [-27.50, 151.90], [-27.45, 151.80],[-27.38, 151.80],
+    [-27.32, 151.92],
+    // North through Somerset
+    [-27.20, 152.08], [-27.05, 152.20],
+    // Up through Gympie hinterland
+    [-26.70, 152.40], [-26.40, 152.45],
+    [-26.00, 152.35], [-25.55, 152.20],
+    [-25.10, 152.10], [-24.85, 152.15],
+    [-24.75, 152.40]
   ];
+
+  // ── OPPORTUNITY RING (outer, dashed) — still worth looking, near corridors ──
+  const outerCoords = [
+    // Wider north — inland from Bundaberg
+    [-24.55, 152.05], [-24.55, 152.65], [-24.70, 152.80],
+    // Wider coast south
+    [-25.10, 153.00], [-25.45, 153.08], [-25.80, 153.12],
+    // Wide Sunshine Coast
+    [-26.25, 153.18], [-26.55, 153.22], [-26.80, 153.24],
+    // Wide Moreton Bay
+    [-27.00, 153.25], [-27.20, 153.38], [-27.35, 153.45],
+    // Wide Brisbane east
+    [-27.50, 153.48], [-27.65, 153.48],
+    // Wide Gold Coast
+    [-27.85, 153.50], [-28.00, 153.52], [-28.17, 153.50],
+    [-28.22, 153.35],
+    // South-west push — hinterland
+    [-28.20, 153.05], [-28.15, 152.80],
+    // Deep Scenic Rim / Boonah
+    [-28.10, 152.50], [-28.00, 152.20],
+    // West of Lockyer — past Gatton
+    [-27.80, 151.90], [-27.65, 151.70],
+    // West of Toowoomba
+    [-27.50, 151.55], [-27.35, 151.55],
+    [-27.20, 151.65], [-27.10, 151.82],
+    // North-west — Esk, Kilcoy
+    [-26.95, 152.00], [-26.75, 152.10],
+    // Wide inland from Gympie
+    [-26.40, 152.15], [-26.00, 152.05],
+    [-25.50, 151.90], [-25.00, 151.85],
+    [-24.70, 151.95], [-24.55, 152.05]
+  ];
+
+  const primeStyle = {
+    color: '#06b6d4', weight: 2.5, opacity: 0.9,
+    fillColor: '#06b6d4', fillOpacity: 0.07,
+    dashArray: null, lineCap: 'round'
+  };
+  const outerStyle = {
+    color: '#06b6d4', weight: 1.5, opacity: 0.5,
+    fillColor: '#06b6d4', fillOpacity: 0.03,
+    dashArray: '10,8', lineCap: 'round'
+  };
 
   const corridorGroup = L.layerGroup();
 
-  corridors.forEach(function(c) {
-    var poly = L.polygon(c.coords, corridorStyle).addTo(corridorGroup);
-    poly.bindTooltip('<div style="' + labelStyle + '">' + c.name + '</div>', {
-      permanent: false, direction: 'center', className: 'corridor-label', sticky: true
-    });
-    poly.bindPopup('<div style="font-size:12px;min-width:200px"><strong style="color:#06b6d4">' + c.name + '</strong><br><span style="color:#666;font-size:11px">' + c.sub + '</span><br><br><span style="font-size:10px;color:#888">Click any property inside this zone for<br>zoning, constraints & development potential.</span></div>');
+  // Outer ring first (underneath)
+  var outerPoly = L.polygon(outerCoords, outerStyle).addTo(corridorGroup);
+  outerPoly.bindTooltip('<div style="background:rgba(6,182,212,.75);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">OPPORTUNITY RING \u00B7 Near Growth</div>', {
+    permanent: false, direction: 'center', className: 'corridor-label', sticky: true
+  });
+
+  // Prime zone on top
+  var primePoly = L.polygon(primeCoords, primeStyle).addTo(corridorGroup);
+  primePoly.bindTooltip('<div style="background:rgba(6,182,212,.92);color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">PRIME GROWTH ZONE</div>', {
+    permanent: false, direction: 'center', className: 'corridor-label', sticky: true
   });
 
   corridorGroup.addTo(mi);
