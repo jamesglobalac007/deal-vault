@@ -2033,6 +2033,33 @@ function renderPropPanel(latlng, r) {
   if (councilZoneName) console.log('Council Zone:', councilZoneName, '| Precinct:', councilZonePrecinct);
 
   // Zone categorization — highlight residential, rural, industrial
+  // ── ShapingSEQ 2023 Growth Data by LGA ──
+  // Dwelling supply targets (2021-2046), consolidation/expansion split, key growth areas
+  const shapingSEQ = {
+    'BRISBANE': { dwellings: 282000, consolPct: 88, expandPct: 12, keyAreas: 'Northshore Hamilton, Woolloongabba, Bowen Hills, Cross River Rail corridor, Carseldine Village', type: 'Metro Core' },
+    'GOLD COAST': { dwellings: 158800, consolPct: 69, expandPct: 31, keyAreas: 'Coomera, Pimpama, Ormeau, Merrimac, Surfers Paradise infill, Southport CBD', type: 'Coastal Growth' },
+    'SUNSHINE COAST': { dwellings: 84800, consolPct: 60, expandPct: 40, keyAreas: 'Caloundra South (Aura), Palmview, Beerwah East, Maroochydore CBD', type: 'Coastal Growth' },
+    'MORETON BAY': { dwellings: 100000, consolPct: 55, expandPct: 45, keyAreas: 'Waraba (Caboolture West) PDA, North Lakes, Morayfield, Burpengary East, Dakabin', type: 'Northern Growth' },
+    'LOGAN': { dwellings: 57700, consolPct: 52, expandPct: 48, keyAreas: 'Flagstone PDA, Yarrabilba PDA, Park Ridge, Meadowbrook, Logan Central', type: 'Southern Growth' },
+    'IPSWICH': { dwellings: 66200, consolPct: 40, expandPct: 60, keyAreas: 'Ripley Valley PDA, Springfield, Redbank Plains, Rosewood, Walloon', type: 'Western Growth' },
+    'REDLAND': { dwellings: 14200, consolPct: 80, expandPct: 20, keyAreas: 'Redland Bay, Cleveland, Capalaba, Victoria Point', type: 'Bayside Infill' },
+    'NOOSA': { dwellings: 9200, consolPct: 75, expandPct: 25, keyAreas: 'Noosaville, Tewantin, Cooroy, Pomona', type: 'Hinterland' },
+    'SOMERSET': { dwellings: 5500, consolPct: 35, expandPct: 65, keyAreas: 'Fernvale, Lowood, Esk, Kilcoy', type: 'Rural Growth' },
+    'LOCKYER VALLEY': { dwellings: 7800, consolPct: 40, expandPct: 60, keyAreas: 'Gatton, Laidley, Plainland, Withcott', type: 'Rural Growth' },
+    'SCENIC RIM': { dwellings: 8500, consolPct: 35, expandPct: 65, keyAreas: 'Beaudesert, Boonah, Tamborine Mountain, Canungra', type: 'Rural Growth' },
+    'TOOWOOMBA': { dwellings: 28000, consolPct: 50, expandPct: 50, keyAreas: 'Highfields, Glenvale, Westbrook, Charlton, Torrington', type: 'Inland City' }
+  };
+
+  function getShapingSEQData(lgaName) {
+    if (!lgaName || lgaName === '\u2014') return null;
+    var lga = lgaName.toUpperCase();
+    for (var key in shapingSEQ) {
+      if (lga.indexOf(key) !== -1) return shapingSEQ[key];
+    }
+    return null;
+  }
+  const seqData = getShapingSEQData(lga);
+
   function categorizeZone(zoneName) {
     if (!zoneName) return { cat: 'unknown', label: '', color: '#7a8194', bg: 'rgba(107,114,128,.15)', icon: '' };
     var z = zoneName.toLowerCase();
@@ -2101,6 +2128,12 @@ function renderPropPanel(latlng, r) {
   // SEQ growth area bonus
   if (seqZoneName && seqZoneName.toLowerCase().match(/urban|expansion|investigation|development/)) {
     dpScore += 8; dpFactors.push('SEQ growth area');
+  }
+
+  // ShapingSEQ 2023 bonus — high expansion councils score higher
+  if (seqData) {
+    if (seqData.expandPct >= 50) { dpScore += 10; dpFactors.push('High expansion LGA (' + seqData.expandPct + '%)'); }
+    else if (seqData.expandPct >= 35) { dpScore += 6; dpFactors.push('Growth LGA (' + seqData.expandPct + '% expansion)'); }
   }
 
   // Constraint penalties
@@ -2190,6 +2223,21 @@ function renderPropPanel(latlng, r) {
     html += '<div style="margin-top:4px"><span class="pp-overlay-tag" style="background:rgba(59,130,246,.12);color:#3b82f6">' + pdaName + '</span></div>';
   }
   html += '</div>';
+
+  // ShapingSEQ 2023 Growth Context section
+  if (seqData) {
+    var expandColor = seqData.expandPct >= 50 ? '#00d4aa' : seqData.expandPct >= 35 ? '#f59e0b' : '#7a8194';
+    var expandLabel = seqData.expandPct >= 50 ? 'HIGH EXPANSION' : seqData.expandPct >= 35 ? 'GROWTH AREA' : 'CONSOLIDATION';
+    html += '<div class="pp-section">';
+    html += '<div class="pp-section-title">ShapingSEQ 2023 Growth Context</div>';
+    html += '<div class="pp-grid">';
+    html += '<div class="pp-field"><div class="pp-field-label">Dwelling Target (to 2046)</div><div class="pp-field-val" style="color:#00d4aa;font-weight:700;font-size:14px">+' + seqData.dwellings.toLocaleString() + '</div></div>';
+    html += '<div class="pp-field"><div class="pp-field-label">Growth Type</div><div class="pp-field-val" style="color:' + expandColor + ';font-weight:600">' + expandLabel + '</div></div>';
+    html += '<div class="pp-field"><div class="pp-field-label">Consolidation / Expansion</div><div class="pp-field-val">' + seqData.consolPct + '% / ' + seqData.expandPct + '%</div></div>';
+    html += '<div class="pp-field"><div class="pp-field-label">Region Type</div><div class="pp-field-val">' + seqData.type + '</div></div>';
+    html += '<div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Key Growth Areas</div><div class="pp-field-val" style="font-size:11px;line-height:1.5;color:var(--dim)">' + seqData.keyAreas + '</div></div>';
+    html += '</div></div>';
+  }
 
   // Koala habitat
   const koalaStatus = r.koala ? 'Habitat Identified' : 'Unaffected';
