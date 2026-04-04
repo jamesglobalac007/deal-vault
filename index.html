@@ -1365,11 +1365,15 @@ const pfgaDatabase = [
 ];
 
 const cat1DevAreas = [
-  { name: 'Burpengary East', lat: -27.16, lng: 153.00, council: 'Moreton Bay', desc: 'Structure planning required before development. Near Bruce Hwy and rail' },
-  { name: 'Elimbah', lat: -27.00, lng: 152.95, council: 'Moreton Bay', type: 'Residential', desc: 'Northern Moreton Bay near Waraba PDA. Structure planning underway' },
-  { name: 'Narangba', lat: -27.20, lng: 152.97, council: 'Moreton Bay', desc: 'Close to existing urban edge. Structure planning required' },
-  { name: 'Yandina', lat: -26.56, lng: 152.95, council: 'Sunshine Coast', desc: 'Hinterland expansion area. Added to urban footprint in ShapingSEQ 2023' },
-  { name: 'Southern Thornlands', lat: -27.57, lng: 153.26, council: 'Redland', desc: 'Elevated to full PDA in April 2025. Now under ILUP' }
+  { name: 'Burpengary East', lat: -27.16, lng: 153.00, council: 'Moreton Bay', category: 1, desc: 'Structure planning required before development. Near Bruce Hwy and rail. Prohibits MCU/RoL until planning complete.' },
+  { name: 'Elimbah', lat: -27.00, lng: 152.95, council: 'Moreton Bay', category: 1, desc: 'Northern Moreton Bay near Waraba PDA. Portion also designated Cat 2. Structure planning underway.' },
+  { name: 'Narangba', lat: -27.20, lng: 152.97, council: 'Moreton Bay', category: 1, desc: 'Close to existing urban edge. Structure planning required before MCU/RoL.' },
+  { name: 'Yandina', lat: -26.56, lng: 152.95, council: 'Sunshine Coast', category: 1, desc: 'Hinterland expansion area added to urban footprint in ShapingSEQ 2023. ~5,000ha total added across SEQ.' },
+  { name: 'Southern Thornlands', lat: -27.57, lng: 153.26, council: 'Redland', category: 1, desc: 'Elevated to full PDA in April 2025 (890ha). Now under Interim Land Use Plan.' },
+  { name: 'Beerwah East', lat: -26.86, lng: 152.97, council: 'Sunshine Coast', category: 2, desc: 'Category 2 — retained from ShapingSEQ 2017. Near The Wave rail corridor. Applications must align with future planning intent.' },
+  { name: 'Sandstone Point', lat: -27.08, lng: 153.13, council: 'Moreton Bay', category: 2, desc: 'Category 2 — new in ShapingSEQ 2023. Coastal Moreton Bay near Bribie Island. Applications must demonstrate alignment.' },
+  { name: 'Stapylton', lat: -27.76, lng: 153.27, council: 'Gold Coast', category: 2, desc: 'Category 2 — new in ShapingSEQ 2023. Northern Gold Coast industrial/employment land near M1. Also a PFGA.' },
+  { name: 'West Toowoomba', lat: -27.57, lng: 151.90, council: 'Toowoomba', category: 2, desc: 'Category 2 — new in ShapingSEQ 2023. Part of ~5,000ha urban footprint expansion. Added with Westbrook, Wellcamp, Meringandan, Gowrie Junction.' }
 ];
 
 // ── Render Growth Intelligence Markers ──
@@ -1467,13 +1471,17 @@ function addGrowthIntelligence(mi) {
   // ── Category 1 Dev Areas (off by default) ──
   var cat1Group = L.layerGroup();
   cat1DevAreas.forEach(function(area) {
-    var marker = L.marker([area.lat, area.lng], { icon: makeIcon('📋', '#14b8a6', 24) });
+    var cat = area.category || 1;
+    var catColor = cat === 1 ? '#14b8a6' : '#0891b2';
+    var catLabel = 'Cat ' + cat + ' SEQ Dev Area';
+    var catNote = cat === 1 ? 'Structure planning required before MCU/RoL approval' : 'Applications must demonstrate alignment with future planning intent';
+    var marker = L.marker([area.lat, area.lng], { icon: makeIcon(cat === 1 ? '📋' : '📐', catColor, 24) });
     marker.bindPopup(
       '<div style="min-width:220px;font-family:-apple-system,sans-serif">' +
-      '<div style="font-size:13px;font-weight:700;color:#14b8a6">' + area.name + '</div>' +
-      '<div style="font-size:10px;color:#666;margin-bottom:6px">Cat 1 SEQ Dev Area · ' + area.council + '</div>' +
+      '<div style="font-size:13px;font-weight:700;color:' + catColor + '">' + area.name + '</div>' +
+      '<div style="font-size:10px;color:#666;margin-bottom:6px">' + catLabel + ' · ' + area.council + '</div>' +
       '<div style="font-size:11px;color:#333;line-height:1.5;background:#f0fdfa;padding:6px 8px;border-radius:4px">' + area.desc + '</div>' +
-      '<div style="font-size:10px;color:#888;margin-top:6px;font-style:italic">Structure planning required before MCU/RoL approval</div>' +
+      '<div style="font-size:10px;color:#888;margin-top:6px;font-style:italic">' + catNote + '</div>' +
       '</div>', { maxWidth: 280 }
     );
     marker.addTo(cat1Group);
@@ -2258,18 +2266,18 @@ function renderPropPanel(latlng, r) {
   // ── ShapingSEQ 2023 Growth Data by LGA ──
   // Dwelling supply targets (2021-2046), consolidation/expansion split, key growth areas
   const shapingSEQ = {
-    'BRISBANE': { dwellings: 155200, consolPct: 92, expandPct: 8, keyAreas: 'Northshore Hamilton PDA, Woolloongabba PDA, Bowen Hills PDA, Cross River Rail corridor, Carseldine Village, Albion, Newstead', type: 'Metro Core' },
-    'GOLD COAST': { dwellings: 161700, consolPct: 69, expandPct: 31, keyAreas: 'Coomera Town Centre PDA, Pimpama, Ormeau, Merrimac, Surfers Paradise infill, Southport CBD, Coomera Connector corridor', type: 'Coastal Growth' },
-    'SUNSHINE COAST': { dwellings: 85000, consolPct: 60, expandPct: 40, keyAreas: 'Caloundra South (Aura) PDA, Palmview, Beerwah East, Maroochydore CBD, The Wave rail corridor, Yandina Cat 1', type: 'Coastal Growth' },
-    'MORETON BAY': { dwellings: 123000, consolPct: 55, expandPct: 45, keyAreas: 'Waraba (Caboolture West) PDA, North Lakes, Morayfield, Burpengary East Cat 1, Elimbah Cat 1, Narangba Cat 1, Dakabin', type: 'Northern Growth' },
-    'LOGAN': { dwellings: 108400, consolPct: 42, expandPct: 58, keyAreas: 'Greater Flagstone PDA (51,500 dwellings), Yarrabilba PDA (20,000 dwellings), Park Ridge, Meadowbrook, Logan Central', type: 'Southern Growth' },
-    'IPSWICH': { dwellings: 107900, consolPct: 35, expandPct: 65, keyAreas: 'Ripley Valley PDA (48,750 dwellings), Springfield, Redbank Plains, Rosewood, Walloon', type: 'Western Growth' },
-    'REDLAND': { dwellings: 14200, consolPct: 75, expandPct: 25, keyAreas: 'Southern Thornlands PDA (890ha, declared Apr 2025), Redland Bay, Cleveland, Capalaba, Victoria Point', type: 'Bayside Infill' },
-    'NOOSA': { dwellings: 9200, consolPct: 75, expandPct: 25, keyAreas: 'Noosaville, Tewantin, Cooroy, Pomona', type: 'Hinterland' },
-    'SOMERSET': { dwellings: 5500, consolPct: 35, expandPct: 65, keyAreas: 'Fernvale, Lowood, Esk, Kilcoy, Glamorgan Vale PFGA', type: 'Rural Growth' },
-    'LOCKYER VALLEY': { dwellings: 7800, consolPct: 40, expandPct: 60, keyAreas: 'Gatton, Laidley, Plainland, Withcott, Lanefield/Grandchester PFGA', type: 'Rural Growth' },
-    'SCENIC RIM': { dwellings: 8500, consolPct: 35, expandPct: 65, keyAreas: 'Beaudesert, Boonah, Tamborine Mountain, Canungra, Glen Eagle expansion, Beaudesert East PFGA', type: 'Rural Growth' },
-    'TOOWOOMBA': { dwellings: 28000, consolPct: 50, expandPct: 50, keyAreas: 'Highfields PFGA, Glenvale, Westbrook PFGA, Wellcamp PFGA (employment), Charlton, Torrington, Meringandan', type: 'Inland City' }
+    'BRISBANE': { dwellings: 210000, consolPct: 92, expandPct: 8, keyAreas: 'Northshore Hamilton PDA, Woolloongabba PDA, Bowen Hills PDA, Cross River Rail corridor, Carseldine Village, Albion, Newstead', type: 'Metro Core', current: 518500, target2046: 728200 },
+    'GOLD COAST': { dwellings: 158100, consolPct: 69, expandPct: 31, keyAreas: 'Coomera Town Centre PDA, Pimpama, Ormeau, Merrimac, Surfers Paradise infill, Southport CBD, Coomera Connector corridor, Stapylton Cat 2', type: 'Coastal Growth', current: 271400, target2046: 429500 },
+    'SUNSHINE COAST': { dwellings: 80600, consolPct: 60, expandPct: 40, keyAreas: 'Caloundra South (Aura) PDA, Palmview, Beerwah East Cat 2, Maroochydore PDA, The Wave rail corridor, Yandina Cat 1, Halls Creek PFGA', type: 'Coastal Growth', current: 0, target2046: 0 },
+    'MORETON BAY': { dwellings: 123000, consolPct: 55, expandPct: 45, keyAreas: 'Waraba (Caboolture West) PDA, North Lakes, Morayfield, Burpengary East Cat 1, Elimbah Cat 1/Cat 2, Narangba Cat 1, Sandstone Point Cat 2, Dakabin', type: 'Northern Growth', current: 0, target2046: 0 },
+    'LOGAN': { dwellings: 110200, consolPct: 42, expandPct: 58, keyAreas: 'Greater Flagstone PDA (51,500 dw), Yarrabilba PDA (20,000 dw), Park Ridge, Chambers Flat-Logan Reserve (+19.1% growth), Greenbank-North Maclean (+12.8%)', type: 'Southern Growth', current: 137876, target2046: 0, note: 'Fastest growing LGA in QLD (3.9%). 8,153ha broad-hectare supply — most in SEQ.' },
+    'IPSWICH': { dwellings: 107900, consolPct: 35, expandPct: 65, keyAreas: 'Ripley Valley PDA (48,750 dw), Springfield, Redbank Plains, Rosewood, Walloon, Inland Rail intermodal Ebenezer', type: 'Western Growth', current: 0, target2046: 0 },
+    'REDLAND': { dwellings: 14200, consolPct: 75, expandPct: 25, keyAreas: 'Southern Thornlands PDA (890ha, declared Apr 2025), Redland Bay, Cleveland, Capalaba, Victoria Point', type: 'Bayside Infill', current: 0, target2046: 0 },
+    'NOOSA': { dwellings: 9200, consolPct: 75, expandPct: 25, keyAreas: 'Noosaville, Tewantin, Cooroy, Pomona', type: 'Hinterland', current: 0, target2046: 0 },
+    'SOMERSET': { dwellings: 5500, consolPct: 35, expandPct: 65, keyAreas: 'Fernvale, Lowood, Esk, Kilcoy, Glamorgan Vale PFGA', type: 'Rural Growth', current: 0, target2046: 0 },
+    'LOCKYER VALLEY': { dwellings: 7800, consolPct: 40, expandPct: 60, keyAreas: 'Gatton, Laidley, Plainland, Withcott, Lanefield/Grandchester PFGA', type: 'Rural Growth', current: 0, target2046: 0 },
+    'SCENIC RIM': { dwellings: 8500, consolPct: 35, expandPct: 65, keyAreas: 'Beaudesert, Boonah, Tamborine Mountain, Canungra, Glen Eagle urban footprint expansion, Beaudesert East PFGA', type: 'Rural Growth', current: 0, target2046: 0 },
+    'TOOWOOMBA': { dwellings: 28000, consolPct: 50, expandPct: 50, keyAreas: 'Highfields PFGA, Glenvale, Westbrook urban expansion, Wellcamp PFGA (employment), West Toowoomba Cat 2, Meringandan expansion, Gowrie Junction expansion', type: 'Inland City', current: 0, target2046: 0 }
   };
 
   function getShapingSEQData(lgaName) {
@@ -2458,6 +2466,9 @@ function renderPropPanel(latlng, r) {
     html += '<div class="pp-field"><div class="pp-field-label">Consolidation / Expansion</div><div class="pp-field-val">' + seqData.consolPct + '% / ' + seqData.expandPct + '%</div></div>';
     html += '<div class="pp-field"><div class="pp-field-label">Region Type</div><div class="pp-field-val">' + seqData.type + '</div></div>';
     html += '<div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Key Growth Areas</div><div class="pp-field-val" style="font-size:11px;line-height:1.5;color:var(--dim)">' + seqData.keyAreas + '</div></div>';
+    if (seqData.note) {
+      html += '<div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Intelligence Note</div><div class="pp-field-val" style="font-size:11px;line-height:1.5;color:#ec4899;background:rgba(236,72,153,.08);padding:6px 8px;border-radius:6px">' + seqData.note + '</div></div>';
+    }
     html += '</div></div>';
   }
 
