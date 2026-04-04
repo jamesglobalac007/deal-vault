@@ -1286,98 +1286,42 @@ function addGrowthCorridors(mi) {
 
   const corridors = [
     {
-      name: 'BUNDABERG / WIDE BAY',
-      sub: 'Bundaberg \u00B7 Hervey Bay \u00B7 Maryborough \u00B7 Bargara',
+      name: 'GROWTH FOCUS ZONE',
+      sub: 'Bundaberg to Gold Coast \u00B7 Toowoomba to Coast \u00B7 All SEQ + Wide Bay corridors',
       coords: [
-        [-24.70, 152.00], [-24.70, 152.50], [-24.80, 152.55],
-        [-25.05, 152.55], [-25.30, 152.80], [-25.40, 152.85],
-        [-25.55, 152.70], [-25.55, 152.30], [-25.35, 152.10],
-        [-25.10, 152.00], [-24.90, 151.95], [-24.70, 152.00]
-      ]
-    },
-    {
-      name: 'GLADSTONE / ROCKHAMPTON',
-      sub: 'Gladstone \u00B7 Tannum Sands \u00B7 Rockhampton \u00B7 Gracemere',
-      coords: [
-        [-23.20, 150.40], [-23.20, 151.00], [-23.45, 151.15],
-        [-23.70, 151.20], [-24.00, 151.40], [-24.10, 151.50],
-        [-24.15, 151.20], [-24.00, 150.80], [-23.80, 150.55],
-        [-23.50, 150.40], [-23.20, 150.40]
-      ]
-    },
-    {
-      name: 'SUNSHINE COAST',
-      sub: 'Caloundra South \u00B7 Aura \u00B7 Palmview \u00B7 Beerwah \u00B7 Nambour',
-      coords: [
-        [-26.50, 152.85], [-26.50, 153.15], [-26.65, 153.18],
-        [-26.80, 153.18], [-26.95, 153.12], [-26.95, 152.90],
-        [-26.85, 152.82], [-26.70, 152.82], [-26.50, 152.85]
-      ]
-    },
-    {
-      name: 'NORTHERN CORRIDOR',
-      sub: 'Caboolture West \u00B7 Morayfield \u00B7 Burpengary \u00B7 Narangba',
-      coords: [
-        [-26.93, 152.78], [-26.93, 153.12], [-27.05, 153.15],
-        [-27.18, 153.12], [-27.25, 153.05], [-27.25, 152.82],
-        [-27.15, 152.75], [-27.02, 152.72], [-26.93, 152.78]
-      ]
-    },
-    {
-      name: 'BRISBANE METRO',
-      sub: 'Brisbane \u00B7 Redlands \u00B7 Pine Rivers \u00B7 Redcliffe',
-      coords: [
-        [-27.22, 152.88], [-27.22, 153.25], [-27.32, 153.35],
-        [-27.42, 153.40], [-27.55, 153.30], [-27.55, 153.05],
-        [-27.50, 152.92], [-27.40, 152.85], [-27.30, 152.82],
-        [-27.22, 152.88]
-      ]
-    },
-    {
-      name: 'WESTERN CORRIDOR',
-      sub: 'Springfield \u00B7 Ripley Valley \u00B7 Ipswich \u00B7 Fernvale',
-      coords: [
-        [-27.42, 152.42], [-27.42, 152.82], [-27.52, 152.90],
-        [-27.68, 152.90], [-27.75, 152.82], [-27.75, 152.55],
-        [-27.65, 152.42], [-27.55, 152.38], [-27.42, 152.42]
-      ]
-    },
-    {
-      name: 'SOUTHERN CORRIDOR',
-      sub: 'Flagstone \u00B7 Yarrabilba \u00B7 Park Ridge \u00B7 Logan \u00B7 Beaudesert',
-      coords: [
-        [-27.55, 152.90], [-27.55, 153.18], [-27.68, 153.25],
-        [-27.82, 153.28], [-27.92, 153.20], [-27.95, 153.00],
-        [-27.88, 152.88], [-27.78, 152.82], [-27.68, 152.82],
-        [-27.55, 152.90]
-      ]
-    },
-    {
-      name: 'GOLD COAST',
-      sub: 'Coomera \u00B7 Pimpama \u00B7 Ormeau \u00B7 Upper Coomera \u00B7 Nerang',
-      coords: [
-        [-27.72, 153.22], [-27.72, 153.42], [-27.85, 153.45],
-        [-28.00, 153.42], [-28.10, 153.38], [-28.10, 153.20],
-        [-27.98, 153.12], [-27.88, 153.15], [-27.78, 153.18],
-        [-27.72, 153.22]
-      ]
-    },
-    {
-      name: 'TOOWOOMBA',
-      sub: 'Highfields \u00B7 Glenvale \u00B7 Westbrook \u00B7 Charlton',
-      coords: [
-        [-27.40, 151.78], [-27.40, 152.05], [-27.52, 152.10],
-        [-27.65, 152.05], [-27.65, 151.82], [-27.55, 151.72],
-        [-27.45, 151.72], [-27.40, 151.78]
-      ]
-    },
-    {
-      name: 'LOCKYER / SCENIC RIM',
-      sub: 'Gatton \u00B7 Laidley \u00B7 Boonah \u00B7 Beaudesert',
-      coords: [
-        [-27.55, 152.15], [-27.55, 152.42], [-27.65, 152.48],
-        [-27.80, 152.50], [-27.95, 152.40], [-28.00, 152.20],
-        [-27.88, 152.05], [-27.72, 152.00], [-27.55, 152.15]
+        // Bundaberg (top, coast side)
+        [-24.65, 152.45], [-24.70, 152.55], [-24.80, 152.70],
+        // Coast south past Hervey Bay / Maryborough
+        [-25.20, 152.90], [-25.50, 153.00], [-25.75, 153.05],
+        // Sunshine Coast coast
+        [-26.30, 153.10], [-26.55, 153.14], [-26.70, 153.18],
+        // Moreton Bay / Redcliffe coast
+        [-26.95, 153.18], [-27.15, 153.25], [-27.30, 153.35],
+        // Brisbane east coast / Redlands
+        [-27.45, 153.42], [-27.55, 153.40],
+        // South to Gold Coast coast
+        [-27.75, 153.42], [-27.90, 153.45], [-28.05, 153.45],
+        [-28.17, 153.42],
+        // Gold Coast southern tip (Coolangatta)
+        [-28.17, 153.30],
+        // Inland from Gold Coast — Nerang, Beaudesert
+        [-28.10, 153.10], [-28.05, 152.95],
+        // Scenic Rim — Boonah
+        [-28.05, 152.70], [-28.00, 152.40],
+        // Lockyer Valley — Gatton, Laidley
+        [-27.80, 152.05], [-27.65, 151.85],
+        // Toowoomba west edge
+        [-27.55, 151.68], [-27.40, 151.68],
+        // Toowoomba north
+        [-27.30, 151.80], [-27.25, 152.00],
+        // Up through Somerset / Esk
+        [-27.10, 152.15], [-26.90, 152.20],
+        // Inland from Gympie / Mary Valley
+        [-26.50, 152.30], [-26.10, 152.20],
+        // Inland from Bundaberg
+        [-25.50, 152.10], [-25.10, 152.00],
+        // Back to Bundaberg start
+        [-24.80, 152.10], [-24.65, 152.45]
       ]
     }
   ];
@@ -1387,9 +1331,9 @@ function addGrowthCorridors(mi) {
   corridors.forEach(function(c) {
     var poly = L.polygon(c.coords, corridorStyle).addTo(corridorGroup);
     poly.bindTooltip('<div style="' + labelStyle + '">' + c.name + '</div>', {
-      permanent: true, direction: 'center', className: 'corridor-label'
+      permanent: false, direction: 'center', className: 'corridor-label', sticky: true
     });
-    poly.bindPopup('<div style="font-size:12px;min-width:180px"><strong style="color:#06b6d4">' + c.name + '</strong><br><span style="color:#666;font-size:11px">' + c.sub + '</span><br><br><span style="font-size:10px;color:#888">Growth corridor focus area.<br>Click properties inside for zone & constraint data.</span></div>');
+    poly.bindPopup('<div style="font-size:12px;min-width:200px"><strong style="color:#06b6d4">' + c.name + '</strong><br><span style="color:#666;font-size:11px">' + c.sub + '</span><br><br><span style="font-size:10px;color:#888">Click any property inside this zone for<br>zoning, constraints & development potential.</span></div>');
   });
 
   corridorGroup.addTo(mi);
