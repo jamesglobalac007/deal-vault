@@ -460,7 +460,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="lp-group">Planning</div>
         <label class="lp-item" data-layer="landuse">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#8b5cf6"></div>Land Use Classification
+          <div class="lp-dot" style="background:#8b5cf6"></div>Land Use (Current Use)
         </label>
         <div class="lp-group">Flood Mapping</div>
         <label class="lp-item" data-layer="flood">
@@ -3684,9 +3684,52 @@ function renderPropPanel(latlng, r) {
       <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
       <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
       <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Elevation</div><div class="pp-field-val">${elevation !== '—' ? elevation + 'm AHD' : '—'}</div></div>
     </div>
   </div>`;
+
+  // Koala habitat
+  const koalaStatus = r.koala ? 'Habitat Identified' : 'Unaffected';
+  const koalaClass = r.koala ? 'affected' : 'clear';
+
+  // Heritage
+  const heritageStatus = r.heritage ? 'Heritage Area' : 'Unaffected';
+  const heritageClass = r.heritage ? 'moderate' : 'clear';
+
+  // Acid sulfate
+  const acidStatus = r.acid ? 'Affected' : 'Unaffected';
+  const acidClass = r.acid ? 'moderate' : 'clear';
+
+  // Hazard section (moved near top for quick assessment)
+  html += `<div class="pp-section">
+    <div class="pp-section-title">Hazard Assessment</div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M20 14c0 4-3.6 7-8 7s-8-3-8-7 4-10 8-14c4 4 8 10 8 14z"/></svg></div>Flood</div>
+      <span class="pp-status ${floodClass}">${floodStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2-3 4-5.5 4-7.5a4 4 0 0 0-8 0c0 2 2 4.5 4 7.5z"/><path d="M5 21h14"/></svg></div>Bushfire</div>
+      <span class="pp-status clear">Check Layer</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M20 14c0 4-3.6 7-8 7s-8-3-8-7 4-10 8-14c4 4 8 10 8 14z"/></svg></div>Floodplain Overlay</div>
+      <span class="pp-status ${fpClass}">${fpStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 22c-4 0-8-3-8-7 0-3 2-6 4-8l4 3 4-3c2 2 4 5 4 8 0 4-4 7-8 7z"/></svg></div>Koala Habitat</div>
+      <span class="pp-status ${koalaClass}">${koalaStatus}</span>
+    </div>
+    <div class="pp-hazard-row">
+      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></div>Environmental (MSES)</div>
+      <span class="pp-status ${msesClass}">${msesStatus}</span>
+    </div>
+  </div>`;
+
+  // MSES details if affected
+  if (msesDetails.length > 0) {
+    html += `<div class="pp-section"><div class="pp-section-title">Environmental Overlays</div>`;
+    msesDetails.forEach(d => { html += `<span class="pp-overlay-tag">${d}</span>`; });
+    html += `</div>`;
+  }
 
   // Planning Information section
   html += `<div class="pp-section">
@@ -3699,9 +3742,6 @@ function renderPropPanel(latlng, r) {
         </div>
       </div>
       ${councilZonePrecinct && councilZonePrecinct !== 'None' ? '<div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Zone Precinct</div><div class="pp-field-val">' + councilZonePrecinct + '</div></div>' : ''}
-      <div class="pp-field"><div class="pp-field-label">SEQ Regional Plan</div><div class="pp-field-val pp-zone" style="background:${seqZoneName ? 'rgba(34,197,94,.15);color:#22c55e' : 'rgba(107,114,128,.15);color:#7a8194'}">${seqZoneName || '—'}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Land Use (ALUMC)</div><div class="pp-field-val pp-zone" style="background:rgba(139,92,246,.15);color:#8b5cf6">${landUseClass}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Priority Dev Area</div><div class="pp-field-val">${pdaName || 'Not in PDA'}</div></div>
     </div>`;
   // Zone category tags
   if (councilZoneName) {
@@ -3810,62 +3850,6 @@ function renderPropPanel(latlng, r) {
     html += '</div>';
     html += '<div style="margin-top:8px;font-size:10px;color:var(--dim);font-style:italic">Estimates based on ' + lga + ' market rates. 65% net developable, 400m\u00B2 avg lots, $45K/lot infra. For indicative purposes only.</div>';
     html += '</div>';
-  }
-
-  // Koala habitat
-  const koalaStatus = r.koala ? 'Habitat Identified' : 'Unaffected';
-  const koalaClass = r.koala ? 'affected' : 'clear';
-
-  // Heritage
-  const heritageStatus = r.heritage ? 'Heritage Area' : 'Unaffected';
-  const heritageClass = r.heritage ? 'moderate' : 'clear';
-
-  // Acid sulfate
-  const acidStatus = r.acid ? 'Affected' : 'Unaffected';
-  const acidClass = r.acid ? 'moderate' : 'clear';
-
-  // Hazard section (Landchecker-style grid)
-  html += `<div class="pp-section">
-    <div class="pp-section-title">Hazard Assessment</div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M20 14c0 4-3.6 7-8 7s-8-3-8-7 4-10 8-14c4 4 8 10 8 14z"/></svg></div>Flood</div>
-      <span class="pp-status ${floodClass}">${floodStatus}</span>
-    </div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2-3 4-5.5 4-7.5a4 4 0 0 0-8 0c0 2 2 4.5 4 7.5z"/><path d="M5 21h14"/></svg></div>Bushfire</div>
-      <span class="pp-status clear">Check Layer</span>
-    </div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M2 22L12 2l10 20H2z"/></svg></div>Landslide</div>
-      <span class="pp-status clear">Check Layer</span>
-    </div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg></div>Acid Sulfate</div>
-      <span class="pp-status ${acidClass}">${acidStatus}</span>
-    </div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></div>Heritage</div>
-      <span class="pp-status ${heritageClass}">${heritageStatus}</span>
-    </div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 22c-4 0-8-3-8-7 0-3 2-6 4-8l4 3 4-3c2 2 4 5 4 8 0 4-4 7-8 7z"/></svg></div>Koala Habitat</div>
-      <span class="pp-status ${koalaClass}">${koalaStatus}</span>
-    </div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M20 14c0 4-3.6 7-8 7s-8-3-8-7 4-10 8-14c4 4 8 10 8 14z"/></svg></div>Floodplain Overlay</div>
-      <span class="pp-status ${fpClass}">${fpStatus}</span>
-    </div>
-    <div class="pp-hazard-row">
-      <div class="pp-hazard-label"><div class="pp-hazard-icon"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></div>Environmental (MSES)</div>
-      <span class="pp-status ${msesClass}">${msesStatus}</span>
-    </div>
-  </div>`;
-
-  // MSES details if affected
-  if (msesDetails.length > 0) {
-    html += `<div class="pp-section"><div class="pp-section-title">Environmental Overlays</div>`;
-    msesDetails.forEach(d => { html += `<span class="pp-overlay-tag">${d}</span>`; });
-    html += `</div>`;
   }
 
   // Subdivision Quick Assessment
