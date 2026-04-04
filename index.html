@@ -3919,39 +3919,73 @@ function queryCouncilZone(latlng, lgaName, callback) {
 // ─── SELECTED PARCEL HIGHLIGHT ───
 var selectedParcelLayer = null;
 
-function highlightSelectedParcel(geometry) {
-  // Remove previous highlight
+function fetchAndHighlightParcel(latlng) {
+  // Remove previous highlight but don't clear — just replace
   if (selectedParcelLayer && window.mapFull) {
     window.mapFull.removeLayer(selectedParcelLayer);
     selectedParcelLayer = null;
   }
-  if (!geometry || !geometry.rings || !window.mapFull) return;
+  if (!window.mapFull || !latlng) return;
 
-  // Convert ArcGIS rings to Leaflet polygon coords (ArcGIS = [lng,lat], Leaflet = [lat,lng])
-  var latlngs = geometry.rings.map(function(ring) {
-    return ring.map(function(pt) { return [pt[1], pt[0]]; });
+  // Standalone query JUST for geometry — completely independent of property panel
+  var url = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/4/query';
+  var params = new URLSearchParams({
+    geometry: latlng.lng + ',' + latlng.lat,
+    geometryType: 'esriGeometryPoint',
+    inSR: '4326',
+    spatialRel: 'esriSpatialRelIntersects',
+    outFields: 'lotplan',
+    returnGeometry: 'true',
+    geometryPrecision: '6',
+    outSR: '4326',
+    resultRecordCount: '1',
+    f: 'geojson'
   });
 
-  selectedParcelLayer = L.polygon(latlngs, {
-    color: '#ffffff',
-    weight: 3,
-    opacity: 0.95,
-    fillColor: '#ffffff',
-    fillOpacity: 0.08,
-    dashArray: null,
-    interactive: false,
-    className: 'selected-parcel-glow'
-  }).addTo(window.mapFull);
+  console.log('[Parcel highlight] Fetching geometry for', latlng.lat, latlng.lng);
 
-  // Zoom in to fit the parcel with padding
-  var bounds = selectedParcelLayer.getBounds();
-  if (bounds.isValid()) {
-    window.mapFull.fitBounds(bounds, {padding: [80, 80], maxZoom: 18, animate: true, duration: 0.5});
-  }
+  fetch(url + '?' + params.toString())
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      console.log('[Parcel highlight] Response:', JSON.stringify(data).substring(0, 300));
+
+      if (!data.features || data.features.length === 0) {
+        console.log('[Parcel highlight] No features returned');
+        return;
+      }
+
+      var feature = data.features[0];
+      console.log('[Parcel highlight] Feature type:', feature.geometry && feature.geometry.type);
+
+      // Response is GeoJSON — Leaflet handles it natively
+      selectedParcelLayer = L.geoJSON(feature, {
+        style: {
+          color: '#ffffff',
+          weight: 3.5,
+          opacity: 1,
+          fillColor: '#ffffff',
+          fillOpacity: 0.07,
+          interactive: false
+        }
+      }).addTo(window.mapFull);
+
+      // Zoom to parcel
+      var bounds = selectedParcelLayer.getBounds();
+      if (bounds && bounds.isValid()) {
+        window.mapFull.fitBounds(bounds, {padding: [80, 80], maxZoom: 18, animate: true, duration: 0.5});
+      }
+      console.log('[Parcel highlight] Drew parcel outline OK');
+    })
+    .catch(function(err) {
+      console.log('[Parcel highlight] Error:', err);
+    });
 }
 
 function identifyParcel(latlng) {
   const content = document.getElementById('propContent');
+
+  // Immediately fetch and highlight the parcel boundary (independent of panel data)
+  fetchAndHighlightParcel(latlng);
 
   // Show loading state
   content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying QLD Government data...</div>';
@@ -4045,8 +4079,7 @@ function identifyParcel(latlng) {
       geometryType: 'esriGeometryPoint',
       spatialRel: 'esriSpatialRelIntersects',
       outFields: '*',
-      returnGeometry: 'true',
-      outSR: '4326',
+      returnGeometry: 'false',
       resultRecordCount: '1',
       f: 'json'
     });
@@ -4056,7 +4089,6 @@ function identifyParcel(latlng) {
         console.log('Cadastral query response:', JSON.stringify(data));
         if (data.features && data.features.length > 0) {
           results.cadastral = data.features[0].attributes;
-          results.cadastralGeometry = data.features[0].geometry;
           console.log('Cadastral attrs:', JSON.stringify(data.features[0].attributes));
         }
         checkComplete();
@@ -4154,8 +4186,6 @@ function identifyParcel(latlng) {
 }
 
 function renderPropPanel(latlng, r) {
-  // Highlight selected parcel with white border
-  highlightSelectedParcel(r.cadastralGeometry || null);
 
   const content = document.getElementById('propContent');
   const c = r.cadastral || {};
