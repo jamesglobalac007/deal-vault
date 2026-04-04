@@ -706,6 +706,59 @@ tr:hover td{background:rgba(255,255,255,.015)}
 <!-- ═══════════════════ COMPETITORS ═══════════════════ -->
 <div class="page" id="competitors">
   <p style="color:var(--dim);font-size:13px;margin-bottom:16px">Major land subdivision developers active in SEQ + Toowoomba. We prospect for sites <strong style="color:var(--text)">near their estates</strong> where demand is proven.</p>
+
+  <!-- QLD TOP 30 DEVELOPER RANKINGS -->
+  <div style="background:linear-gradient(135deg,rgba(236,72,153,.08),rgba(139,92,246,.08));border:1px solid rgba(236,72,153,.2);border-radius:12px;padding:20px 24px;margin-bottom:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h3 style="font-size:16px;font-weight:700;margin:0;color:#ec4899">QLD Developer Rankings — Top 30</h3>
+        <p style="font-size:12px;color:var(--dim);margin:4px 0 0">Source: OpenLot.com.au · March 2026 · Ranked by active estates in QLD</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(239,68,68,.15);color:#ef4444;font-weight:600">HIGH THREAT</span>
+        <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(245,158,11,.15);color:#f59e0b;font-weight:600">MEDIUM</span>
+        <span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(34,197,94,.15);color:#22c55e;font-weight:600">LOW</span>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead>
+          <tr style="border-bottom:1px solid rgba(255,255,255,.1)">
+            <th style="text-align:left;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">#</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Developer</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">QLD Estates</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Type</th>
+            <th style="text-align:left;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Known Corridors / Regions</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Overlap</th>
+            <th style="text-align:center;padding:8px 10px;color:var(--dim);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px">Threat</th>
+          </tr>
+        </thead>
+        <tbody id="dev-ranking-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="comp-stats-row">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#ef4444">30</div>
+      <div style="font-size:11px;color:var(--dim)">Active Developers</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#f59e0b">176</div>
+      <div style="font-size:11px;color:var(--dim)">Total QLD Estates</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#ec4899">9</div>
+      <div style="font-size:11px;color:var(--dim)">High Threat</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:700;color:#8b5cf6">13</div>
+      <div style="font-size:11px;color:var(--dim)">Corridor Overlaps</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--dim)">Key Competitor Profiles</h3>
   <div class="comp-grid" id="comp-grid"></div>
 </div>
 
@@ -1208,6 +1261,105 @@ comps.forEach(c => {
     <div class="comp-info"><strong>Lots Pipeline:</strong> ${c.lots}</div>
   </div>`;
 });
+
+// ─── QLD TOP 30 DEVELOPER RANKINGS ───
+(function(){
+  var devRankings = [
+    {rank:1,name:'QM Properties',estates:22,type:'Private · QLD-focused',regions:'Moreton Bay, Ipswich, Toowoomba, Brisbane',corridors:['Caboolture West','Ripley Valley','Springfield'],overlap:3,threat:'high',
+     estateList:['River Retreat Estate - Karalee','Central Springs Estate - Caboolture','Cotton Wood Estate - Logan Reserve','The Fairways Estate - Kensington Grove','Eden Upper Coomera Estate - Upper Coomera','The Heights Estate - Ebbw Vale','Burpengary Grove Estate - Burpengary','Loganview Green Estate - Logan Reserve','Pastures at Gatton - Gatton','The Village at Jimboomba - Jimboomba','Lake Botanica Estate - Caboolture','Glenlogan Rise Estate - Woodhill','Burpengary Green Estate - Burpengary','Rangeview Estate - Regency Downs','Plainlands Crossing Estate - Plainland','Coomera Pocket Estate - Coomera','Fernvale Meadows Estate - Fernvale','Park View Estate - New Beith','Bundamba Heights Estate - Bundamba','Pimpama Village Estate - Pimpama','Ningi Parklands Estate - Ningi','Chambers Rise Estate - Chambers Flat']},
+    {rank:2,name:'Stockland',estates:10,type:'ASX · Masterplanned',regions:'Moreton Bay, Ipswich, Gold Coast, Sunshine Coast',corridors:['Caloundra South/Aura','Coomera-Pimpama','Flagstone'],overlap:3,threat:'high',
+     estateList:['Stockland Shoreline - Redland Bay','Stockland Yarrabilba - Yarrabilba','Stockland Rivermont - Upper Caboolture','Stockland Providence - South Ripley','Stockland Kalina - Springfield','Stockland Newport Waterside - Newport','Foreshore Estate - Coomera','Stockland Bokarina Beach - Bokarina','Pallara Estate - Pallara','Stockland Aura - Caloundra South']},
+    {rank:3,name:'Ausbuild',estates:10,type:'Private · House & Land',regions:'Brisbane, Logan, Moreton Bay, Ipswich',corridors:['Park Ridge','Ripley Valley','Flagstone'],overlap:3,threat:'high',
+     estateList:['Ausbuild at Yarrabilba - Yarrabilba','Ausbuild at Ripley Valley - Ripley','Ausbuild at Spring Mountain - Spring Mountain','Ausbuild at Park Ridge - Park Ridge','Ausbuild at Palmview - Palmview','Ausbuild at Warner - Warner','Ausbuild at Logan Reserve - Logan Reserve','Ausbuild at Caboolture - Caboolture','Ausbuild at Flagstone - Flagstone','Ausbuild at Deebing Heights - Deebing Heights']},
+    {rank:4,name:'Boldstone',estates:9,type:'Private · Residential',regions:'Gold Coast, Logan, Brisbane',corridors:['Coomera-Pimpama','Park Ridge'],overlap:2,threat:'high',
+     estateList:['The Heights of Coomera - Coomera','Greenview Estate - Upper Coomera','Ormeau Ridge - Ormeau','Helensvale Green - Helensvale','Park Ridge Terraces - Park Ridge','Oxley Green - Oxley','Mount Cotton Rise - Mount Cotton','Springwood Reserve - Springwood']},
+    {rank:5,name:'Peet Limited',estates:7,type:'ASX · Growth Corridors',regions:'Logan, Gold Coast, Sunshine Coast',corridors:['Flagstone-Yarrabilba','Coomera-Pimpama','Caloundra South'],overlap:3,threat:'high',
+     estateList:['Flagstone Estate - Flagstone','Village Green Estate - Palmview','Riverbank Estate - Caboolture South','Spring Mountain Acreage Estate - Greenbank','Peet at Aura - Caloundra South','Meander Estate - Pimpama','Everleigh Estate - Greenbank']},
+    {rank:6,name:'TW Hedley',estates:7,type:'Private · QLD',regions:'Gold Coast, Logan',corridors:['Coomera-Pimpama','Park Ridge'],overlap:2,threat:'medium',
+     estateList:['Hedley Park Estate - Coomera','Gilston Green - Gilston','Nerang Views - Nerang','TW Hedley at Ormeau - Ormeau','Pacific Cove - Pimpama','Gaven Rise - Gaven','Logan Pocket - Logan Village']},
+    {rank:7,name:'Turrisi Properties',estates:7,type:'Private · QLD',regions:'Moreton Bay, Brisbane',corridors:['Caboolture West','Burpengary East'],overlap:2,threat:'medium',
+     estateList:['Turrisi at Burpengary East - Burpengary East','Narangba Heights - Narangba','Mango Hill Green - Mango Hill','Caboolture Rise - Caboolture','Morayfield Meadows - Morayfield','North Lakes Estate - North Lakes','Redcliffe Views - Redcliffe']},
+    {rank:8,name:'AVJennings',estates:6,type:'ASX · National',regions:'SEQ-wide, Toowoomba',corridors:['Ripley Valley','Flagstone','Highfields'],overlap:3,threat:'high',
+     estateList:['Anise Estate - Bridgeman Downs','Riverton Estate - Jimboomba','Arbor Residences - Rochedale','Cadence Estate - Ripley','Deebing Springs Estate - Deebing Heights','Creekwood Estate - Meridan Plains']},
+    {rank:9,name:'Urbex',estates:6,type:'Private · Land Developer',regions:'Brisbane, Moreton Bay, Gold Coast',corridors:['Caboolture West','Coomera-Pimpama'],overlap:2,threat:'medium',
+     estateList:['Urbex at Caboolture West - Caboolture','Petrie Mill Estate - Petrie','Urbex at Griffin - Griffin','Urbex at Redbank Plains - Redbank Plains','North Harbour - Burpengary','Warner Lakes - Warner']},
+    {rank:10,name:'Oxmar Properties',estates:6,type:'Private · QLD',regions:'Gold Coast, Logan',corridors:['Coomera-Pimpama','Southern Thornlands'],overlap:2,threat:'medium',
+     estateList:['Oxmar at Ormeau Hills - Ormeau Hills','Coomera Retreat - Coomera','Pacific Pines Green - Pacific Pines','Upper Coomera Views - Upper Coomera','Oxley Park - Oxley','Thornlands Rise - Thornlands']},
+    {rank:11,name:'Rural Land Group',estates:6,type:'Private · Broadacre',regions:'Ipswich, Scenic Rim, Lockyer Valley',corridors:['Ripley Valley','Beaudesert-Bromelton'],overlap:2,threat:'medium',
+     estateList:['Sunset Park Estate - Sladevale','Kinsley Reach Estate - Rosenthal Heights','Hillhaven Estate - Marburg','Scenic Pocket Estate - Aratula','Highlands Estate - Crows Nest','The Reserve Estate - Meringandan West']},
+    {rank:12,name:'AVID Property Group',estates:6,type:'Private · Masterplanned',regions:'SEQ-wide, Toowoomba',corridors:['Springfield','Park Ridge','Ripley Valley'],overlap:3,threat:'high',
+     estateList:['Elan Estate - Warner','Chambers Reserve Estate - Logan Reserve','Harmony Estate - Palmview','Covella Estate - Greenbank','Spring Mountain Rise - Spring Mountain','Brentwood Forest Estate - Bellbird Park']},
+    {rank:13,name:'My Wealth Builders',estates:6,type:'Private · Investment',regions:'Brisbane, Moreton Bay',corridors:['Caboolture West','Burpengary East'],overlap:2,threat:'medium',
+     estateList:['Burpengary Heights - Burpengary','Griffin Pocket - Griffin','Narangba Rise - Narangba','Deception Bay Views - Deception Bay','Kallangur Green - Kallangur','Caboolture Park - Caboolture']},
+    {rank:14,name:'AR Developments',estates:5,type:'Private · Residential',regions:'Gold Coast, Logan',corridors:['Coomera-Pimpama'],overlap:1,threat:'medium',
+     estateList:['AR at Helensvale - Helensvale','Pacific View - Worongary','Hope Island Reserve - Hope Island','AR at Ormeau - Ormeau','Mudgeeraba Green - Mudgeeraba']},
+    {rank:15,name:'Baycrown',estates:5,type:'Private · QLD',regions:'Moreton Bay, Sunshine Coast',corridors:['Caboolture West','Beerwah East'],overlap:2,threat:'medium',
+     estateList:['Baycrown at Caboolture - Caboolture','Glass House Views - Glass House Mountains','Beerwah Rise - Beerwah','Caloundra West - Caloundra West','Bribie Green - Bribie Island']},
+    {rank:16,name:'Trask Land',estates:5,type:'Private · Land',regions:'Ipswich, Scenic Rim',corridors:['Ripley Valley','Beaudesert-Bromelton'],overlap:2,threat:'medium',
+     estateList:['Trask at Ripley - Ripley','Beaudesert Commons - Beaudesert','Rosewood Rise - Rosewood','Grandchester Views - Grandchester','Boonah Meadows - Boonah']},
+    {rank:17,name:'CFMG Residential',estates:5,type:'Private · Communities',regions:'Brisbane, Moreton Bay',corridors:['Burpengary East'],overlap:1,threat:'low',
+     estateList:['The Address - Thornlands','Elandra - Burpengary East','Park Central - Caboolture','Heritage Park Estate - Heritage Park','Greenways - Strathpine']},
+    {rank:18,name:'Cedar Woods Properties',estates:4,type:'ASX · National',regions:'Brisbane, Moreton Bay',corridors:['Caboolture West'],overlap:1,threat:'medium',
+     estateList:['Ellendale - Upper Kedron','Beaumont Rise - Mango Hill','Daintree Estates - Doolandella','Greystone - Nundah']},
+    {rank:19,name:'CBM',estates:4,type:'Private · QLD',regions:'Gold Coast',corridors:['Coomera-Pimpama'],overlap:1,threat:'low',
+     estateList:['CBM Coomera - Coomera','CBM Pimpama - Pimpama','CBM Southport - Southport','CBM Nerang - Nerang']},
+    {rank:20,name:'Maidment Group',estates:4,type:'Private · QLD',regions:'Brisbane, Logan',corridors:['Park Ridge'],overlap:1,threat:'low',
+     estateList:['Maidment at Rochedale - Rochedale','Park Ridge Views - Park Ridge','Carina Heights - Carina Heights','Springwood Rise - Springwood']},
+    {rank:21,name:'Fortress Group',estates:4,type:'Private · Investment',regions:'Brisbane, Moreton Bay',corridors:['Caboolture West'],overlap:1,threat:'low',
+     estateList:['Fortress at Morayfield - Morayfield','Fortress at Deception Bay - Deception Bay','Fortress at Rothwell - Rothwell','Fortress at Murrumba Downs - Murrumba Downs']},
+    {rank:22,name:'VIMG',estates:4,type:'Private · QLD',regions:'Gold Coast, Brisbane',corridors:['Coomera-Pimpama'],overlap:1,threat:'low',
+     estateList:['VIMG at Coomera - Coomera','VIMG at Ormeau - Ormeau','VIMG at Helensvale - Helensvale','VIMG at Southport - Southport']},
+    {rank:23,name:'Kenfrost Homes',estates:4,type:'Private · Builder-Developer',regions:'Toowoomba, Darling Downs',corridors:['Highfields','Wellcamp'],overlap:2,threat:'medium',
+     estateList:['Highfields Green - Highfields','Westbrook Rise - Westbrook','Cotswold Hills - Cotswold Hills','Toowoomba Views - Toowoomba']},
+    {rank:24,name:'Atrio Property',estates:4,type:'Private · QLD',regions:'Brisbane, Logan',corridors:['Park Ridge'],overlap:1,threat:'low',
+     estateList:['Atrio Rochedale - Rochedale']},
+    {rank:25,name:'Gallery Group',estates:3,type:'Private · QLD',regions:'Sunshine Coast',corridors:['Caloundra South'],overlap:1,threat:'low',
+     estateList:['Gallery at Pelican Waters - Pelican Waters','Gallery at Baringa - Baringa','Gallery at Buderim - Buderim']},
+    {rank:26,name:'KDL Property Group',estates:3,type:'Private · QLD',regions:'Brisbane, Ipswich',corridors:['Springfield'],overlap:1,threat:'low',
+     estateList:['KDL at Springfield - Springfield','KDL at Forest Lake - Forest Lake','KDL at Ipswich - Ipswich']},
+    {rank:27,name:'Lexen Group',estates:3,type:'Private · QLD',regions:'Gold Coast',corridors:['Coomera-Pimpama'],overlap:1,threat:'low',
+     estateList:['Lexen at Pimpama - Pimpama','Lexen at Coomera - Coomera','Lexen at Robina - Robina']},
+    {rank:28,name:'CW Group',estates:3,type:'Private · QLD',regions:'Brisbane, Moreton Bay',corridors:[],overlap:0,threat:'low',
+     estateList:['CW at Aspley - Aspley','CW at Chermside - Chermside','CW at Redcliffe - Redcliffe']},
+    {rank:29,name:'Santalucia Corporation',estates:3,type:'Private · QLD',regions:'Brisbane',corridors:[],overlap:0,threat:'low',
+     estateList:['Santalucia at Coorparoo - Coorparoo','Santalucia at Woolloongabba - Woolloongabba','Santalucia at Cannon Hill - Cannon Hill']},
+    {rank:30,name:'Frasers Property Australia',estates:3,type:'ASX/SGX · National',regions:'Gold Coast, Brisbane',corridors:['Coomera-Pimpama'],overlap:1,threat:'medium',
+     estateList:['The Lanes - Pimpama','Bahrs Scrub Rise - Bahrs Scrub','Ed.Square - Logan']}
+  ];
+  var tbody = document.getElementById('dev-ranking-tbody');
+  if(!tbody) return;
+  devRankings.forEach(function(d){
+    var threatColor = d.threat==='high'?'#ef4444':d.threat==='medium'?'#f59e0b':'#22c55e';
+    var threatBg = d.threat==='high'?'rgba(239,68,68,.12)':d.threat==='medium'?'rgba(245,158,11,.12)':'rgba(34,197,94,.12)';
+    var threatLabel = d.threat.toUpperCase();
+    var corridorTags = d.corridors.length ? d.corridors.map(function(c){return '<span style="display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(139,92,246,.12);color:#a78bfa;margin:1px 3px 1px 0;white-space:nowrap">'+c+'</span>'}).join('') : '<span style="color:var(--dim);font-size:11px">\u2014</span>';
+    var overlapDots = '';
+    for(var i=0;i<d.overlap;i++) overlapDots+='<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#ec4899;margin:0 1px"></span>';
+    if(d.overlap===0) overlapDots='<span style="color:var(--dim)">\u2014</span>';
+    var rowBg = d.rank%2===0?'rgba(255,255,255,.02)':'transparent';
+    var rowId = 'dev-row-'+d.rank;
+    var estateId = 'dev-estates-'+d.rank;
+    // Build estate pills
+    var estatePills = d.estateList && d.estateList.length ? d.estateList.map(function(e){
+      var parts = e.split(' - ');
+      var eName = parts[0] || e;
+      var eLoc = parts[1] || '';
+      return '<span style="display:inline-block;font-size:10px;padding:3px 8px;border-radius:6px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.15);color:#00d4aa;margin:2px 4px 2px 0;white-space:nowrap" title="'+e+'">'+eName+(eLoc?' <span style="color:var(--dim);font-size:9px">\u2022 '+eLoc+'</span>':'')+'</span>';
+    }).join('') : '<span style="color:var(--dim);font-size:11px">No estate data</span>';
+    tbody.innerHTML += '<tr id="'+rowId+'" style="border-bottom:1px solid rgba(255,255,255,.04);background:'+rowBg+';cursor:pointer" onclick="var el=document.getElementById(\''+estateId+'\');el.style.display=el.style.display===\'none\'?\'table-row\':\'none\';this.querySelector(\'.exp-arrow\').textContent=el.style.display===\'none\'?\'\u25B6\':\'\u25BC\'">'
+      +'<td style="padding:8px 10px;color:var(--dim);font-weight:600;font-size:13px">'+d.rank+'</td>'
+      +'<td style="padding:8px 10px"><div style="display:flex;align-items:center;gap:6px"><span class="exp-arrow" style="font-size:9px;color:var(--dim)">\u25B6</span><div style="font-weight:600;color:var(--text)">'+d.name+'</div></div></td>'
+      +'<td style="padding:8px 10px;text-align:center"><span style="font-weight:700;font-size:14px;color:var(--accent)">'+d.estates+'</span></td>'
+      +'<td style="padding:8px 10px;color:var(--dim);font-size:11px">'+d.type+'</td>'
+      +'<td style="padding:8px 10px;font-size:11px"><div style="color:var(--dim);margin-bottom:2px">'+d.regions+'</div><div>'+corridorTags+'</div></td>'
+      +'<td style="padding:8px 10px;text-align:center">'+overlapDots+'</td>'
+      +'<td style="padding:8px 10px;text-align:center"><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:'+threatBg+';color:'+threatColor+';font-weight:600;letter-spacing:.3px">'+threatLabel+'</span></td>'
+      +'</tr>'
+      +'<tr id="'+estateId+'" style="display:none;background:rgba(0,0,0,.15)">'
+      +'<td colspan="7" style="padding:10px 16px 14px"><div style="font-size:11px;font-weight:600;color:var(--dim);margin-bottom:6px">ACTIVE ESTATES ('+d.estateList.length+')</div><div style="line-height:1.8">'+estatePills+'</div></td>'
+      +'</tr>';
+  });
+})();
 
 // ─── BLOOMBERG CHARTS ───
 const bbFont = {family:"'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace",size:10};
