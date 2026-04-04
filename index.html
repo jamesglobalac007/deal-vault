@@ -2230,11 +2230,14 @@ function addCadastral(mi) {
 
 // Dashboard map removed — use full map page instead
 
-// Tile layers — QLD Gov latest orthophoto (highest quality for QLD), Esri fallback
+// Tile layers — multiple imagery sources ranked by quality for QLD
 const qldSatUrl = 'https://spatial-img.information.qld.gov.au/arcgis/rest/services/Basemaps/LatestSatellite_AllUsers/MapServer/tile/{z}/{y}/{x}';
+const qldAerialUrl = 'https://spatial-img.information.qld.gov.au/arcgis/rest/services/Basemaps/LatestStateProgram_AllUsers/ImageServer/tile/{z}/{y}/{x}';
+const esriClarityUrl = 'https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const esriSatUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-const satUrl = qldSatUrl;
-const satOpts = { attribution:'© QLD Gov Orthophoto', maxZoom:21, errorTileUrl:'' };
+const esriLabelsUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
+const satUrl = qldAerialUrl;
+const satOpts = { attribution:'© QLD Gov Aerial Program', maxZoom:21, errorTileUrl:'' };
 
 let mapFull;
 setTimeout(() => {
@@ -2249,36 +2252,58 @@ setTimeout(() => {
   initFullMapLayers(); // Wire up layer panel + property click
 }, 200);
 
-// ─── MAP STYLE TOGGLE (Street / Satellite) ───
+// ─── MAP STYLE TOGGLE (Street / Satellite Street / Satellite) ───
 function addMapStyleToggle(mi, streetL, satL) {
   var container = L.DomUtil.create('div','map-style-toggle');
   L.DomEvent.disableClickPropagation(container);
   container.innerHTML = '<button class="map-style-btn active" data-style="street">Street</button>'
+    +'<button class="map-style-btn" data-style="hybrid">Hybrid</button>'
     +'<button class="map-style-btn" data-style="satellite">Satellite</button>';
   mi.getContainer().appendChild(container);
 
-  // Fallback: if QLD Gov tiles fail, swap to Esri
+  // Label overlay for hybrid mode
+  var labelsLayer = L.tileLayer(esriLabelsUrl, {attribution:'', maxZoom:21, pane:'overlayPane', opacity:0.9});
+
+  // Fallback chain: QLD Aerial → QLD Satellite → Esri Clarity → Esri Standard
+  var esriClarity = L.tileLayer(esriClarityUrl, {attribution:'© Esri Clarity', maxZoom:22});
   var esriFallback = L.tileLayer(esriSatUrl, {attribution:'© Esri', maxZoom:19});
-  var hasFailed = false;
+  var qldSatFallback = L.tileLayer(qldSatUrl, {attribution:'© QLD Gov Satellite', maxZoom:21});
+  var failCount = 0;
   satL.on('tileerror', function(){
-    if(!hasFailed){
-      hasFailed = true;
-      if(mi.hasLayer(satL)){ mi.removeLayer(satL); esriFallback.addTo(mi); esriFallback.bringToBack(); }
-      satL = esriFallback;
+    failCount++;
+    if(failCount === 3){
+      // Try QLD Satellite first
+      if(mi.hasLayer(satL)){ mi.removeLayer(satL); qldSatFallback.addTo(mi); qldSatFallback.bringToBack(); }
+      satL = qldSatFallback;
     }
   });
+  qldSatFallback.on('tileerror', function(){
+    if(mi.hasLayer(qldSatFallback)){ mi.removeLayer(qldSatFallback); esriClarity.addTo(mi); esriClarity.bringToBack(); }
+    satL = esriClarity;
+  });
+  esriClarity.on('tileerror', function(){
+    if(mi.hasLayer(esriClarity)){ mi.removeLayer(esriClarity); esriFallback.addTo(mi); esriFallback.bringToBack(); }
+    satL = esriFallback;
+  });
+
+  function removeAllBase(){
+    [streetL, satL, qldSatFallback, esriClarity, esriFallback, labelsLayer].forEach(function(l){
+      if(mi.hasLayer(l)) mi.removeLayer(l);
+    });
+  }
 
   container.querySelectorAll('.map-style-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
       container.querySelectorAll('.map-style-btn').forEach(function(b){b.classList.remove('active');});
       btn.classList.add('active');
+      removeAllBase();
       if(btn.dataset.style==='satellite'){
-        if(mi.hasLayer(streetL)) mi.removeLayer(streetL);
-        if(!mi.hasLayer(satL) && !mi.hasLayer(esriFallback)){ satL.addTo(mi); satL.bringToBack(); }
+        satL.addTo(mi); satL.bringToBack();
+      } else if(btn.dataset.style==='hybrid'){
+        satL.addTo(mi); satL.bringToBack();
+        labelsLayer.addTo(mi);
       } else {
-        if(mi.hasLayer(satL)) mi.removeLayer(satL);
-        if(mi.hasLayer(esriFallback)) mi.removeLayer(esriFallback);
-        if(!mi.hasLayer(streetL)){ streetL.addTo(mi); streetL.bringToBack(); }
+        streetL.addTo(mi); streetL.bringToBack();
       }
     });
   });
