@@ -2435,12 +2435,12 @@ function addGrowthCorridors(mi) {
   const primeStyle = {
     color: '#22c55e', weight: 2, opacity: 0.85,
     fillColor: '#22c55e', fillOpacity: 0.08,
-    dashArray: null, lineCap: 'round'
+    dashArray: null, lineCap: 'round', interactive: false
   };
   const outerStyle = {
     color: '#22c55e', weight: 1.5, opacity: 0.45,
     fillColor: '#22c55e', fillOpacity: 0.04,
-    dashArray: '10,8', lineCap: 'round'
+    dashArray: '10,8', lineCap: 'round', interactive: false
   };
 
   const corridorGroup = L.layerGroup();
@@ -3790,11 +3790,7 @@ function showTrackedList() {
 // ─── PROPERTY INFO PANEL (Landchecker-style) ───
 function closePropPanel() {
   document.getElementById('propPanel').classList.remove('open');
-  // Clear selected parcel highlight
-  if (selectedParcelLayer && window.mapFull) {
-    window.mapFull.removeLayer(selectedParcelLayer);
-    selectedParcelLayer = null;
-  }
+  // White outline stays on map until next property is clicked
 }
 
 function openPropPanel() {
@@ -3946,6 +3942,12 @@ function highlightSelectedParcel(geometry) {
     interactive: false,
     className: 'selected-parcel-glow'
   }).addTo(window.mapFull);
+
+  // Zoom in to fit the parcel with padding
+  var bounds = selectedParcelLayer.getBounds();
+  if (bounds.isValid()) {
+    window.mapFull.fitBounds(bounds, {padding: [80, 80], maxZoom: 18, animate: true, duration: 0.5});
+  }
 }
 
 function identifyParcel(latlng) {
