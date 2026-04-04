@@ -436,15 +436,20 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('sda',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#06b6d4"></div>State Dev Areas
         </label>
-        <div class="lp-group">Hazards</div>
+        <div class="lp-group">Flood Mapping</div>
         <label class="lp-item" data-layer="flood">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#3b82f6"></div>Flood Lines (Historical)
+          <div class="lp-dot" style="background:#3b82f6"></div>Flood Hazard Zones
+        </label>
+        <label class="lp-item" data-layer="flood1pct">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood1pct',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#1e40af"></div>1% AEP (1-in-100yr)
         </label>
         <label class="lp-item" data-layer="floodplain">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodplain',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#60a5fa"></div>Floodplain Assessment
+          <div class="lp-dot" style="background:#60a5fa"></div>Floodplain Overlay
         </label>
+        <div class="lp-group">Hazards</div>
         <label class="lp-item" data-layer="bushfire">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#f97316"></div>Bushfire Prone Areas
@@ -1324,12 +1329,16 @@ const qldServices = {
     layers: [14], opacity: 0.45, minZoom: 8, maxZoom: 19
   },
   flood: {
-    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/InlandWaters/FloodLines/MapServer',
-    layers: false, opacity: 0.55, minZoom: 10, maxZoom: 19
+    url: 'https://services8.arcgis.com/g9mppFwSsmIw9E0Z/arcgis/rest/services/Queensland_floodplain_assessment_overlay/FeatureServer',
+    isFeature: true, opacity: 0.5, minZoom: 8, maxZoom: 19
+  },
+  flood1pct: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/FloodCheck/BasinOnePercentAEP/MapServer',
+    layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
   },
   floodplain: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer',
-    layers: [188], opacity: 0.4, minZoom: 8, maxZoom: 19
+    layers: [15], opacity: 0.45, minZoom: 8, maxZoom: 19
   },
   bushfire: {
     url: 'https://tiles.arcgis.com/tiles/vkTwD8kHw2woKBqV/arcgis/rest/services/Bushfire_Prone_Areas/MapServer',
@@ -1398,6 +1407,24 @@ function toggleLayer(layerKey, on) {
         opacity: svc.opacity,
         minZoom: svc.minZoom || 8,
         maxZoom: svc.maxZoom || 19
+      });
+    } else if (svc.isFeature) {
+      // FeatureServer layer (e.g. QFAO flood overlay with styled polygons)
+      layer = L.esri.featureLayer({
+        url: svc.url + '/0',
+        opacity: svc.opacity,
+        minZoom: svc.minZoom || 8,
+        maxZoom: svc.maxZoom || 19,
+        style: function(feature) {
+          // Graduated blue for flood zones — darker = higher risk
+          var sub = (feature.properties && feature.properties.sub_name) || '';
+          return {
+            color: '#1e40af',
+            weight: 0.5,
+            fillColor: '#3b82f6',
+            fillOpacity: 0.35
+          };
+        }
       });
     } else {
       // Dynamic map layer
