@@ -450,7 +450,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="lp-group" style="color:#d4a017">Focus Areas</div>
         <label class="lp-item active" data-layer="corridors">
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('corridors',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#06b6d4"></div>Growth Zones
+          <div class="lp-dot" style="background:#22c55e"></div>Growth Zones
         </label>
         <div class="lp-group">Cadastral</div>
         <label class="lp-item active" data-layer="cadastral">
@@ -2268,13 +2268,13 @@ function addGrowthCorridors(mi) {
   const allCouncils = [...primeCouncils, ...outerCouncils];
 
   const primeStyle = {
-    color: '#06b6d4', weight: 2, opacity: 0.85,
-    fillColor: '#06b6d4', fillOpacity: 0.06,
+    color: '#22c55e', weight: 2, opacity: 0.85,
+    fillColor: '#22c55e', fillOpacity: 0.08,
     dashArray: null, lineCap: 'round'
   };
   const outerStyle = {
-    color: '#06b6d4', weight: 1.5, opacity: 0.45,
-    fillColor: '#06b6d4', fillOpacity: 0.03,
+    color: '#22c55e', weight: 1.5, opacity: 0.45,
+    fillColor: '#22c55e', fillOpacity: 0.04,
     dashArray: '10,8', lineCap: 'round'
   };
 
@@ -2306,7 +2306,7 @@ function addGrowthCorridors(mi) {
         });
         var poly = L.polygon(latlngs, style).addTo(corridorGroup);
         var label = isPrime ? 'PRIME \u00B7 ' + name : 'EXTENDED \u00B7 ' + name;
-        var tipBg = isPrime ? 'rgba(6,182,212,.92)' : 'rgba(6,182,212,.7)';
+        var tipBg = isPrime ? 'rgba(34,197,94,.92)' : 'rgba(34,197,94,.7)';
         poly.bindTooltip('<div style="background:' + tipBg + ';color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.5px;box-shadow:0 1px 4px rgba(0,0,0,.3)">' + label + '</div>', {
           permanent: false, direction: 'center', className: 'corridor-label', sticky: true
         });
