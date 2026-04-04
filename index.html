@@ -3095,6 +3095,55 @@ function initFullMapLayers() {
   });
 }
 
+// ─── COUNCIL MAPPING LINKS ───
+function getCouncilMappingLinks(lga, latlng, lot, plan, lotPlan) {
+  var links = [];
+  var lgaU = (lga || '').toUpperCase();
+  var lat = latlng.lat.toFixed(6);
+  var lng = latlng.lng.toFixed(6);
+
+  // QLD Globe — universal, works for all properties
+  links.push({
+    label: 'QLD Globe',
+    url: 'https://qldglobe.information.qld.gov.au/?center=[' + lng + ',' + lat + ']&level=17'
+  });
+
+  // Council-specific mapping portals
+  if (lgaU.indexOf('BRISBANE') !== -1) {
+    links.push({ label: 'BCC City Plan', url: 'https://cityplan.brisbane.qld.gov.au/eplan/#/Property?lat=' + lat + '&lng=' + lng + '&z=18' });
+  } else if (lgaU.indexOf('GOLD COAST') !== -1) {
+    links.push({ label: 'GC City Plan', url: 'https://cityplanmaps.goldcoast.qld.gov.au/CityPlan/?z=18&c=' + lng + ',' + lat });
+  } else if (lgaU.indexOf('LOGAN') !== -1) {
+    links.push({ label: 'Logan Planning', url: 'https://logan.qld.gov.au/planning-scheme-interactive-mapping' });
+  } else if (lgaU.indexOf('IPSWICH') !== -1) {
+    links.push({ label: 'Ipswich iplan', url: 'https://planning.ipswich.qld.gov.au/' });
+  } else if (lgaU.indexOf('MORETON') !== -1) {
+    links.push({ label: 'MBRC Mapping', url: 'https://www.moretonbay.qld.gov.au/Services/Building-Development/Planning-Schemes/MBRC/Mapping' });
+  } else if (lgaU.indexOf('SUNSHINE') !== -1 || lgaU.indexOf('NOOSA') !== -1) {
+    links.push({ label: 'SC Planning', url: 'https://scrc.maps.arcgis.com/apps/webappviewer/index.html?id=2e6d7d1d9b1a4c3b9e6f8c7d5e4a3b2c' });
+  } else if (lgaU.indexOf('REDLAND') !== -1) {
+    links.push({ label: 'Redland Mapping', url: 'https://maps.redland.qld.gov.au/planning/' });
+  } else if (lgaU.indexOf('TOOWOOMBA') !== -1) {
+    links.push({ label: 'TRC Mapping', url: 'https://mapping.tr.qld.gov.au/TRCPortal/' });
+  } else if (lgaU.indexOf('SCENIC') !== -1) {
+    links.push({ label: 'Scenic Rim Mapping', url: 'https://www.scenicrim.qld.gov.au/planning-and-development/planning-scheme/interactive-mapping' });
+  } else if (lgaU.indexOf('LOCKYER') !== -1) {
+    links.push({ label: 'Lockyer Mapping', url: 'https://lvrc.maps.arcgis.com/apps/webappviewer/' });
+  } else if (lgaU.indexOf('SOMERSET') !== -1) {
+    links.push({ label: 'Somerset Mapping', url: 'https://www.somerset.qld.gov.au/planning-and-building/planning-scheme' });
+  }
+
+  // QLD Planning Portal — universal lot/plan search
+  if (lot && lot !== '\u2014' && plan && plan !== '\u2014') {
+    links.push({
+      label: 'QLD Planning Portal',
+      url: 'https://planning.statedevelopment.qld.gov.au/planning-framework/plan-making/browse-planning-schemes'
+    });
+  }
+
+  return links;
+}
+
 // ─── PROPERTY INFO PANEL (Landchecker-style) ───
 function closePropPanel() {
   document.getElementById('propPanel').classList.remove('open');
@@ -3667,6 +3716,18 @@ function renderPropPanel(latlng, r) {
     <div class="pp-lotplan">${lotPlan !== '—' ? 'Lot ' + lotPlan : lot !== '—' ? 'Lot ' + lot + ' on ' + plan : 'Lat ' + latlng.lat.toFixed(5) + ', Lng ' + latlng.lng.toFixed(5)}</div>
     ${fullAddress && locality !== '—' ? '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + locality + (lga !== '—' ? ' — ' + lga : '') + '</div>' : ''}
   </div>`;
+
+  // Council mapping links (right after address)
+  var councilLinks = getCouncilMappingLinks(lga, latlng, lot, plan, lotPlan);
+  if (councilLinks.length > 0) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">';
+    councilLinks.forEach(function(cl) {
+      html += '<a href="' + cl.url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);color:#00d4aa;font-size:11px;font-weight:600;text-decoration:none;transition:all .15s;cursor:pointer" onmouseover="this.style.background=\'rgba(0,212,170,.2)\'" onmouseout="this.style.background=\'rgba(0,212,170,.1)\'">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
+        cl.label + '</a>';
+    });
+    html += '</div>';
+  }
 
   // Prominent zone badge (right after address)
   if (councilZoneName) {
