@@ -1448,6 +1448,26 @@ function toggleLayer(layerKey, on) {
 let _markerClicked = false; // Flag to prevent identify when marker popup opens
 
 function initFullMapLayers() {
+  // One-time: fetch Layer 4 field names so we know exact DCDB schema
+  fetch(qldServices.cadastral.url + '/4?f=json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.fields) {
+        console.log('=== DCDB Layer 4 Fields ===');
+        data.fields.forEach(function(f){ console.log('  ' + f.name + ' (' + f.alias + ') [' + f.type + ']'); });
+      }
+    }).catch(function(e){ console.log('Field fetch error:', e); });
+
+  // Also fetch Layer 0 (Address) field names
+  fetch(qldServices.cadastral.url + '/0?f=json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.fields) {
+        console.log('=== Address Layer 0 Fields ===');
+        data.fields.forEach(function(f){ console.log('  ' + f.name + ' (' + f.alias + ') [' + f.type + ']'); });
+      }
+    }).catch(function(e){ console.log('Address field fetch error:', e); });
+
   // Mark cadastral as active (already added by addCadastral)
   const svc = qldServices.cadastral;
   activeLayers.cadastral = L.esri.dynamicMapLayer({
@@ -1584,8 +1604,8 @@ function identifyParcel(latlng) {
       });
   })();
 
-  // 1. Cadastral parcels
-  arcgisIdentify(qldServices.cadastral.url, latlng, 'all:4', 3, function(r){
+  // 1. Cadastral parcels (tolerance 10 for reliable parcel hits)
+  arcgisIdentify(qldServices.cadastral.url, latlng, 'all:4', 10, function(r){
     if(r) results.cadastral = r[0].attributes;
     checkComplete();
   });
@@ -1696,22 +1716,39 @@ function renderPropPanel(latlng, r) {
     if (addrPostcode) fullAddress += ' ' + addrPostcode;
   }
 
-  // Extract key fields from cadastral — DCDB uses lowercase field names
-  const lotPlan = c.lotplan || c.LOTPLAN || c.LOT_PLAN || c.Lot_Plan || '—';
-  const lot = c.lot || c.LOT || c.LOTNUMBER || '—';
-  const plan = c.plan || c.PLAN || c.PLANNUMBER || '—';
-  // Area: DCDB doesn't have a direct area field — use Shape_Area or st_area
-  const area = c.Shape_Area || c.SHAPE_Area || c.shape_Area || c['st_area(shape)'] || c.AREA_M2 || c.AREA || (c.Shape && c.Shape.area) || (c.SHAPE && c.SHAPE.area) || null;
-  const areaDisplay = area ? (area > 10000 ? (area/10000).toFixed(2) + ' ha' : Math.round(area).toLocaleString() + ' m\u00B2') : '—';
-  const tenure = c.tenure || c.TENURE || c.Tenure || '—';
-  const lga = c.shire_name || c.SHIRE_NAME || c.LGA || c.LGA_NAME || c.LOCAL_GOVERNMENT || '—';
-  const locality = c.locality || c.LOCALITY || c.LOCALITY_NAME || c.Locality || '—';
-  const segParcel = c.segment_parcel || c.SEG_PARCEL || c.parcel_typ || c.PARCEL_TYPE || '—';
-  const coverType = c.cover_typ || c.COVER_TYP || c.COVER_TYPE || '—';
-
   // Log ALL returned data for debugging (check browser console F12)
-  console.log('Cadastral attrs:', JSON.stringify(c));
-  console.log('Land use attrs:', JSON.stringify(lu));
+  console.log('ALL Cadastral keys:', Object.keys(c).join(', '));
+  console.log('ALL Cadastral attrs:', JSON.stringify(c));
+  console.log('ALL Land use keys:', Object.keys(lu).join(', '));
+  console.log('ALL Land use attrs:', JSON.stringify(lu));
+
+  // Smart field finder — searches all keys case-insensitively
+  function findField(obj, patterns) {
+    for (var i = 0; i < patterns.length; i++) {
+      var p = patterns[i].toLowerCase();
+      for (var k in obj) {
+        if (k.toLowerCase() === p && obj[k] !== null && obj[k] !== '' && obj[k] !== undefined) return obj[k];
+      }
+    }
+    return null;
+  }
+
+  // Extract key fields from cadastral using smart matching
+  const lotPlan = findField(c, ['lotplan','lot_plan','lotplan_id','LOTPLAN','LOT_PLAN']) || '—';
+  const lot = findField(c, ['lot','lot_number','lotnumber','LOT','LOTNUMBER']) || '—';
+  const plan = findField(c, ['plan','plan_number','plannumber','PLAN','PLANNUMBER','plan_type']) || '—';
+
+  // Area: try multiple field patterns — DCDB may use O_SHAPE or Shape_Area or similar
+  const areaRaw = findField(c, ['Shape_Area','SHAPE_Area','shape_area','st_area(shape)','AREA_M2','area','AREA','O_SHAPE','shape.area','shape.starea','lot_area','LOT_AREA','PARCEL_AREA','parcel_area','calc_area','CALC_AREA']);
+  // Also check if Shape object has area
+  const area = areaRaw || (c.Shape && typeof c.Shape === 'object' ? c.Shape.area || c.Shape.Area : null) || (c.SHAPE && typeof c.SHAPE === 'object' ? c.SHAPE.area || c.SHAPE.Area : null) || null;
+  const areaDisplay = area ? (parseFloat(area) > 10000 ? (parseFloat(area)/10000).toFixed(2) + ' ha' : Math.round(parseFloat(area)).toLocaleString() + ' m\u00B2') : '—';
+
+  const tenure = findField(c, ['tenure','TENURE','Tenure','tenure_type']) || '—';
+  const lga = findField(c, ['shire_name','SHIRE_NAME','lga','LGA','lga_name','LGA_NAME','local_government','LOCAL_GOVERNMENT','council','COUNCIL','lga_code']) || '—';
+  const locality = findField(c, ['locality','LOCALITY','locality_name','LOCALITY_NAME','suburb','SUBURB','loc_name']) || '—';
+  const segParcel = findField(c, ['segment_parcel','SEG_PARCEL','parcel_typ','PARCEL_TYPE','parcel_type','PAR_TYPE','seg_par','PARTYP']) || '—';
+  const coverType = findField(c, ['cover_typ','COVER_TYP','COVER_TYPE','cover_type','covtyp','COV_TYP']) || '—';
 
   // Land use — ALUMC fields
   const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.Secondary || lu.Tertiary || lu.Primary || lu.COMMODITY || lu.DESCRIPTION || '—';
