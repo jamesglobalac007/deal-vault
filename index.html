@@ -1542,10 +1542,10 @@ function identifyParcel(latlng) {
   const results = {
     address: null, cadastral: null, landuse: null, pda: null,
     flood: null, floodplain: null, contour: null, mses: null,
-    koala: null, heritage: null, acid: null
+    koala: null, heritage: null, acid: null, seqZone: null
   };
   let completed = 0;
-  const total = 11;
+  const total = 12;
 
   function checkComplete() {
     completed++;
@@ -1699,6 +1699,29 @@ function identifyParcel(latlng) {
     checkComplete();
   });
 
+  // 11. SEQ Regional Plan (ShapingSEQ 2023) — Layer 160 in AdminBoundariesFramework
+  (function(){
+    var qp = new URLSearchParams({
+      geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
+      geometryType: 'esriGeometryPoint',
+      spatialRel: 'esriSpatialRelIntersects',
+      outFields: '*',
+      returnGeometry: 'false',
+      resultRecordCount: '1',
+      f: 'json'
+    });
+    fetch('https://spatial-gis.information.qld.gov.au/arcgis/rest/services/Boundaries/AdminBoundariesFramework/MapServer/160/query?' + qp.toString())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        console.log('SEQ Zone response:', JSON.stringify(data));
+        if (data.features && data.features.length > 0) {
+          results.seqZone = data.features[0].attributes;
+        }
+        checkComplete();
+      })
+      .catch(function(err){ console.log('SEQ Zone query error:', err); checkComplete(); });
+  })();
+
   // Timeout fallback — render whatever we have after 10s
   setTimeout(function() {
     if (completed < total) {
@@ -1777,15 +1800,18 @@ function renderPropPanel(latlng, r) {
   const area = findField(c, ['lot_area','shape_area','st_area(shape)','area_m2','area','calc_area','excl_area']) || null;
   const areaDisplay = area ? (parseFloat(area) > 10000 ? (parseFloat(area)/10000).toFixed(2) + ' ha' : Math.round(parseFloat(area)).toLocaleString() + ' m\u00B2') : '—';
 
-  const tenure = findField(c, ['tenure']) || '—';
   // LGA: cadastral uses "shire_name", address uses "local_authority"
   const lga = findField(c, ['shire_name','lga','lga_name']) || findField(ad, ['local_authority','lga']) || '—';
   const locality = findField(c, ['locality']) || findField(ad, ['locality']) || '—';
   const segParcel = findField(c, ['parcel_typ','parcel_type']) || '—';
-  const coverType = findField(c, ['cover_typ','cover_type']) || '—';
 
-  // Land use — ALUMC fields
-  const landUseClass = lu.SECONDARY || lu.TERTIARY || lu.PRIMARY || lu.Secondary || lu.Tertiary || lu.Primary || lu.COMMODITY || lu.DESCRIPTION || '—';
+  // Land use — ALUMC fields (lowercase from /query response)
+  const landUseClass = findField(lu, ['secondary','tertiary','primary_','primary','commodity','description']) || '—';
+
+  // SEQ Regional Plan Zone (ShapingSEQ 2023)
+  const sz = r.seqZone || {};
+  if (Object.keys(sz).length > 0) console.log('SEQ Zone keys:', Object.keys(sz).join(', '));
+  const seqZoneName = findField(sz, ['category','cat_desc','zone','zone_name','designation','land_use_category','description','name','type','sub_category']) || null;
 
   // PDA
   const pdaName = r.pda ? (r.pda.PDA_NAME || r.pda.pda_name || r.pda.NAME || r.pda.name || r.pda.DESCRIPTION || 'Yes — PDA Area') : null;
@@ -1822,13 +1848,10 @@ function renderPropPanel(latlng, r) {
     <div class="pp-section-title">Property Details</div>
     <div class="pp-grid">
       <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Tenure</div><div class="pp-field-val">${tenure}</div></div>
       <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
       <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
       <div class="pp-field"><div class="pp-field-label">Parcel Type</div><div class="pp-field-val">${segParcel}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Cover Type</div><div class="pp-field-val">${coverType}</div></div>
       <div class="pp-field"><div class="pp-field-label">Elevation</div><div class="pp-field-val">${elevation !== '—' ? elevation + 'm AHD' : '—'}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Coordinates</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:10px">${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}</div></div>
     </div>
   </div>`;
 
@@ -1836,11 +1859,15 @@ function renderPropPanel(latlng, r) {
   html += `<div class="pp-section">
     <div class="pp-section-title">Planning Information</div>
     <div class="pp-grid">
+      <div class="pp-field"><div class="pp-field-label">SEQ Regional Plan Zone</div><div class="pp-field-val pp-zone" style="background:${seqZoneName ? 'rgba(34,197,94,.15);color:#22c55e' : 'rgba(107,114,128,.15);color:#7a8194'}">${seqZoneName || '—'}</div></div>
       <div class="pp-field"><div class="pp-field-label">Land Use</div><div class="pp-field-val pp-zone" style="background:rgba(139,92,246,.15);color:#8b5cf6">${landUseClass}</div></div>
       <div class="pp-field"><div class="pp-field-label">Priority Dev Area</div><div class="pp-field-val">${pdaName || 'Not in PDA'}</div></div>
     </div>`;
   if (pdaName) {
     html += `<div style="margin-top:8px"><span class="pp-overlay-tag" style="background:rgba(59,130,246,.12);color:#3b82f6">${pdaName}</span></div>`;
+  }
+  if (seqZoneName) {
+    html += `<div style="margin-top:4px"><span class="pp-overlay-tag" style="background:rgba(34,197,94,.12);color:#22c55e">${seqZoneName}</span></div>`;
   }
   html += `</div>`;
 
