@@ -2793,30 +2793,46 @@ function addGrowthIntelligence(mi) {
   var serviceRadarGroup = L.layerGroup();
 
   servicedAreas.forEach(function(area) {
-    // Inner ring — solid hot pink line — "services are here"
+    // Inner ring — bold solid hot pink — "services are here"
     var inner = L.circle([area.lat, area.lng], {
       radius: area.r,
       color: '#ff47a3',
-      weight: 2,
-      opacity: 0.75,
-      fillColor: 'transparent',
-      fillOpacity: 0,
+      weight: 3.5,
+      opacity: 0.9,
+      fillColor: '#ff47a3',
+      fillOpacity: 0.04,
       interactive: false
     });
 
-    // Outer ring — dashed hot pink line — "1-3km extension zone"
+    // Outer ring — dashed hot pink — "extension zone"
     var outer = L.circle([area.lat, area.lng], {
       radius: area.r + area.ext,
       color: '#ff47a3',
-      weight: 1.5,
-      opacity: 0.4,
+      weight: 2,
+      opacity: 0.55,
       fillColor: 'transparent',
       fillOpacity: 0,
-      dashArray: '6 5',
+      dashArray: '8 6',
       interactive: false
     });
 
-    // Small label at center
+    // Distance between rings (ext value)
+    var extKm = (area.ext / 1000).toFixed(1);
+
+    // Distance label on the edge between inner and outer ring (east side)
+    var midRadius = area.r + (area.ext / 2);
+    var offsetLat = area.lat;
+    var offsetLng = area.lng + (midRadius / 111320) / Math.cos(area.lat * Math.PI / 180);
+    var distLabel = L.marker([offsetLat, offsetLng], {
+      interactive: false,
+      icon: L.divIcon({
+        className: '',
+        html: '<div style="font-size:9px;font-weight:800;color:#ff47a3;text-shadow:0 1px 3px rgba(0,0,0,0.85),-1px 0 3px rgba(0,0,0,0.7);white-space:nowrap;letter-spacing:.3px;background:rgba(15,20,30,0.6);padding:1px 5px;border-radius:3px;border:1px solid rgba(255,71,163,0.4)">\u2194 ' + extKm + ' km</div>',
+        iconSize: [60, 16], iconAnchor: [30, 8]
+      })
+    });
+
+    // Center name label
     var label = L.marker([area.lat, area.lng], {
       interactive: true,
       icon: L.divIcon({
@@ -2838,15 +2854,20 @@ function addGrowthIntelligence(mi) {
         '<div style="background:#f0fdf4;padding:5px 8px;border-radius:5px;flex:1"><div style="font-size:8px;color:#888;text-transform:uppercase">Serviced</div><div style="font-size:14px;font-weight:700;color:#22c55e">' + innerKm + ' km</div></div>' +
         '<div style="background:#fffbeb;padding:5px 8px;border-radius:5px;flex:1"><div style="font-size:8px;color:#888;text-transform:uppercase">Extension</div><div style="font-size:14px;font-weight:700;color:#f59e0b">' + outerKm + ' km</div></div>' +
       '</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+        '<div style="background:#fdf2f8;padding:5px 8px;border-radius:5px;flex:1"><div style="font-size:8px;color:#888;text-transform:uppercase">Gap Distance</div><div style="font-size:14px;font-weight:700;color:#ff47a3">' + extKm + ' km</div></div>' +
+      '</div>' +
       '<div style="font-size:10.5px;color:#555;line-height:1.5">' + area.note + '</div>' +
       '<div style="font-size:9px;color:#888;margin-top:6px;border-top:1px solid #eee;padding-top:4px">' +
-        '<strong>Solid ring</strong> = services available at boundary<br>' +
-        '<strong>Dashed ring</strong> = 1-3km feasible extension zone' +
+        '<strong>Solid ring</strong> = current housing/services edge<br>' +
+        '<strong>Dashed ring</strong> = ' + extKm + 'km feasible extension zone<br>' +
+        '<strong>\u2194 label</strong> = distance between rings' +
       '</div></div>', {maxWidth: 280}
     );
 
     serviceRadarGroup.addLayer(outer);
     serviceRadarGroup.addLayer(inner);
+    serviceRadarGroup.addLayer(distLabel);
     serviceRadarGroup.addLayer(label);
   });
 
