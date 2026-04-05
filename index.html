@@ -574,6 +574,14 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#9ca3af"></div><div class="lp-label">Terrain (Contours)<span class="lp-desc">Contour lines for visualising elevation</span></div>
         </label>
+        <div class="lp-group" style="color:#3b82f6">Property Tracking <span id="trackedBadge" style="font-size:9px;background:#3b82f6;color:#fff;padding:1px 6px;border-radius:8px;margin-left:6px;display:none">0</span></div>
+        <label class="lp-item" data-layer="trackedProps">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleTrackedLayer(this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#3b82f6"></div><div class="lp-label">Tracked Properties<span class="lp-desc">Properties you're monitoring &amp; contacting</span></div>
+        </label>
+        <label class="lp-item" style="padding-left:28px;cursor:pointer" onclick="showTrackedList()">
+          <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label" style="color:#a855f7;font-weight:600">View All Tracked &#8250;<span class="lp-desc">Open full tracking list</span></div>
+        </label>
         <div class="lp-item" style="flex-direction:column;align-items:flex-start;padding:6px 14px 10px">
           <div style="font-size:9px;color:#d4a017;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">&#128270; Land Size Filter</div>
           <div class="size-filter-bar" id="sizeFilterBar">
@@ -1117,14 +1125,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
           </label>
         </div>
 
-        <div class="lp-group" style="color:#3b82f6">Property Tracking <span id="trackedBadge" style="font-size:9px;background:#3b82f6;color:#fff;padding:1px 6px;border-radius:8px;margin-left:6px;display:none">0</span></div>
-        <label class="lp-item" data-layer="trackedProps">
-          <div class="lp-switch"><input type="checkbox" checked onchange="toggleTrackedLayer(this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#3b82f6"></div><div class="lp-label">Tracked Properties<span class="lp-desc">Properties you're monitoring & contacting</span></div>
-        </label>
-        <label class="lp-item" style="padding-left:28px;cursor:pointer" onclick="showTrackedList()">
-          <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label" style="color:#a855f7;font-weight:600">View All Tracked &#8250;<span class="lp-desc">Open full tracking list</span></div>
-        </label>
+        <!-- Property Tracking moved up below Terrain -->
       </div>
     </div>
     <!-- legend removed — clean map -->
