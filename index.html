@@ -4344,48 +4344,44 @@ function identifyParcel(latlng) {
   const results = {
     address: null, cadastral: null, landuse: null, pda: null,
     flood: null, floodplain: null, contour: null, mses: null,
-    koala: null, heritage: null, acid: null, seqZone: null, councilZone: null
+    koala: null, heritage: null, acid: null, seqZone: null, councilZone: null,
+    stateZone: null, nominatim: null
   };
   let completed = 0;
-  const baseTotal = 12; // 12 base queries (address, cadastral, landuse, pda, flood, floodplain, contour, mses, koala, heritage, acid, seqZone)
-  let zoneQueryFired = false;
+  const baseTotal = 14; // 14 base queries: address, cadastral, landuse, pda, flood, floodplain, contour, mses, koala, heritage, acid, seqZone, stateZone, nominatimAddr
+  let councilZoneQueryFired = false;
   let rendered = false;
 
   function checkComplete() {
     completed++;
-    var displayTotal = zoneQueryFired ? baseTotal + 1 : baseTotal;
+    var displayTotal = councilZoneQueryFired ? baseTotal + 1 : baseTotal;
     // Update loading text with progress
     if (!rendered) {
       content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying... (' + Math.min(completed, displayTotal) + '/' + displayTotal + ' services)</div>';
     }
-    // Fire council zone query as soon as we know the LGA
-    if (!zoneQueryFired) {
+    // Fire council zone query as soon as we know the LGA (bonus — enhances state zone)
+    if (!councilZoneQueryFired) {
       var lgaName = null;
-      if (results.cadastral) lgaName = results.cadastral.shire_name || results.cadastral.SHIRE_NAME;
-      if (!lgaName && results.address) lgaName = results.address.local_authority || results.address.LOCAL_AUTHORITY;
+      if (results.cadastral) lgaName = results.cadastral.shire_name || results.cadastral.SHIRE_NAME || results.cadastral.SHIRE_NAME_1 || results.cadastral.lga || results.cadastral.LGA;
+      if (!lgaName && results.address) lgaName = results.address.local_authority || results.address.LOCAL_AUTHORITY || results.address.lga || results.address.LGA;
+      if (!lgaName && results.nominatim) lgaName = results.nominatim._lgaName;
       if (lgaName) {
-        zoneQueryFired = true;
-        // Try council-level zone first, fall back to state QPP zone
+        councilZoneQueryFired = true;
         queryCouncilZone(latlng, lgaName, function(zoneData){
-          if (zoneData) {
-            results.councilZone = zoneData;
+          if (zoneData && zoneData.zone) {
+            results.councilZone = zoneData; // council zone overrides state zone
           }
-          // If council query failed, try state-level QPP zoning
-          if (!zoneData || !zoneData.zone) {
-            queryStateZone(latlng, function(stateZone){
-              if (stateZone && !results.councilZone) results.councilZone = stateZone;
-              else if (stateZone && results.councilZone && !results.councilZone.zone) results.councilZone = stateZone;
-              checkComplete();
-            });
-          } else {
-            checkComplete();
-          }
+          checkComplete();
         });
       }
     }
-    // Render when base queries done + zone query done (or never fired)
-    if (!rendered && completed >= baseTotal && (!zoneQueryFired || completed >= baseTotal + 1)) {
+    // Render when base queries done + council zone done (or never fired)
+    if (!rendered && completed >= baseTotal && (!councilZoneQueryFired || completed >= baseTotal + 1)) {
       rendered = true;
+      // If no council zone but state zone available, use state zone
+      if ((!results.councilZone || !results.councilZone.zone) && results.stateZone) {
+        results.councilZone = results.stateZone;
+      }
       renderPropPanel(latlng, results);
     }
   }
@@ -4540,13 +4536,52 @@ function identifyParcel(latlng) {
     checkComplete();
   });
 
-  // Timeout fallback — render whatever we have after 8s
+  // 12. State-level QPP zoning — ALWAYS fires (guaranteed zone data)
+  queryStateZone(latlng, function(stateZone){
+    if (stateZone) {
+      results.stateZone = stateZone;
+      console.log('State zone result:', JSON.stringify(stateZone));
+    }
+    checkComplete();
+  });
+
+  // 13. Nominatim reverse geocode — fallback address when QLD service fails
+  (function(){
+    var nomUrl = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + latlng.lat + '&lon=' + latlng.lng + '&zoom=18&addressdetails=1';
+    fetch(nomUrl, {headers: {'Accept': 'application/json'}})
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data && data.address) {
+          console.log('Nominatim address:', JSON.stringify(data.address));
+          var a = data.address;
+          results.nominatim = {
+            display: data.display_name || '',
+            road: a.road || '',
+            house_number: a.house_number || '',
+            suburb: a.suburb || a.village || a.town || a.hamlet || '',
+            city: a.city || a.town || '',
+            postcode: a.postcode || '',
+            county: a.county || '',
+            state: a.state || '',
+            _lgaName: a.county || a.city || '' // used for council zone lookup
+          };
+        }
+        checkComplete();
+      })
+      .catch(function(err){ console.log('Nominatim error:', err); checkComplete(); });
+  })();
+
+  // Timeout fallback — render whatever we have after 10s
   setTimeout(function() {
     if (!rendered) {
       rendered = true;
+      // If no council zone but state zone available, use state zone
+      if ((!results.councilZone || !results.councilZone.zone) && results.stateZone) {
+        results.councilZone = results.stateZone;
+      }
       renderPropPanel(latlng, results);
     }
-  }, 8000);
+  }, 10000);
 }
 
 function renderPropPanel(latlng, r) {
@@ -4555,6 +4590,7 @@ function renderPropPanel(latlng, r) {
   const c = r.cadastral || {};
   const lu = r.landuse || {};
   const ad = r.address || {};
+  const nom = r.nominatim || {};
 
   // Build full street address from QLD Address Management Framework
   // Log all address keys for debugging
@@ -4580,17 +4616,28 @@ function renderPropPanel(latlng, r) {
     }
   }
 
-  // Construct display address
+  // Construct display address — QLD data first, then Nominatim fallback
   let streetAddress = addrFull || autoDetectedAddr;
   if (!streetAddress && (houseNum || roadName)) {
     streetAddress = [houseNum, roadName, roadType].filter(Boolean).join(' ');
   }
+  // Nominatim fallback if QLD address returned nothing
+  if (!streetAddress && nom.road) {
+    streetAddress = nom.house_number ? nom.house_number + ' ' + nom.road : nom.road;
+    console.log('Using Nominatim address fallback:', streetAddress);
+  }
   let fullAddress = '';
   if (streetAddress) {
     fullAddress = streetAddress;
-    if (addrLocality) fullAddress += ', ' + addrLocality;
+    var loc = addrLocality || nom.suburb || '';
+    if (loc) fullAddress += ', ' + loc;
     fullAddress += ', ' + addrState;
-    if (addrPostcode) fullAddress += ' ' + addrPostcode;
+    var pc = addrPostcode || nom.postcode || '';
+    if (pc) fullAddress += ' ' + pc;
+  } else if (nom.display) {
+    // Last resort: use full Nominatim display name (trimmed to QLD portion)
+    var parts = nom.display.split(',').slice(0, 4).join(',').trim();
+    if (parts) fullAddress = parts;
   }
 
   // Log ALL returned data for debugging (check browser console F12)
@@ -4619,9 +4666,9 @@ function renderPropPanel(latlng, r) {
   const area = findField(c, ['lot_area','shape_area','st_area(shape)','area_m2','area','calc_area','excl_area']) || null;
   const areaDisplay = area ? (parseFloat(area) > 10000 ? (parseFloat(area)/10000).toFixed(2) + ' ha' : Math.round(parseFloat(area)).toLocaleString() + ' m\u00B2') : '—';
 
-  // LGA: cadastral uses "shire_name", address uses "local_authority"
-  const lga = findField(c, ['shire_name','lga','lga_name']) || findField(ad, ['local_authority','lga']) || '—';
-  const locality = findField(c, ['locality']) || findField(ad, ['locality']) || '—';
+  // LGA: cadastral uses "shire_name", address uses "local_authority", Nominatim fallback
+  const lga = findField(c, ['shire_name','lga','lga_name']) || findField(ad, ['local_authority','lga']) || nom._lgaName || '—';
+  const locality = findField(c, ['locality']) || findField(ad, ['locality']) || nom.suburb || '—';
   const segParcel = findField(c, ['parcel_typ','parcel_type']) || '—';
 
   // Land use — ALUMC fields (lowercase from /query response)
