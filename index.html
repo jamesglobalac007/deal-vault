@@ -5151,11 +5151,12 @@ function renderPropPanel(latlng, r) {
   if (Object.keys(sz).length > 0) console.log('SEQ Zone keys:', Object.keys(sz).join(', '));
   const seqZoneName = findField(sz, ['Name','name','category','cat_desc','zone','zone_name','designation','land_use_category','description','type','sub_category','value']) || null;
 
-  // Council Planning Scheme Zone
+  // Council Planning Scheme Zone — with SEQ and land use fallbacks
   const cz = r.councilZone || {};
-  const councilZoneName = cz.zone || null;
+  const councilZoneName = cz.zone || seqZoneName || landUseClass || null;
   const councilZonePrecinct = cz.precinct || null;
-  if (councilZoneName) console.log('Council Zone:', councilZoneName, '| Precinct:', councilZonePrecinct);
+  const councilZoneSource = cz.zone ? 'Council' : (seqZoneName ? 'SEQ Regional' : (landUseClass !== '—' ? 'Land Use' : ''));
+  if (councilZoneName) console.log('Zone:', councilZoneName, '| Source:', councilZoneSource, '| Precinct:', councilZonePrecinct);
 
   // Zone categorization — highlight residential, rural, industrial
   // ── ShapingSEQ 2023 Growth Data by LGA ──
@@ -5313,15 +5314,22 @@ function renderPropPanel(latlng, r) {
     ${fullAddress && locality !== '—' ? '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + locality + (lga !== '—' ? ' — ' + lga : '') + '</div>' : ''}
   </div>`;
 
-  // Zone badge (first after address)
+  // Zone badge (first after address) — always show, with fallback chain
   if (councilZoneName) {
     html += `<div style="margin-bottom:12px;padding:8px 12px;background:${zoneCat.bg};border:1px solid ${zoneCat.color}33;border-radius:8px;display:flex;align-items:center;gap:8px">
       ${zoneCat.icon ? '<span style="font-size:18px">' + zoneCat.icon + '</span>' : ''}
       <div style="flex:1">
-        <div style="font-size:10px;color:${zoneCat.color};font-weight:700;letter-spacing:.5px">ZONE</div>
+        <div style="font-size:10px;color:${zoneCat.color};font-weight:700;letter-spacing:.5px">ZONE${councilZoneSource && councilZoneSource !== 'Council' ? ' <span style="font-weight:500;opacity:.7">(' + councilZoneSource + ')</span>' : ''}</div>
         <div style="font-size:13px;font-weight:600;color:var(--text)">${councilZoneName}</div>
       </div>
       <span style="background:${zoneCat.color};color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700">${zoneCat.label}</span>
+    </div>`;
+  } else {
+    html += `<div style="margin-bottom:12px;padding:8px 12px;background:rgba(107,114,128,.12);border:1px solid rgba(107,114,128,.2);border-radius:8px;display:flex;align-items:center;gap:8px">
+      <div style="flex:1">
+        <div style="font-size:10px;color:#7a8194;font-weight:700;letter-spacing:.5px">ZONE</div>
+        <div style="font-size:13px;font-weight:600;color:var(--dim)">Zone data loading — check layer panel</div>
+      </div>
     </div>`;
   }
 
