@@ -664,16 +664,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
         <label class="lp-item" data-layer="serviceRadar">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#0ea5e9"></div><div class="lp-label">Service Coverage Scan<span class="lp-desc">Power · Water · Sewer · NBN per area</span></div>
+          <div class="lp-dot" style="background:#0ea5e9"></div><div class="lp-label">Key Infrastructure<span class="lp-desc">Substations, treatment plants, WTPs</span></div>
         </label>
         <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-            <span>&#9889; Power</span>
-            <span>&#128167; Water</span>
-            <span>&#9899; Sewer</span>
-            <span>&#128225; NBN</span>
-          </div>
-          <span style="color:#0ea5e9">&#9432;</span> Shows service availability by growth area. Click any area for details.
+          <span style="color:#0ea5e9">&#9432;</span> Service access (power, water, sewer, NBN) shown per property when selected.
         </div>
         <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
         <label class="lp-item" data-layer="pdaMarkers">
@@ -2734,105 +2728,51 @@ function addGrowthIntelligence(mi) {
 
   console.log('Growth Intelligence loaded: ' + pdaDatabase.length + ' PDAs, ' + infraDatabase.length + ' infrastructure, ' + devEstatesDatabase.length + ' estates, ' + pfgaDatabase.length + ' PFGAs, ' + cat1DevAreas.length + ' Cat 1 areas');
 
-  // ── SERVICES & UTILITIES — SUBURB-LEVEL RADAR SCAN ──
-  // Clean icons per growth area showing which services are available
-  var serviceAreas = [
-    {name:'Flagstone',lat:-27.83,lng:152.96,power:true,water:true,sewer:'planned',nbn:true,
-     note:'Flagstone STP planned (51,500 lots). Energex zone sub 80 MVA. Water via Urban Utilities trunk.'},
-    {name:'Yarrabilba',lat:-27.79,lng:153.11,power:true,water:true,sewer:true,nbn:true,
-     note:'Yarrabilba zone sub 80 MVA. Pimpama STP 50 ML/day. Full NBN FTTP rollout.'},
-    {name:'Ripley Valley',lat:-27.67,lng:152.76,power:true,water:true,sewer:true,nbn:true,
-     note:'New zone sub 100 MVA. Bundamba STP 66 ML/day. Mt Crosby WTP supply. NBN FTTP.'},
-    {name:'Springfield',lat:-27.67,lng:152.90,power:true,water:true,sewer:true,nbn:true,
-     note:'Springfield zone sub 100 MVA. Oxley Creek STP trunk. Full services established.'},
-    {name:'Coomera-Pimpama',lat:-27.86,lng:153.31,power:true,water:true,sewer:true,nbn:true,
-     note:'Coomera zone sub 120 MVA. Pimpama STP 50 ML/day. Molendinar WTP via Hinze Dam.'},
-    {name:'Caboolture West',lat:-27.06,lng:152.87,power:true,water:true,sewer:'planned',nbn:'partial',
-     note:'Caboolture zone sub 90 MVA. Sth Caboolture STP 40 ML/day. Trunk sewer extensions planned for Waraba PDA.'},
-    {name:'Caloundra South',lat:-26.82,lng:153.02,power:true,water:true,sewer:true,nbn:true,
-     note:'Caloundra zone sub 80 MVA. Kawana STP 50 ML/day. Image Flat WTP supply. Aura FTTP.'},
-    {name:'Park Ridge',lat:-27.72,lng:153.07,power:true,water:true,sewer:true,nbn:true,
-     note:'Energex distribution. Urban Utilities sewer trunk. Established service corridor.'},
-    {name:'Beaudesert',lat:-27.99,lng:153.00,power:true,water:true,sewer:'limited',nbn:'partial',
-     note:'Beaudesert STP 8 ML/day (upgrade needed). WTP 12 ML/day. Ergon power. NBN fixed wireless in parts.'},
-    {name:'Highfields',lat:-27.45,lng:151.95,power:true,water:true,sewer:true,nbn:true,
-     note:'Highfields zone sub 60 MVA (Ergon). Toowoomba Council water/sewer. NBN FTTP in newer estates.'},
-    {name:'Beerwah East',lat:-26.86,lng:152.96,power:true,water:true,sewer:'planned',nbn:'partial',
-     note:'Energex distribution. Unitywater connections being extended. Sewer trunk planned for Cat 2 growth.'},
-    {name:'Thornlands',lat:-27.56,lng:153.25,power:true,water:true,sewer:true,nbn:true,
-     note:'Thornlands zone sub 80 MVA. Redland Water/Sewer established. Full NBN.'},
-    {name:'North Lakes',lat:-27.24,lng:153.01,power:true,water:true,sewer:true,nbn:true,
-     note:'Fully serviced established area. Murrumba Downs STP 50 ML/day. NBN FTTP.'},
-    {name:'Ormeau-Jacobs Well',lat:-27.76,lng:153.24,power:true,water:true,sewer:true,nbn:true,
-     note:'Gold Coast Water sewer. Energex power. Full NBN. Coombabah STP 70 ML/day.'},
-    {name:'Wellcamp',lat:-27.57,lng:151.79,power:true,water:'limited',sewer:false,nbn:'partial',
-     note:'Ergon power. No reticulated sewer (on-site systems). Limited town water. Suited to rural-res or industrial.'}
+  // ── SERVICES & UTILITIES — KEY INFRASTRUCTURE POINTS ──
+  // Small subtle markers for major infrastructure — no circles, no implied coverage
+  var infraPoints = [
+    // Substations
+    {name:'Ripley Zone Sub',lat:-27.670,lng:152.760,type:'power',cap:'100 MVA'},
+    {name:'Yarrabilba Zone Sub',lat:-27.785,lng:153.105,type:'power',cap:'80 MVA'},
+    {name:'Coomera Zone Sub',lat:-27.870,lng:153.310,type:'power',cap:'120 MVA'},
+    {name:'Flagstone Zone Sub',lat:-27.845,lng:152.945,type:'power',cap:'80 MVA'},
+    {name:'Springfield Zone Sub',lat:-27.665,lng:152.900,type:'power',cap:'100 MVA'},
+    {name:'Caboolture Zone Sub',lat:-27.085,lng:152.945,type:'power',cap:'90 MVA'},
+    {name:'Caloundra Zone Sub',lat:-26.800,lng:153.040,type:'power',cap:'80 MVA'},
+    {name:'Highfields Zone Sub',lat:-27.445,lng:151.950,type:'power',cap:'60 MVA'},
+    {name:'Thornlands Zone Sub',lat:-27.565,lng:153.250,type:'power',cap:'80 MVA'},
+    // Treatment Plants
+    {name:'Bundamba STP',lat:-27.620,lng:152.800,type:'sewer',cap:'66 ML/day'},
+    {name:'Pimpama STP',lat:-27.820,lng:153.305,type:'sewer',cap:'50 ML/day'},
+    {name:'Coombabah STP',lat:-27.895,lng:153.365,type:'sewer',cap:'70 ML/day'},
+    {name:'Murrumba Downs STP',lat:-27.283,lng:152.965,type:'sewer',cap:'50 ML/day'},
+    {name:'Kawana STP',lat:-26.715,lng:153.135,type:'sewer',cap:'50 ML/day'},
+    {name:'Beaudesert STP',lat:-27.995,lng:153.000,type:'sewer',cap:'8 ML/day'},
+    // Water
+    {name:'Mt Crosby WTP',lat:-27.533,lng:152.770,type:'water',cap:'860 ML/day'},
+    {name:'North Pine WTP',lat:-27.268,lng:152.935,type:'water',cap:'200 ML/day'},
+    {name:'Molendinar WTP',lat:-27.960,lng:153.375,type:'water',cap:'210 ML/day'}
   ];
 
-  var serviceRadarGroup = L.layerGroup();
-  serviceAreas.forEach(function(area) {
-    // Build service icons row
-    function svcIcon(emoji, status) {
-      if (status === true) return '<span style="opacity:1">' + emoji + '</span>';
-      if (status === 'planned') return '<span style="opacity:0.5" title="Planned">' + emoji + '<sup style="font-size:7px">P</sup></span>';
-      if (status === 'partial') return '<span style="opacity:0.5" title="Partial">' + emoji + '<sup style="font-size:7px">~</sup></span>';
-      if (status === 'limited') return '<span style="opacity:0.35" title="Limited">' + emoji + '<sup style="font-size:7px">L</sup></span>';
-      return '<span style="opacity:0.15">' + emoji + '</span>';
-    }
-    var icons = svcIcon('\u26A1',area.power) + ' ' + svcIcon('\uD83D\uDCA7',area.water) + ' ' + svcIcon('\u26AB',area.sewer) + ' ' + svcIcon('\uD83D\uDCE1',area.nbn);
-
-    // Count how many are fully connected
-    var fullCount = [area.power, area.water, area.sewer, area.nbn].filter(function(s){ return s === true; }).length;
-    var ringColor = fullCount === 4 ? '#22c55e' : fullCount >= 3 ? '#0ea5e9' : fullCount >= 2 ? '#f59e0b' : '#ef4444';
-
-    // Soft circle on map
-    var circle = L.circle([area.lat, area.lng], {
-      radius: 2500, color: ringColor, weight: 1.5, opacity: 0.6,
-      fillColor: ringColor, fillOpacity: 0.06, interactive: true
-    });
-
-    // DivIcon label in center
-    var label = L.marker([area.lat, area.lng], {
-      interactive: true,
+  var servicePointGroup = L.layerGroup();
+  infraPoints.forEach(function(pt) {
+    var icon = pt.type === 'power' ? '\u26A1' : pt.type === 'sewer' ? '\u26AB' : '\uD83D\uDCA7';
+    var col = pt.type === 'power' ? '#eab308' : pt.type === 'sewer' ? '#78716c' : '#0ea5e9';
+    var m = L.marker([pt.lat, pt.lng], {
       icon: L.divIcon({
         className: '',
-        html: '<div style="text-align:center;pointer-events:auto;cursor:pointer">' +
-              '<div style="font-size:13px;letter-spacing:1px;line-height:1">' + icons + '</div>' +
-              '<div style="font-size:8.5px;font-weight:700;color:' + ringColor + ';margin-top:2px;text-shadow:0 1px 3px rgba(0,0,0,0.8);white-space:nowrap;letter-spacing:.3px">' + area.name.toUpperCase() + '</div>' +
-              '</div>',
-        iconSize: [120, 32],
-        iconAnchor: [60, 16]
+        html: '<div style="width:18px;height:18px;border-radius:50%;background:rgba(10,13,20,0.85);border:1.5px solid ' + col + ';display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer">' + icon + '</div>',
+        iconSize: [18, 18], iconAnchor: [9, 9]
       })
     });
-
-    // Popup with details
-    var popupHtml = '<div style="min-width:220px;font-family:-apple-system,sans-serif">' +
-      '<div style="font-size:14px;font-weight:800;color:' + ringColor + ';margin-bottom:6px">' + area.name + '</div>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:8px">' +
-        svcRow('\u26A1', 'Power', area.power) +
-        svcRow('\uD83D\uDCA7', 'Water', area.water) +
-        svcRow('\u26AB', 'Sewer', area.sewer) +
-        svcRow('\uD83D\uDCE1', 'NBN', area.nbn) +
-      '</div>' +
-      '<div style="font-size:10.5px;color:#555;line-height:1.5;border-top:1px solid #eee;padding-top:6px">' + area.note + '</div></div>';
-
-    circle.bindPopup(popupHtml, {maxWidth: 300});
-    label.bindPopup(popupHtml, {maxWidth: 300});
-
-    serviceRadarGroup.addLayer(circle);
-    serviceRadarGroup.addLayer(label);
+    m.bindTooltip('<div style="font-size:11px;font-weight:700;color:' + col + '">' + pt.name + '</div><div style="font-size:10px;color:#e2e8f0">' + pt.cap + '</div>',
+      {className: 'tracked-tooltip', direction: 'top', offset: [0, -8]});
+    servicePointGroup.addLayer(m);
   });
 
-  function svcRow(emoji, name, status) {
-    var color = status === true ? '#22c55e' : status === 'planned' ? '#f59e0b' : status === 'partial' ? '#f59e0b' : status === 'limited' ? '#ef4444' : '#d1d5db';
-    var label = status === true ? 'Connected' : status === 'planned' ? 'Planned' : status === 'partial' ? 'Partial' : status === 'limited' ? 'Limited' : 'None';
-    return '<div style="display:flex;align-items:center;gap:4px;font-size:11px"><span>' + emoji + '</span><span style="color:#333">' + name + '</span></div>' +
-           '<div style="font-size:11px;font-weight:700;color:' + color + '">' + label + '</div>';
-  }
-
   if (!window.serviceRadarLayers) window.serviceRadarLayers = {};
-  window.serviceRadarLayers[mi._leaflet_id] = serviceRadarGroup;
-  console.log('Service radar loaded: ' + serviceAreas.length + ' growth areas scanned');
+  window.serviceRadarLayers[mi._leaflet_id] = servicePointGroup;
+  console.log('Service points loaded: ' + infraPoints.length + ' infrastructure markers');
 
   // ── TARGET CORRIDOR OVERLAYS ──
   // Scored acquisition zones with strategy labels — toggle via layer panel
@@ -3520,6 +3460,80 @@ function trackProperty(lotPlan, address, lat, lng, lga, zone, area) {
   drawTrackedBorders();
   updateTrackedCount();
   return prop;
+}
+
+// ── Per-Property Service Assessment ──
+// Determines likely service availability based on zone, LGA, and lot attributes
+function assessPropertyServices(zoneName, lga, cadastral) {
+  var z = (zoneName || '').toLowerCase();
+  var lgaL = (lga || '').toLowerCase();
+  var area = cadastral ? (cadastral.lot_area || cadastral.LOT_AREA || 0) : 0;
+
+  // Urban zones — residential, commercial, industrial, mixed use, centre, community
+  var isUrban = /residen|mixed|centre|commercial|industrial|community|township|village|emerging|next gen|medium|high density|low density|character/i.test(z);
+  // Rural zones
+  var isRural = /rural|environmental|conservation|open space|sport|recreation|limited development/i.test(z);
+  // Large lot (>2ha) even in urban zones might be unserviced
+  var isLargeLot = area > 20000;
+
+  // SEQ council areas with full reticulated services
+  var fullServiceLGAs = ['brisbane','gold coast','logan','moreton bay','ipswich','sunshine coast','noosa','redland'];
+  var isFullServiceLGA = fullServiceLGAs.some(function(l){ return lgaL.indexOf(l) !== -1; });
+
+  // Regional councils — mixed services
+  var regionalLGAs = ['toowoomba','scenic rim','somerset','lockyer','bundaberg','fraser','gympie'];
+  var isRegionalLGA = regionalLGAs.some(function(l){ return lgaL.indexOf(l) !== -1; });
+
+  var services = [];
+
+  // POWER — almost everywhere in QLD has access to power grid
+  if (isUrban || isFullServiceLGA) {
+    services.push({icon:'\u26A1', name:'Power', status:'Available', note: isFullServiceLGA ? 'Energex network' : 'Ergon Energy'});
+  } else if (isRegionalLGA) {
+    services.push({icon:'\u26A1', name:'Power', status:'Likely', note:'Ergon Energy — check feeder capacity'});
+  } else {
+    services.push({icon:'\u26A1', name:'Power', status:'Likely', note:'Confirm with Ergon/Energex'});
+  }
+
+  // WATER — urban SEQ = yes, rural/regional = check
+  if (isUrban && isFullServiceLGA) {
+    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Available', note: lgaL.indexOf('gold coast') !== -1 ? 'Gold Coast Water' : lgaL.indexOf('sunshine') !== -1 || lgaL.indexOf('moreton') !== -1 || lgaL.indexOf('noosa') !== -1 ? 'Unitywater' : 'Urban Utilities'});
+  } else if (isRegionalLGA && isUrban) {
+    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Likely', note:'Council reticulated — check trunk main distance'});
+  } else if (isRural || isLargeLot) {
+    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Check', note:'May require bore or tank — verify with council'});
+  } else {
+    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Likely', note:'Confirm with water provider'});
+  }
+
+  // SEWER — urban SEQ = yes, rural = on-site, fringe = check trunk distance
+  if (isUrban && isFullServiceLGA) {
+    services.push({icon:'\u26AB', name:'Sewer', status:'Available', note:'Reticulated sewer network'});
+  } else if (isUrban && isRegionalLGA) {
+    services.push({icon:'\u26AB', name:'Sewer', status:'Check', note:'May need trunk extension — check with council'});
+  } else if (isRural || isLargeLot) {
+    services.push({icon:'\u26AB', name:'Sewer', status:'Check', note:'Likely on-site (septic) — key cost for subdivision'});
+  } else {
+    services.push({icon:'\u26AB', name:'Sewer', status:'Check', note:'Verify sewer trunk connection availability'});
+  }
+
+  // NBN — most of SEQ urban has FTTP or FTTC, rural = fixed wireless or satellite
+  if (isUrban && (isFullServiceLGA || isRegionalLGA)) {
+    services.push({icon:'\uD83D\uDCE1', name:'NBN', status:'Available', note:'FTTP/FTTC likely — check nbnco.com.au'});
+  } else if (isRural) {
+    services.push({icon:'\uD83D\uDCE1', name:'NBN', status:'Check', note:'Fixed wireless or satellite — check coverage map'});
+  } else {
+    services.push({icon:'\uD83D\uDCE1', name:'NBN', status:'Likely', note:'Verify technology type at nbnco.com.au'});
+  }
+
+  // STORMWATER — important for subdivision
+  if (isUrban && isFullServiceLGA) {
+    services.push({icon:'\uD83C\uDF0A', name:'Stormwater', status:'Available', note:'Council stormwater network'});
+  } else {
+    services.push({icon:'\uD83C\uDF0A', name:'Stormwater', status:'Check', note:'On-site detention may be required'});
+  }
+
+  return services;
 }
 
 function updateTrackedProp(lotPlan, updates) {
@@ -4644,6 +4658,22 @@ function renderPropPanel(latlng, r) {
     });
     html += '</div></div>';
   }
+
+  // ── Per-Property Service Assessment ──
+  var svcAssess = assessPropertyServices(councilZoneName, lga, r.cadastral);
+  html += '<div class="pp-section"><div class="pp-section-title">Services &amp; Utilities</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  svcAssess.forEach(function(s) {
+    var bg = s.status === 'Available' ? 'rgba(34,197,94,.1)' : s.status === 'Likely' ? 'rgba(14,165,233,.1)' : s.status === 'Check' ? 'rgba(245,158,11,.1)' : 'rgba(239,68,68,.1)';
+    var col = s.status === 'Available' ? '#22c55e' : s.status === 'Likely' ? '#0ea5e9' : s.status === 'Check' ? '#f59e0b' : '#ef4444';
+    html += '<div style="padding:6px 8px;border-radius:6px;background:' + bg + ';border:1px solid ' + col + '22">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
+      '<span style="font-size:11px;font-weight:600;color:var(--text)">' + s.icon + ' ' + s.name + '</span>' +
+      '<span style="font-size:9px;font-weight:700;color:' + col + ';letter-spacing:.3px">' + s.status.toUpperCase() + '</span></div>' +
+      (s.note ? '<div style="font-size:8.5px;color:var(--dim);margin-top:2px">' + s.note + '</div>' : '') +
+      '</div>';
+  });
+  html += '</div></div>';
 
   // Prominent zone badge (right after address)
   if (councilZoneName) {
