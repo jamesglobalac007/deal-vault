@@ -4941,7 +4941,6 @@ function fetchAndHighlightParcel(latlng) {
     spatialRel: 'esriSpatialRelIntersects',
     outFields: 'lotplan',
     returnGeometry: 'true',
-    geometryPrecision: '6',
     outSR: '4326',
     resultRecordCount: '1',
     f: 'geojson'
@@ -4974,10 +4973,22 @@ function fetchAndHighlightParcel(latlng) {
         }
       }).addTo(mapFull);
 
-      // Zoom to parcel
-      var bounds = selectedParcelLayer.getBounds();
-      if (bounds && bounds.isValid()) {
-        mapFull.fitBounds(bounds, {padding: [80, 80], maxZoom: 18, animate: true, duration: 0.5});
+      // Only zoom/pan if user is at a low zoom (far out). If already zoomed in (>=15),
+      // just draw the outline — don't shift the map. User clicked where they're looking.
+      var currentZoom = mapFull.getZoom();
+      if (currentZoom < 15) {
+        var bounds = selectedParcelLayer.getBounds();
+        if (bounds && bounds.isValid()) {
+          var panelOpen = document.getElementById('propPanel').classList.contains('open');
+          var rightPad = panelOpen ? 400 : 80;
+          mapFull.fitBounds(bounds, {
+            paddingTopLeft: [80, 80],
+            paddingBottomRight: [rightPad, 80],
+            maxZoom: 18,
+            animate: true,
+            duration: 0.5
+          });
+        }
       }
       console.log('[Parcel highlight] Drew parcel outline OK');
     })
