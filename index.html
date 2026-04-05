@@ -664,19 +664,14 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
         <label class="lp-item" data-layer="serviceRadar">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#0ea5e9"></div><div class="lp-label">Service Coverage Reach<span class="lp-desc">How far power, sewer &amp; water extend</span></div>
+          <div class="lp-dot" style="background:#ffffff"></div><div class="lp-label">Service Radar<span class="lp-desc">Where services reach from existing housing</span></div>
         </label>
         <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:3px">
-            <span style="color:#eab308">&#9889; Power subs</span>
-            <span style="color:#78716c">&#9899; Sewer STPs</span>
-            <span style="color:#0ea5e9">&#128167; Water WTPs</span>
+          <div style="display:flex;gap:10px;margin-bottom:2px">
+            <span><span style="display:inline-block;width:14px;height:0;border-top:2px solid rgba(255,255,255,0.6);vertical-align:middle;margin-right:3px"></span> Services here</span>
+            <span><span style="display:inline-block;width:14px;height:0;border-top:2px dashed rgba(255,255,255,0.35);vertical-align:middle;margin-right:3px"></span> 1-3km extension</span>
           </div>
-          <div style="display:flex;gap:8px;margin-top:2px">
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(34,197,94,0.3);border:1px solid #22c55e"></span> &lt;5km</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(245,158,11,0.3);border:1px solid #f59e0b"></span> 5-15km</span>
-            <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:rgba(239,68,68,0.2);border:1px solid #ef4444"></span> 15-25km</span>
-          </div>
+          Land inside the solid ring = services available. Dashed ring = feasible extension.
         </div>
         <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
         <label class="lp-item" data-layer="pdaMarkers">
@@ -2737,115 +2732,121 @@ function addGrowthIntelligence(mi) {
 
   console.log('Growth Intelligence loaded: ' + pdaDatabase.length + ' PDAs, ' + infraDatabase.length + ' infrastructure, ' + devEstatesDatabase.length + ' estates, ' + pfgaDatabase.length + ' PFGAs, ' + cat1DevAreas.length + ' Cat 1 areas');
 
-  // ── SERVICES & UTILITIES — COVERAGE REACH RINGS ──
-  // Shows realistic service reach from each infrastructure point
-  // Power substations distribute ~15-25km via 33kV feeders
-  // Sewer STPs connect via trunk mains ~5-15km
-  // Water WTPs distribute via trunk mains ~15-40km
-  var infraPoints = [
-    // Power Substations (Energex/Ergon zone subs — 33kV distribution reach ~15km urban, ~25km rural)
-    {name:'Ripley Zone Sub',lat:-27.670,lng:152.760,type:'power',cap:'100 MVA',op:'Energex',reach:15000},
-    {name:'Yarrabilba Zone Sub',lat:-27.785,lng:153.105,type:'power',cap:'80 MVA',op:'Energex',reach:12000},
-    {name:'Coomera Zone Sub',lat:-27.870,lng:153.310,type:'power',cap:'120 MVA',op:'Energex',reach:18000},
-    {name:'Flagstone Zone Sub',lat:-27.845,lng:152.945,type:'power',cap:'80 MVA',op:'Energex',reach:12000},
-    {name:'Springfield Zone Sub',lat:-27.665,lng:152.900,type:'power',cap:'100 MVA',op:'Energex',reach:15000},
-    {name:'Caboolture Zone Sub',lat:-27.085,lng:152.945,type:'power',cap:'90 MVA',op:'Energex',reach:15000},
-    {name:'Caloundra Zone Sub',lat:-26.800,lng:153.040,type:'power',cap:'80 MVA',op:'Energex',reach:14000},
-    {name:'Highfields Zone Sub',lat:-27.445,lng:151.950,type:'power',cap:'60 MVA',op:'Ergon',reach:18000},
-    {name:'Thornlands Zone Sub',lat:-27.565,lng:153.250,type:'power',cap:'80 MVA',op:'Energex',reach:12000},
-    {name:'Richlands Zone Sub',lat:-27.600,lng:152.970,type:'power',cap:'100 MVA',op:'Energex',reach:14000},
-    {name:'Eight Mile Plains Sub',lat:-27.575,lng:153.100,type:'power',cap:'90 MVA',op:'Energex',reach:13000},
-    {name:'Helensvale Zone Sub',lat:-27.915,lng:153.330,type:'power',cap:'90 MVA',op:'Energex',reach:14000},
-    {name:'Narangba Zone Sub',lat:-27.195,lng:152.975,type:'power',cap:'80 MVA',op:'Energex',reach:14000},
-    {name:'Toowoomba Zone Sub',lat:-27.560,lng:151.955,type:'power',cap:'80 MVA',op:'Ergon',reach:18000},
-    {name:'Beaudesert Zone Sub',lat:-27.990,lng:153.000,type:'power',cap:'40 MVA',op:'Energex',reach:15000},
-    // Sewer STPs (trunk sewer reach depends on gravity/pumped — typically 5-15km)
-    {name:'Bundamba STP',lat:-27.620,lng:152.800,type:'sewer',cap:'66 ML/day',op:'Urban Utilities',reach:12000},
-    {name:'Oxley Creek STP',lat:-27.582,lng:152.985,type:'sewer',cap:'55 ML/day',op:'Urban Utilities',reach:15000},
-    {name:'Goodna STP',lat:-27.615,lng:152.885,type:'sewer',cap:'25 ML/day',op:'Urban Utilities',reach:8000},
-    {name:'Luggage Point STP',lat:-27.385,lng:153.120,type:'sewer',cap:'215 ML/day',op:'Urban Utilities',reach:20000},
-    {name:'Pimpama STP',lat:-27.820,lng:153.305,type:'sewer',cap:'50 ML/day',op:'Gold Coast Water',reach:12000},
-    {name:'Coombabah STP',lat:-27.895,lng:153.365,type:'sewer',cap:'70 ML/day',op:'Gold Coast Water',reach:15000},
-    {name:'Merrimac STP',lat:-28.035,lng:153.385,type:'sewer',cap:'55 ML/day',op:'Gold Coast Water',reach:12000},
-    {name:'Murrumba Downs STP',lat:-27.283,lng:152.965,type:'sewer',cap:'50 ML/day',op:'Unitywater',reach:12000},
-    {name:'South Caboolture STP',lat:-27.095,lng:152.935,type:'sewer',cap:'40 ML/day',op:'Unitywater',reach:10000},
-    {name:'Kawana STP',lat:-26.715,lng:153.135,type:'sewer',cap:'50 ML/day',op:'Unitywater',reach:12000},
-    {name:'Brendale STP',lat:-27.320,lng:152.980,type:'sewer',cap:'35 ML/day',op:'Unitywater',reach:10000},
-    {name:'Beaudesert STP',lat:-27.995,lng:153.000,type:'sewer',cap:'8 ML/day',op:'Scenic Rim',reach:6000},
-    // Water Treatment Plants (distribute via trunk mains — much wider reach 15-40km)
-    {name:'Mt Crosby WTP',lat:-27.533,lng:152.770,type:'water',cap:'860 ML/day',op:'Seqwater',reach:35000},
-    {name:'North Pine WTP',lat:-27.268,lng:152.935,type:'water',cap:'200 ML/day',op:'Seqwater',reach:25000},
-    {name:'Molendinar WTP',lat:-27.960,lng:153.375,type:'water',cap:'210 ML/day',op:'Seqwater',reach:30000},
-    {name:'Image Flat WTP',lat:-26.590,lng:152.945,type:'water',cap:'130 ML/day',op:'Seqwater',reach:25000},
-    {name:'Beaudesert WTP',lat:-27.985,lng:153.005,type:'water',cap:'12 ML/day',op:'Seqwater',reach:10000},
-    {name:'Lowood WTP',lat:-27.465,lng:152.580,type:'water',cap:'20 ML/day',op:'Seqwater',reach:12000}
+  // ── SERVICE RADAR — HOUSING-BASED COVERAGE RINGS ──
+  // Logic: where houses are = where services are
+  // Inner solid ring = current serviced housing edge (services available here)
+  // Outer dashed ring = 1-3km beyond housing (feasible extension zone)
+  // No fill colors — just line rings so they don't clash with land size tiers
+
+  // Each entry = a housing cluster center with radius matching where development currently reaches
+  // These represent the actual developed/serviced urban edge, NOT infrastructure points
+  var servicedAreas = [
+    // Greater Brisbane suburban reach
+    {name:'Brisbane CBD & Inner',lat:-27.470,lng:153.025,r:12000,ext:3000,note:'Full services — power, water, sewer, NBN, stormwater'},
+    {name:'Brisbane South (Sunnybank–Calamvale)',lat:-27.580,lng:153.060,r:6000,ext:3000,note:'Fully serviced suburban corridor'},
+    {name:'Brisbane West (Indooroopilly–Kenmore)',lat:-27.510,lng:152.940,r:5000,ext:2000,note:'Established services'},
+
+    // Ipswich–Springfield corridor
+    {name:'Ipswich–Springfield',lat:-27.630,lng:152.870,r:8000,ext:3000,note:'Urban Utilities sewer + Energex. Springfield fully serviced, Ripley extending.'},
+    {name:'Ripley Valley (developing)',lat:-27.680,lng:152.760,r:4000,ext:3000,note:'New zone sub 100 MVA. Sewer trunk extending from Bundamba STP. Active subdivision.'},
+
+    // Logan corridor
+    {name:'Logan Central–Marsden–Crestmead',lat:-27.660,lng:153.100,r:6000,ext:3000,note:'Full sewer, power, water. Urban Utilities.'},
+    {name:'Park Ridge–Chambers Flat',lat:-27.720,lng:153.060,r:4000,ext:3000,note:'Services extending south. New subdivisions connecting to sewer trunk.'},
+    {name:'Flagstone–Jimboomba',lat:-27.830,lng:152.960,r:5000,ext:3000,note:'Flagstone PDA — sewer STP planned. Power sub 80 MVA. Services actively extending.'},
+    {name:'Yarrabilba',lat:-27.790,lng:153.110,r:4000,ext:3000,note:'Power sub 80 MVA. Pimpama STP connection. NBN FTTP in estates.'},
+
+    // North corridor (Moreton Bay)
+    {name:'North Lakes–Mango Hill',lat:-27.235,lng:153.010,r:5000,ext:2000,note:'Fully serviced. Unitywater. NBN FTTP.'},
+    {name:'Caboolture–Morayfield',lat:-27.075,lng:152.945,r:5000,ext:3000,note:'Power sub 90 MVA. Sth Caboolture STP. Waraba PDA extensions planned.'},
+    {name:'Narangba–Burpengary',lat:-27.180,lng:152.960,r:4000,ext:2500,note:'Established services. Unitywater sewer trunk.'},
+
+    // Gold Coast north corridor
+    {name:'Coomera–Pimpama–Upper Coomera',lat:-27.860,lng:153.310,r:7000,ext:3000,note:'Coomera sub 120 MVA. Pimpama STP 50 ML/day. Fully serviced growth spine.'},
+    {name:'Ormeau–Jacobs Well',lat:-27.760,lng:153.240,r:4000,ext:3000,note:'Gold Coast Water sewer. Energex. Extending south.'},
+    {name:'Helensvale–Oxenford',lat:-27.915,lng:153.330,r:5000,ext:2000,note:'Full services. Coombabah STP 70 ML/day.'},
+
+    // Sunshine Coast
+    {name:'Caloundra South (Aura)',lat:-26.810,lng:153.030,r:5000,ext:3000,note:'Caloundra sub 80 MVA. Kawana STP. Image Flat WTP. Massive MPC.'},
+    {name:'Maroochydore–Buderim',lat:-26.660,lng:153.070,r:6000,ext:2000,note:'Fully serviced. Unitywater.'},
+    {name:'Beerwah–Landsborough',lat:-26.860,lng:152.960,r:3000,ext:3000,note:'Services extending. Cat 2 growth area. Sewer trunk planned.'},
+
+    // Toowoomba
+    {name:'Toowoomba CBD & suburbs',lat:-27.565,lng:151.960,r:7000,ext:3000,note:'Ergon 80 MVA. Council water/sewer. Fully serviced urban area.'},
+    {name:'Highfields',lat:-27.450,lng:151.950,r:3500,ext:3000,note:'Highfields sub 60 MVA (Ergon). Council sewer/water. NBN FTTP in newer estates.'},
+
+    // Redlands
+    {name:'Thornlands–Victoria Point',lat:-27.565,lng:153.260,r:5000,ext:2000,note:'Thornlands sub 80 MVA. Redland Water full services.'},
+
+    // Regional
+    {name:'Beaudesert',lat:-27.990,lng:153.000,r:2500,ext:3000,note:'Small STP 8 ML/day. WTP 12 ML/day. Services limited — upgrade needed for growth.'},
+    {name:'Fernvale–Lowood',lat:-27.465,lng:152.580,r:2000,ext:3000,note:'Small WTP 20 ML/day. Limited sewer. Power available. Rural fringe.'},
+    {name:'Gatton',lat:-27.560,lng:152.280,r:2500,ext:3000,note:'Council services in town. Sewer/water limited outside urban footprint.'}
   ];
 
-  var serviceReachGroup = L.layerGroup();
+  var serviceRadarGroup = L.layerGroup();
 
-  infraPoints.forEach(function(pt) {
-    var emoji = pt.type === 'power' ? '\u26A1' : pt.type === 'sewer' ? '\u26AB' : '\uD83D\uDCA7';
-    var typeCol = pt.type === 'power' ? '#eab308' : pt.type === 'sewer' ? '#78716c' : '#0ea5e9';
-
-    // Coverage reach ring — graduated opacity
-    // Inner ring (strong coverage — low connection cost)
-    var innerR = Math.min(pt.reach * 0.33, 5000);
-    var inner = L.circle([pt.lat, pt.lng], {
-      radius: innerR, color: '#22c55e', weight: 0, opacity: 0,
-      fillColor: '#22c55e', fillOpacity: 0.12, interactive: false
+  servicedAreas.forEach(function(area) {
+    // Inner ring — solid white line — "services are here"
+    var inner = L.circle([area.lat, area.lng], {
+      radius: area.r,
+      color: 'rgba(255,255,255,0.55)',
+      weight: 1.5,
+      opacity: 1,
+      fillColor: 'transparent',
+      fillOpacity: 0,
+      interactive: false
     });
 
-    // Mid ring (reachable — standard extension)
-    var midR = Math.min(pt.reach * 0.66, 15000);
-    var mid = L.circle([pt.lat, pt.lng], {
-      radius: midR, color: '#f59e0b', weight: 0, opacity: 0,
-      fillColor: '#f59e0b', fillOpacity: 0.06, interactive: false
+    // Outer ring — dashed white line — "1-3km extension zone"
+    var outer = L.circle([area.lat, area.lng], {
+      radius: area.r + area.ext,
+      color: 'rgba(255,255,255,0.30)',
+      weight: 1.5,
+      opacity: 1,
+      fillColor: 'transparent',
+      fillOpacity: 0,
+      dashArray: '6 5',
+      interactive: false
     });
 
-    // Outer ring (max reach — trunk extension needed)
-    var outer = L.circle([pt.lat, pt.lng], {
-      radius: pt.reach, color: typeCol, weight: 1, opacity: 0.25,
-      fillColor: typeCol, fillOpacity: 0.03, interactive: false,
-      dashArray: '4 4'
-    });
-
-    // Center marker with label
-    var marker = L.marker([pt.lat, pt.lng], {
+    // Small label at center
+    var label = L.marker([area.lat, area.lng], {
+      interactive: true,
       icon: L.divIcon({
         className: '',
         html: '<div style="text-align:center;pointer-events:auto;cursor:pointer">' +
-              '<div style="width:22px;height:22px;border-radius:50%;background:rgba(10,13,20,0.9);border:2px solid ' + typeCol + ';display:inline-flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 0 8px ' + typeCol + '44">' + emoji + '</div>' +
+              '<div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.6);text-shadow:0 1px 4px rgba(0,0,0,0.9);white-space:nowrap;letter-spacing:.4px">' + area.name.toUpperCase() + '</div>' +
               '</div>',
-        iconSize: [22, 22], iconAnchor: [11, 11]
+        iconSize: [140, 14], iconAnchor: [70, 7]
       })
     });
 
-    // Popup with details
-    marker.bindPopup(
-      '<div style="min-width:200px;font-family:-apple-system,sans-serif">' +
-      '<div style="font-size:14px;font-weight:800;color:' + typeCol + '">' + pt.name + '</div>' +
-      '<div style="font-size:11px;color:#666;margin-bottom:6px">' + pt.op + '</div>' +
-      '<div style="display:flex;gap:8px;margin-bottom:6px">' +
-        '<div style="background:#f8fafc;padding:5px 8px;border-radius:5px;flex:1"><div style="font-size:8px;color:#888;text-transform:uppercase">Capacity</div><div style="font-size:13px;font-weight:700;color:' + typeCol + '">' + pt.cap + '</div></div>' +
-        '<div style="background:#f8fafc;padding:5px 8px;border-radius:5px;flex:1"><div style="font-size:8px;color:#888;text-transform:uppercase">Reach</div><div style="font-size:13px;font-weight:700;color:' + typeCol + '">' + (pt.reach/1000) + ' km</div></div>' +
+    // Popup on label click
+    var innerKm = (area.r / 1000).toFixed(1);
+    var outerKm = ((area.r + area.ext) / 1000).toFixed(1);
+    label.bindPopup(
+      '<div style="min-width:220px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:14px;font-weight:800;color:#e2e8f0;margin-bottom:4px">' + area.name + '</div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+        '<div style="background:#f0fdf4;padding:5px 8px;border-radius:5px;flex:1"><div style="font-size:8px;color:#888;text-transform:uppercase">Serviced</div><div style="font-size:14px;font-weight:700;color:#22c55e">' + innerKm + ' km</div></div>' +
+        '<div style="background:#fffbeb;padding:5px 8px;border-radius:5px;flex:1"><div style="font-size:8px;color:#888;text-transform:uppercase">Extension</div><div style="font-size:14px;font-weight:700;color:#f59e0b">' + outerKm + ' km</div></div>' +
       '</div>' +
-      '<div style="font-size:10px;color:#555;line-height:1.4">' +
-        '<div style="margin-bottom:3px"><span style="color:#22c55e;font-weight:700">Green zone</span> — ' + Math.round(innerR/1000) + 'km — Low cost connection</div>' +
-        '<div style="margin-bottom:3px"><span style="color:#f59e0b;font-weight:700">Amber zone</span> — ' + Math.round(midR/1000) + 'km — Standard extension</div>' +
-        '<div><span style="color:' + typeCol + ';font-weight:700">Outer ring</span> — ' + Math.round(pt.reach/1000) + 'km — Max trunk reach</div>' +
+      '<div style="font-size:10.5px;color:#555;line-height:1.5">' + area.note + '</div>' +
+      '<div style="font-size:9px;color:#888;margin-top:6px;border-top:1px solid #eee;padding-top:4px">' +
+        '<strong>Solid ring</strong> = services available at boundary<br>' +
+        '<strong>Dashed ring</strong> = 1-3km feasible extension zone' +
       '</div></div>', {maxWidth: 280}
     );
 
-    // Add in order: outer first, then mid, inner, marker on top
-    serviceReachGroup.addLayer(outer);
-    serviceReachGroup.addLayer(mid);
-    serviceReachGroup.addLayer(inner);
-    serviceReachGroup.addLayer(marker);
+    serviceRadarGroup.addLayer(outer);
+    serviceRadarGroup.addLayer(inner);
+    serviceRadarGroup.addLayer(label);
   });
 
   if (!window.serviceRadarLayers) window.serviceRadarLayers = {};
-  window.serviceRadarLayers[mi._leaflet_id] = serviceReachGroup;
-  console.log('Service reach loaded: ' + infraPoints.length + ' infrastructure points with coverage rings');
+  window.serviceRadarLayers[mi._leaflet_id] = serviceRadarGroup;
+  console.log('Service radar loaded: ' + servicedAreas.length + ' serviced area rings');
 
   // ── TARGET CORRIDOR OVERLAYS ──
   // Scored acquisition zones with strategy labels — toggle via layer panel
