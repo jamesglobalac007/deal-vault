@@ -3637,19 +3637,16 @@ function fetchSizeParcels(minSqm) {
     return;
   }
 
-  var env = {
-    xmin: bounds.getWest(), ymin: bounds.getSouth(),
-    xmax: bounds.getEast(), ymax: bounds.getNorth(),
-    spatialReference: {wkid: 4326}
-  };
+  var envStr = bounds.getWest() + ',' + bounds.getSouth() + ',' + bounds.getEast() + ',' + bounds.getNorth();
 
   var cadastralUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/4/query';
   var qp = new URLSearchParams({
-    geometry: JSON.stringify(env),
+    geometry: envStr,
     geometryType: 'esriGeometryEnvelope',
+    inSR: '4326',
     spatialRel: 'esriSpatialRelIntersects',
     where: 'lot_area >= ' + minSqm,
-    outFields: 'lot_area,lotplan,lot_plan,lot,plan,shire_name',
+    outFields: 'lot_area,lotplan,shire_name,locality',
     returnGeometry: 'true',
     resultRecordCount: '500',
     outSR: '4326',
