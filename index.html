@@ -664,12 +664,12 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
         <label class="lp-item" data-layer="serviceRadar">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#ffffff"></div><div class="lp-label">Service Radar<span class="lp-desc">Where services reach from existing housing</span></div>
+          <div class="lp-dot" style="background:#ff47a3"></div><div class="lp-label">Service Radar<span class="lp-desc">Where services reach from existing housing</span></div>
         </label>
         <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
           <div style="display:flex;gap:10px;margin-bottom:2px">
-            <span><span style="display:inline-block;width:14px;height:0;border-top:2px solid rgba(255,255,255,0.6);vertical-align:middle;margin-right:3px"></span> Services here</span>
-            <span><span style="display:inline-block;width:14px;height:0;border-top:2px dashed rgba(255,255,255,0.35);vertical-align:middle;margin-right:3px"></span> 1-3km extension</span>
+            <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px solid #ff47a3;vertical-align:middle;margin-right:3px"></span> Services here</span>
+            <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px dashed #ff47a3;vertical-align:middle;margin-right:3px;opacity:0.5"></span> 1-3km extension</span>
           </div>
           Land inside the solid ring = services available. Dashed ring = feasible extension.
         </div>
@@ -2787,23 +2787,23 @@ function addGrowthIntelligence(mi) {
   var serviceRadarGroup = L.layerGroup();
 
   servicedAreas.forEach(function(area) {
-    // Inner ring — solid white line — "services are here"
+    // Inner ring — solid hot pink line — "services are here"
     var inner = L.circle([area.lat, area.lng], {
       radius: area.r,
-      color: 'rgba(255,255,255,0.55)',
-      weight: 1.5,
-      opacity: 1,
+      color: '#ff47a3',
+      weight: 2,
+      opacity: 0.75,
       fillColor: 'transparent',
       fillOpacity: 0,
       interactive: false
     });
 
-    // Outer ring — dashed white line — "1-3km extension zone"
+    // Outer ring — dashed hot pink line — "1-3km extension zone"
     var outer = L.circle([area.lat, area.lng], {
       radius: area.r + area.ext,
-      color: 'rgba(255,255,255,0.30)',
+      color: '#ff47a3',
       weight: 1.5,
-      opacity: 1,
+      opacity: 0.4,
       fillColor: 'transparent',
       fillOpacity: 0,
       dashArray: '6 5',
@@ -2816,7 +2816,7 @@ function addGrowthIntelligence(mi) {
       icon: L.divIcon({
         className: '',
         html: '<div style="text-align:center;pointer-events:auto;cursor:pointer">' +
-              '<div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.6);text-shadow:0 1px 4px rgba(0,0,0,0.9);white-space:nowrap;letter-spacing:.4px">' + area.name.toUpperCase() + '</div>' +
+              '<div style="font-size:8px;font-weight:700;color:#ff47a3;text-shadow:0 1px 4px rgba(0,0,0,0.9);white-space:nowrap;letter-spacing:.4px">' + area.name.toUpperCase() + '</div>' +
               '</div>',
         iconSize: [140, 14], iconAnchor: [70, 7]
       })
