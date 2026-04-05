@@ -592,7 +592,12 @@ tr:hover td{background:rgba(255,255,255,.015)}
           </div>
           <div id="sizeFilterStatus" style="font-size:9px;margin-top:4px;min-height:12px"></div>
         </div>
-        <div class="lp-group" style="color:#a78bfa">Planning</div>
+        <!-- ═══ PLANNING (collapsible) ═══ -->
+        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('planning')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#a78bfa">
+          <span>Planning</span>
+          <span class="lp-section-chev" id="planningChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
+        </div>
+        <div id="planningSection" style="display:none">
         <label class="lp-item" data-layer="zoning">
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('zoning',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#a78bfa"></div><div class="lp-label">Zoning (Planning Scheme)<span class="lp-desc">Council zone colours — LDR, MDR, EC etc</span></div>
@@ -997,6 +1002,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div style="margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.08);font-size:8px;color:#64748b">
             Zone codes from each council's current planning scheme. Precincts noted where applicable.
           </div>
+        </div>
         </div>
         <!-- Flood Mapping moved into Hazards collapsible section -->
         <!-- ═══ HAZARDS (collapsible) ═══ -->
