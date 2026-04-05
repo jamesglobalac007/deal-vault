@@ -593,6 +593,84 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#8b5cf6"></div><div class="lp-label">Land Use (Current Use)<span class="lp-desc">Planning zones overlay</span></div>
         </label>
+        <div class="lp-group flood-expand-header" onclick="toggleZoneRef()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#a78bfa">
+          <span>Zone Reference Guide</span>
+          <span id="zoneRefChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
+        </div>
+        <div id="zoneRefDropdown" style="display:none;padding:4px 10px 10px;font-size:9px;color:#94a3b8;line-height:1.6">
+          <!-- RESIDENTIAL -->
+          <div style="margin-bottom:6px">
+            <div style="font-weight:800;color:#00d4aa;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127968; RESIDENTIAL</div>
+            <div style="padding-left:8px">
+              <div><span style="color:#00d4aa;font-weight:700">Low Density Residential</span> — Detached houses, typically 600m²+ lots</div>
+              <div><span style="color:#00d4aa;font-weight:700">Low-Medium Density Residential</span> — Townhouses, duplexes, small lots (300-600m²)</div>
+              <div><span style="color:#00d4aa;font-weight:700">Medium Density Residential</span> — Units, apartments up to 4-5 storeys</div>
+              <div><span style="color:#00d4aa;font-weight:700">High Density Residential</span> — Apartments 6+ storeys</div>
+              <div><span style="color:#00d4aa;font-weight:700">Character Residential</span> — Pre-1947 housing character areas</div>
+              <div><span style="color:#00d4aa;font-weight:700">Emerging Community</span> — Future urban land, broad-hectare subdivision</div>
+              <div><span style="color:#00d4aa;font-weight:700">Next Generation Neighbourhood</span> — Master-planned new communities</div>
+              <div><span style="color:#00d4aa;font-weight:700">Township</span> — Small rural towns, mixed residential/commercial</div>
+            </div>
+          </div>
+          <!-- RURAL / RURAL RESIDENTIAL -->
+          <div style="margin-bottom:6px">
+            <div style="font-weight:800;color:#f59e0b;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127795; RURAL / RURAL RESIDENTIAL</div>
+            <div style="padding-left:8px">
+              <div><span style="color:#f59e0b;font-weight:700">Rural</span> — Broadacre farming, grazing, cropping (40ha+ typical)</div>
+              <div><span style="color:#f59e0b;font-weight:700">Rural Residential</span> — Acreage lifestyle lots (2,000m²-2ha)</div>
+              <div><span style="color:#f59e0b;font-weight:700">Park Residential</span> — Large rural-style lots near urban areas</div>
+              <div><span style="color:#f59e0b;font-weight:700">Emerging Community</span> — Designated for future urban conversion</div>
+            </div>
+          </div>
+          <!-- CENTRE / COMMERCIAL -->
+          <div style="margin-bottom:6px">
+            <div style="font-weight:800;color:#3b82f6;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#128722; CENTRE / COMMERCIAL</div>
+            <div style="padding-left:8px">
+              <div><span style="color:#3b82f6;font-weight:700">Principal Centre</span> — Major CBD (Brisbane, Gold Coast, Sunshine Coast)</div>
+              <div><span style="color:#3b82f6;font-weight:700">Major Centre</span> — Regional shopping/business hubs</div>
+              <div><span style="color:#3b82f6;font-weight:700">District Centre</span> — Large suburban centres (e.g. North Lakes)</div>
+              <div><span style="color:#3b82f6;font-weight:700">Local Centre</span> — Neighbourhood shops, small retail clusters</div>
+              <div><span style="color:#3b82f6;font-weight:700">Neighbourhood Centre</span> — Corner shop, convenience retail</div>
+              <div><span style="color:#3b82f6;font-weight:700">Specialised Centre</span> — Hospitals, universities, airports</div>
+              <div><span style="color:#3b82f6;font-weight:700">Mixed Use</span> — Combined residential/commercial/retail</div>
+            </div>
+          </div>
+          <!-- INDUSTRIAL -->
+          <div style="margin-bottom:6px">
+            <div style="font-weight:800;color:#8b5cf6;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127981; INDUSTRIAL</div>
+            <div style="padding-left:8px">
+              <div><span style="color:#8b5cf6;font-weight:700">Low Impact Industry</span> — Light manufacturing, warehousing, trade services</div>
+              <div><span style="color:#8b5cf6;font-weight:700">Medium Impact Industry</span> — Processing, heavy trade, transport depots</div>
+              <div><span style="color:#8b5cf6;font-weight:700">High Impact Industry</span> — Heavy manufacturing, hazardous storage</div>
+              <div><span style="color:#8b5cf6;font-weight:700">Special Industry</span> — Noxious/offensive industries, extractive</div>
+              <div><span style="color:#8b5cf6;font-weight:700">Industry Investigation</span> — Reserved for future industrial use</div>
+            </div>
+          </div>
+          <!-- RECREATION / OPEN SPACE -->
+          <div style="margin-bottom:6px">
+            <div style="font-weight:800;color:#22c55e;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127793; RECREATION / OPEN SPACE</div>
+            <div style="padding-left:8px">
+              <div><span style="color:#22c55e;font-weight:700">Recreation &amp; Open Space</span> — Parks, sports fields, playgrounds</div>
+              <div><span style="color:#22c55e;font-weight:700">Sport &amp; Recreation</span> — Active sport, showgrounds, racecourses</div>
+              <div><span style="color:#22c55e;font-weight:700">Open Space</span> — Passive recreation, conservation buffers</div>
+              <div><span style="color:#22c55e;font-weight:700">Environmental Management</span> — Koala habitat, wetlands, riparian corridors</div>
+              <div><span style="color:#22c55e;font-weight:700">Conservation</span> — Protected ecological areas, national parks buffer</div>
+            </div>
+          </div>
+          <!-- COMMUNITY / SPECIAL PURPOSE -->
+          <div style="margin-bottom:6px">
+            <div style="font-weight:800;color:#ec4899;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127963; COMMUNITY / SPECIAL PURPOSE</div>
+            <div style="padding-left:8px">
+              <div><span style="color:#ec4899;font-weight:700">Community Facilities</span> — Schools, churches, community halls, childcare</div>
+              <div><span style="color:#ec4899;font-weight:700">Special Purpose</span> — Cemeteries, utilities, rail corridors, correctional</div>
+              <div><span style="color:#ec4899;font-weight:700">Limited Development</span> — Constrained land (steep terrain, flooding)</div>
+              <div><span style="color:#ec4899;font-weight:700">Extractive Industry</span> — Quarries, sand/gravel extraction</div>
+            </div>
+          </div>
+          <div style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.08);font-size:8.5px;color:#64748b">
+            Zone names vary by council. This covers standard QLD Planning Regulation zones used across SEQ councils.
+          </div>
+        </div>
         <div class="lp-group flood-expand-header" onclick="toggleFloodDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#60a5fa">
           <span>Flood Mapping</span>
           <span id="floodChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
@@ -3313,6 +3391,18 @@ function refreshCadastralStyle() {
     }]);
   }
   activeLayers.cadastral = L.esri.dynamicMapLayer(opts).addTo(mapFull);
+}
+
+function toggleZoneRef() {
+  var dd = document.getElementById('zoneRefDropdown');
+  var chev = document.getElementById('zoneRefChevron');
+  if (dd.style.display === 'none') {
+    dd.style.display = 'block';
+    chev.style.transform = 'rotate(180deg)';
+  } else {
+    dd.style.display = 'none';
+    chev.style.transform = 'rotate(0deg)';
+  }
 }
 
 function toggleFloodDropdown() {
