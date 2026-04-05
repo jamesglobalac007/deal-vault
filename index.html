@@ -2431,6 +2431,8 @@ function addMapStyleToggle(mi, streetL, satL) {
       container.querySelectorAll('.map-style-btn').forEach(function(b){b.classList.remove('active');});
       btn.classList.add('active');
       removeAllBase();
+      var prevStyle = currentMapStyle;
+      currentMapStyle = btn.dataset.style;
       if(btn.dataset.style==='satellite'){
         satL.addTo(mi); satL.bringToBack();
       } else if(btn.dataset.style==='hybrid'){
@@ -2439,6 +2441,10 @@ function addMapStyleToggle(mi, streetL, satL) {
       } else {
         streetL.addTo(mi); streetL.bringToBack();
       }
+      // Refresh cadastral borders: white for satellite/hybrid, default for street
+      var wasDark = (prevStyle === 'satellite' || prevStyle === 'hybrid');
+      var isDark = (currentMapStyle === 'satellite' || currentMapStyle === 'hybrid');
+      if (wasDark !== isDark) refreshCadastralStyle();
     });
   });
 }
@@ -3251,6 +3257,42 @@ const qldServices = {
 
 // Active layer references for the full map
 const activeLayers = {};
+var currentMapStyle = 'street'; // track basemap mode for dynamic styling
+
+// Refresh cadastral layer — white borders for satellite/hybrid, default for street
+function refreshCadastralStyle() {
+  if (!mapFull || !activeLayers.cadastral) return;
+  mapFull.removeLayer(activeLayers.cadastral);
+  var svc = qldServices.cadastral;
+  var opts = {
+    url: svc.url, layers: svc.layers, opacity: svc.opacity,
+    minZoom: svc.minZoom, maxZoom: svc.maxZoom,
+    attribution: '\u00A9 QLD Govt DCDB'
+  };
+  // Override rendering to white outlines for satellite/hybrid
+  if (currentMapStyle === 'satellite' || currentMapStyle === 'hybrid') {
+    opts.dynamicLayers = JSON.stringify([{
+      id: 4,
+      source: {type: 'mapLayer', mapLayerId: 4},
+      drawingInfo: {
+        renderer: {
+          type: 'simple',
+          symbol: {
+            type: 'esriSFS',
+            style: 'esriSFSNull',
+            outline: {
+              type: 'esriSLS',
+              style: 'esriSLSSolid',
+              color: [255, 255, 255, 180],
+              width: 1.5
+            }
+          }
+        }
+      }
+    }]);
+  }
+  activeLayers.cadastral = L.esri.dynamicMapLayer(opts).addTo(mapFull);
+}
 
 function toggleFloodDropdown() {
   var dd = document.getElementById('floodDropdown');
