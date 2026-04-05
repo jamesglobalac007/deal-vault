@@ -3567,10 +3567,7 @@ const qldServices = {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandUse/MapServer',
     layers: [0], opacity: 0.45, minZoom: 10, maxZoom: 19
   },
-  zoning: {
-    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer',
-    layers: [73], opacity: 0.5, minZoom: 8, maxZoom: 22
-  },
+  // zoning: loaded per-council from councilZoneServices as vector FeatureLayers (no state-wide service exists)
   pda: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PriorityDevelopmentAreas/MapServer',
     layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
@@ -3842,11 +3839,7 @@ function toggleLayer(layerKey, on) {
       mapFull.removeLayer(activeLayers[layerKey]);
       delete activeLayers[layerKey];
     }
-    // Also remove vector zone fallback layer if zoning toggled off
-    if (layerKey === 'zoning' && window._zoningFeatureLayer) {
-      mapFull.removeLayer(window._zoningFeatureLayer);
-      window._zoningFeatureLayer = null;
-    }
+    // Zoning is a layerGroup — removal is handled above by removeLayer on the group
   }
 }
 
@@ -3883,55 +3876,75 @@ function initFullMapLayers() {
     attribution: '© QLD Govt DCDB'
   }).addTo(mapFull);
 
-  // Zoning layer on by default — QPP state-wide planning zones (coloured)
-  // Use dynamicMapLayer for overview AND listen for zoom to handle high-zoom fallback
-  var zoneSvc = qldServices.zoning;
-  activeLayers.zoning = L.esri.dynamicMapLayer({
-    url: zoneSvc.url, layers: zoneSvc.layers, opacity: zoneSvc.opacity,
-    minZoom: zoneSvc.minZoom,
-    // No maxZoom cap — let the server decide. If it stops rendering, the feature fallback kicks in.
-    attribution: '© QLD Govt QPP'
-  }).addTo(mapFull);
-  // Put zoning behind cadastral so parcel borders show on top
-  if (activeLayers.zoning.bringToBack) activeLayers.zoning.bringToBack();
-
-  // High-zoom vector fallback: when zoomed in past level 16, load council zone features
-  // as vectors so colours never disappear (server-side tiles have scale limits)
-  window._zoningFeatureLayer = null;
-  mapFull.on('zoomend', function() {
-    var z = mapFull.getZoom();
-    if (z >= 16 && activeLayers.zoning && !_zoningFeatureLayer) {
-      // Try to load zone polygons as vectors from the state MapServer
-      _zoningFeatureLayer = L.esri.featureLayer({
-        url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/73',
-        minZoom: 16,
-        style: function(feature) {
-          var zone = (feature.properties.ZONE_DESCR || feature.properties.ZONE_NAME || feature.properties.NAME || '').toLowerCase();
-          var fill = '#7a8194'; // default grey
-          if (/residential|dwelling|housing|emerging|character|next gen/.test(zone)) fill = '#00d4aa';
-          else if (/rural/.test(zone)) fill = '#f59e0b';
-          else if (/industr|manufacturing|enterprise/.test(zone)) fill = '#8b5cf6';
-          else if (/centre|commercial|mixed use|retail/.test(zone)) fill = '#3b82f6';
-          else if (/recreation|open space|sport/.test(zone)) fill = '#22c55e';
-          else if (/environmental|conservation/.test(zone)) fill = '#10b981';
-          else if (/community/.test(zone)) fill = '#6366f1';
-          return { fillColor: fill, fillOpacity: 0.35, color: fill, weight: 0.8, opacity: 0.6 };
-        },
-        onEachFeature: function(feature, layer) {
-          var p = feature.properties;
-          var name = p.ZONE_DESCR || p.ZONE_NAME || p.NAME || 'Unknown zone';
-          layer.bindTooltip(name, {sticky: true, className: 'zone-tooltip', opacity: 0.9});
-        }
-      }).addTo(mapFull);
-      if (_zoningFeatureLayer.bringToBack) _zoningFeatureLayer.bringToBack();
-      console.log('Loaded vector zone features for high zoom');
+  // ══════════════════════════════════════════════════════════════════
+  // ZONING LAYER — PER-COUNCIL VECTOR FeatureLayers
+  // There is NO state-wide zoning tile service from QLD Government.
+  // Zone colours come from each council's own FeatureServer endpoint.
+  // These render client-side as vectors at ALL zoom levels — colours never disappear.
+  // ══════════════════════════════════════════════════════════════════
+  window._zoningFeatureLayer = null; // keep reference for toggle cleanup
+  function zoneColourStyle(feature) {
+    var allFields = feature.properties || {};
+    var zone = (allFields.ZONE_DESCR || allFields.ZONE_NAME || allFields.LVL2_ZONE || allFields.LVL1_ZONE ||
+                allFields.Zone || allFields.NAME || allFields.DESCRIPT || allFields.HEADING ||
+                allFields.New_Noosa_Plan_Zones || allFields.ZONE_CODE || allFields.CODE || '').toLowerCase();
+    var fill = '#7a8194'; // default grey
+    if (/low density res|ldr/i.test(zone)) fill = '#66d9a0';
+    else if (/low.?medium|lmr/i.test(zone)) fill = '#00d4aa';
+    else if (/medium density|mdr/i.test(zone)) fill = '#00b894';
+    else if (/high density|hdr/i.test(zone)) fill = '#009688';
+    else if (/residential|dwelling|housing|emerging|character|next gen|limited dev/i.test(zone)) fill = '#00d4aa';
+    else if (/rural res/i.test(zone)) fill = '#c8e6c9';
+    else if (/rural/i.test(zone)) fill = '#f59e0b';
+    else if (/industr|manufacturing|enterprise|lii|hii|mii/i.test(zone)) fill = '#8b5cf6';
+    else if (/principal centre|major centre|pcc|mac/i.test(zone)) fill = '#1e40af';
+    else if (/district centre|dc /i.test(zone)) fill = '#2563eb';
+    else if (/local centre|neighbourhood|lc |nc /i.test(zone)) fill = '#60a5fa';
+    else if (/centre|commercial|mixed use|retail|specialised|township/i.test(zone)) fill = '#3b82f6';
+    else if (/recreation|open space|sport/i.test(zone)) fill = '#22c55e';
+    else if (/environmental|conservation|ec /i.test(zone)) fill = '#10b981';
+    else if (/community/i.test(zone)) fill = '#6366f1';
+    else if (/special purpose|sp /i.test(zone)) fill = '#f472b6';
+    return { fillColor: fill, fillOpacity: 0.35, color: fill, weight: 0.8, opacity: 0.6 };
+  }
+  function zoneTooltipBind(feature, layer) {
+    var p = feature.properties;
+    var name = p.ZONE_DESCR || p.ZONE_NAME || p.LVL2_ZONE || p.LVL1_ZONE ||
+               p.Zone || p.NAME || p.DESCRIPT || p.New_Noosa_Plan_Zones || 'Unknown zone';
+    var code = p.ZONE_CODE || p.CODE || p.LVL1_ZONE || p.HEADING || '';
+    var tip = code ? (code + ' — ' + name) : name;
+    layer.bindTooltip(tip, {sticky: true, className: 'zone-tooltip', opacity: 0.9});
+  }
+  (function loadCouncilZoneLayers() {
+    var zoningGroup = L.layerGroup();
+    for (var key in councilZoneServices) {
+      var svc = councilZoneServices[key];
+      if (svc.isMapServer) {
+        // MapServer layers need dynamicMapLayer (e.g. Logan)
+        var ml = L.esri.dynamicMapLayer({
+          url: svc.url.replace(/\/\d+$/, ''), // strip layer number for dynamicMapLayer
+          layers: [parseInt(svc.url.split('/').pop())],
+          opacity: 0.35, minZoom: 10,
+          attribution: '© ' + key
+        });
+        zoningGroup.addLayer(ml);
+      } else {
+        // FeatureServer layers — render as vectors at all zoom levels
+        var fl = L.esri.featureLayer({
+          url: svc.url,
+          minZoom: 10,
+          style: zoneColourStyle,
+          onEachFeature: zoneTooltipBind
+        });
+        zoningGroup.addLayer(fl);
+      }
     }
-    // Remove vector layer when zoomed out (dynamicMapLayer handles overview)
-    if (z < 15 && _zoningFeatureLayer) {
-      mapFull.removeLayer(_zoningFeatureLayer);
-      _zoningFeatureLayer = null;
-    }
-  });
+    zoningGroup.addTo(mapFull);
+    activeLayers.zoning = zoningGroup;
+    // Put zoning behind cadastral so parcel borders show on top
+    zoningGroup.eachLayer(function(l) { if (l.bringToBack) l.bringToBack(); });
+    console.log('Loaded ' + Object.keys(councilZoneServices).length + ' council zone layers as vectors');
+  })();
 
   // Listen for popup opens — means a marker was clicked, not empty space
   mapFull.on('popupopen', function() { _markerClicked = true; });
@@ -4743,8 +4756,11 @@ function findCouncilZoneService(lgaName) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// STATE ZONE QUERY — ROBUST — tries identify + multiple layers + all councils
-// This is the GUARANTEED zone source. DO NOT simplify or remove.
+// STATE ZONE QUERY — BRUTE-FORCE ALL COUNCIL FeatureServers
+// QLD does NOT have a single state-wide zoning service.
+// Each council publishes zone data via their own FeatureServer.
+// This function queries ALL council endpoints in parallel.
+// First one to return zone data wins. DO NOT simplify or remove.
 // ══════════════════════════════════════════════════════════════════
 function queryStateZone(latlng, callback) {
   var resolved = false;
@@ -4754,89 +4770,25 @@ function queryStateZone(latlng, callback) {
     callback(result);
   }
 
-  // Safety timeout — if nothing returns in 8 seconds, give up
-  setTimeout(function(){ finish(null); }, 8000);
+  // Safety timeout — if nothing returns in 10 seconds, give up
+  setTimeout(function(){ finish(null); }, 10000);
 
   var geom = JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}});
 
-  // Strategy 1: identify endpoint — searches ALL layers in the MapServer
-  var identifyUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/identify';
-  var identifyParams = new URLSearchParams({
-    geometry: geom,
-    geometryType: 'esriGeometryPoint',
-    tolerance: '2',
-    mapExtent: (latlng.lng - 0.01) + ',' + (latlng.lat - 0.01) + ',' + (latlng.lng + 0.01) + ',' + (latlng.lat + 0.01),
-    imageDisplay: '400,400,96',
-    layers: 'all',
-    returnGeometry: 'false',
-    f: 'json'
-  });
-  fetch(identifyUrl + '?' + identifyParams.toString())
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (resolved) return;
-      if (data.results && data.results.length > 0) {
-        // Search all returned layers for zone data
-        for (var i = 0; i < data.results.length; i++) {
-          var attrs = data.results[i].attributes || {};
-          var layerName = (data.results[i].layerName || '').toLowerCase();
-          // Look for zone layers (skip non-zone layers like address, cadastral etc)
-          if (layerName.indexOf('zone') !== -1 || layerName.indexOf('planning') !== -1 || layerName.indexOf('scheme') !== -1) {
-            var zone = attrs.ZONE_DESCR || attrs.ZONE_NAME || attrs.Zone || attrs.zone || attrs.ZONE || attrs.LVL2_ZONE || attrs.NAME || attrs.DESCRIPT || attrs.HEADING || null;
-            if (zone) {
-              console.log('Zone from identify (layer: ' + data.results[i].layerName + '):', zone);
-              finish({zone: zone, precinct: attrs.PRECINCT || attrs.ZONE_PREC || null, council: 'QLD State', raw: attrs});
-              return;
-            }
-          }
-        }
-        // Didn't find a zone layer specifically — try ALL results
-        for (var j = 0; j < data.results.length; j++) {
-          var a2 = data.results[j].attributes || {};
-          var z2 = a2.ZONE_DESCR || a2.ZONE_NAME || a2.Zone || a2.zone || a2.ZONE || a2.LVL2_ZONE || null;
-          if (z2) {
-            console.log('Zone from identify (any layer: ' + data.results[j].layerName + '):', z2);
-            finish({zone: z2, precinct: a2.PRECINCT || null, council: 'QLD State', raw: a2});
-            return;
-          }
-        }
-      }
-      console.log('Identify returned no zone data, trying query fallback...');
-    })
-    .catch(function(err){ console.log('Identify error:', err); });
-
-  // Strategy 2: direct query on layer 73 (original approach)
-  var qp73 = new URLSearchParams({
-    geometry: geom, geometryType: 'esriGeometryPoint',
-    spatialRel: 'esriSpatialRelIntersects', outFields: '*',
-    returnGeometry: 'false', resultRecordCount: '1', f: 'json'
-  });
-  fetch('https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/73/query?' + qp73.toString())
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (resolved) return;
-      if (data.features && data.features.length > 0) {
-        var attrs = data.features[0].attributes;
-        console.log('Layer 73 attrs:', JSON.stringify(attrs));
-        var zone = attrs.ZONE_DESCR || attrs.ZONE_NAME || attrs.LVL2_ZONE || attrs.NAME || attrs.ZONE || null;
-        if (zone) { finish({zone: zone, precinct: attrs.PRECINCT || attrs.ZONE_PREC || null, council: 'QLD State', raw: attrs}); return; }
-      }
-    })
-    .catch(function(err){ console.log('Layer 73 error:', err); });
-
-  // Strategy 3: try ALL council FeatureServer endpoints in parallel (brute force — one will match)
-  var councilEndpoints = [
-    {url:'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/72/query', fields:['ZONE_DESCR','ZONE_NAME','LVL2_ZONE','NAME']},
-    {url:'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/74/query', fields:['ZONE_DESCR','ZONE_NAME','LVL2_ZONE','NAME']},
-    {url:'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/75/query', fields:['ZONE_DESCR','ZONE_NAME','LVL2_ZONE','NAME']}
-  ];
-  // Also try each council zone service directly
+  // Build list of ALL council endpoints to query in parallel
+  var endpoints = [];
   for (var key in councilZoneServices) {
     var svc = councilZoneServices[key];
-    var queryUrl = svc.isMapServer ? svc.url + '/query' : svc.url + '/query';
-    councilEndpoints.push({url: queryUrl, fields: [svc.zoneField, svc.codeField, 'ZONE_NAME', 'ZONE_DESCR', 'Zone', 'NAME', 'DESCRIPT']});
+    endpoints.push({
+      council: key,
+      url: svc.url + '/query',
+      fields: [svc.zoneField, svc.codeField, 'ZONE_NAME', 'ZONE_DESCR', 'Zone', 'NAME', 'DESCRIPT', 'LVL2_ZONE', 'LVL1_ZONE', 'HEADING', 'New_Noosa_Plan_Zones']
+    });
   }
-  councilEndpoints.forEach(function(ep) {
+
+  console.log('queryStateZone: firing ' + endpoints.length + ' council queries in parallel');
+
+  endpoints.forEach(function(ep) {
     var qp = new URLSearchParams({
       geometry: geom, geometryType: 'esriGeometryPoint',
       spatialRel: 'esriSpatialRelIntersects', outFields: '*',
@@ -4848,17 +4800,29 @@ function queryStateZone(latlng, callback) {
         if (resolved) return;
         if (data.features && data.features.length > 0) {
           var attrs = data.features[0].attributes;
+          // Search all known field names for zone data
           for (var fi = 0; fi < ep.fields.length; fi++) {
             var val = attrs[ep.fields[fi]];
-            if (val) {
-              console.log('Zone from council brute-force (' + ep.url.split('/').slice(-3).join('/') + '):', val);
-              finish({zone: val, precinct: attrs.PRECINCT || attrs.ZONE_PREC || null, council: 'Council', raw: attrs});
+            if (val && typeof val === 'string' && val.trim().length > 0) {
+              console.log('Zone from ' + ep.council + ' (' + ep.fields[fi] + '):', val);
+              // Also try to find the zone code separately
+              var code = attrs.ZONE_CODE || attrs.CODE || attrs.LVL1_ZONE || attrs.HEADING || attrs.LP_PREC || null;
+              finish({zone: val, code: code, precinct: attrs.PRECINCT || attrs.ZONE_PREC || attrs.ZONE_PREC_DESC || attrs.ZONE_PRECINCT || null, council: ep.council, raw: attrs});
+              return;
+            }
+          }
+          // If no string field found, try any non-null non-OBJECTID field
+          for (var ak in attrs) {
+            if (ak === 'OBJECTID' || ak === 'FID' || ak === 'Shape__Area' || ak === 'Shape__Length' || ak === 'GlobalID') continue;
+            if (attrs[ak] && typeof attrs[ak] === 'string' && attrs[ak].trim().length > 1) {
+              console.log('Zone from ' + ep.council + ' (fallback field ' + ak + '):', attrs[ak]);
+              finish({zone: attrs[ak], code: null, precinct: null, council: ep.council, raw: attrs});
               return;
             }
           }
         }
       })
-      .catch(function(){}); // silent fail — other strategies may succeed
+      .catch(function(err){ console.log('Zone query error for ' + ep.council + ':', err.message || err); });
   });
 }
 // ══════════════════════════════════════════════════════════════════
@@ -5308,24 +5272,32 @@ function renderPropPanel(latlng, r) {
   // ZONE RESOLUTION — BULLETPROOF — DO NOT REMOVE OR REFACTOR
   // This block determines the planning zone for the clicked property.
   // It uses ONLY planning zone data (NOT land use / ALUMC).
-  // Fallback: council zone → state QPP zone → SEQ regional zone
+  // Fallback: council zone → state zone (brute-force all councils) → SEQ regional zone
   // NEVER falls back to landUseClass (that's ALUMC, not zoning).
   // ══════════════════════════════════════════════════════════════════
   const cz = r.councilZone || {};
   let _czZone = cz.zone || null;
+  let _czCode = cz.code || null; // zone code e.g. LDR, MDR, EC
 
   // If council zone query returned data but main .zone field empty, search raw attrs
   if (!_czZone && cz.raw) {
     _czZone = findField(cz.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','LVL1_ZONE','NAME','DESCRIPT','HEADING','LABEL','New_Noosa_Plan_Zones','CODE','ZONE_CODE','description','name','category']) || null;
     if (_czZone) console.log('Zone recovered from council raw attrs:', _czZone);
   }
+  if (!_czCode && cz.raw) {
+    _czCode = findField(cz.raw, ['ZONE_CODE','CODE','LVL1_ZONE','HEADING','LP_PREC']) || null;
+  }
 
-  // State QPP zone fallback (covers all of QLD — Layer 73)
+  // State zone fallback (brute-force all council endpoints)
   if (!_czZone && r.stateZone) {
     _czZone = r.stateZone.zone || null;
+    _czCode = _czCode || r.stateZone.code || null;
     if (!_czZone && r.stateZone.raw) {
-      _czZone = findField(r.stateZone.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','NAME','DESCRIPT','description','name','category']) || null;
+      _czZone = findField(r.stateZone.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','LVL1_ZONE','NAME','DESCRIPT','description','name','category']) || null;
       if (_czZone) console.log('Zone recovered from state raw attrs:', _czZone);
+    }
+    if (!_czCode && r.stateZone.raw) {
+      _czCode = findField(r.stateZone.raw, ['ZONE_CODE','CODE','LVL1_ZONE','HEADING','LP_PREC']) || null;
     }
   }
 
@@ -5336,9 +5308,20 @@ function renderPropPanel(latlng, r) {
   // landUseClass is ALUMC (e.g. "Residential and farm infrastructure")
   // which is NOT a planning zone code. Zone must come from planning data only.
 
-  const councilZoneName = _czZone || null;
+  // Build display name: "LDR — Low density residential" or just the zone name
+  let councilZoneName = null;
+  if (_czZone) {
+    // If we have both a short code and a longer description, combine them
+    if (_czCode && _czCode !== _czZone && _czZone.length > _czCode.length) {
+      councilZoneName = _czCode + ' \u2014 ' + _czZone;
+    } else if (_czCode && _czCode === _czZone) {
+      councilZoneName = _czZone; // code IS the zone (e.g. Logan)
+    } else {
+      councilZoneName = _czZone;
+    }
+  }
   const councilZonePrecinct = cz.precinct || null;
-  const councilZoneSource = cz.zone ? 'Council' : (r.stateZone && _czZone ? 'State QPP' : (seqZoneName && _czZone === seqZoneName ? 'SEQ Regional' : ''));
+  const councilZoneSource = cz.zone ? ('Council: ' + (cz.council || '')) : (r.stateZone && _czZone ? ('Council: ' + (r.stateZone.council || '')) : (seqZoneName && _czZone === seqZoneName ? 'SEQ Regional' : ''));
   console.log('ZONE RESULT:', councilZoneName, '| Source:', councilZoneSource);
   console.log('  councilZone:', JSON.stringify(cz));
   console.log('  stateZone:', JSON.stringify(r.stateZone || {}));
