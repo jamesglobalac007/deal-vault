@@ -594,81 +594,400 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-dot" style="background:#8b5cf6"></div><div class="lp-label">Land Use (Current Use)<span class="lp-desc">Planning zones overlay</span></div>
         </label>
         <div class="lp-group flood-expand-header" onclick="toggleZoneRef()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#a78bfa">
-          <span>Zone Reference Guide</span>
+          <span>Zone Codes by Council</span>
           <span id="zoneRefChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
         </div>
-        <div id="zoneRefDropdown" style="display:none;padding:4px 10px 10px;font-size:9px;color:#94a3b8;line-height:1.6">
-          <!-- RESIDENTIAL -->
-          <div style="margin-bottom:6px">
-            <div style="font-weight:800;color:#00d4aa;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127968; RESIDENTIAL</div>
-            <div style="padding-left:8px">
-              <div><span style="color:#00d4aa;font-weight:700">Low Density Residential</span> — Detached houses, typically 600m²+ lots</div>
-              <div><span style="color:#00d4aa;font-weight:700">Low-Medium Density Residential</span> — Townhouses, duplexes, small lots (300-600m²)</div>
-              <div><span style="color:#00d4aa;font-weight:700">Medium Density Residential</span> — Units, apartments up to 4-5 storeys</div>
-              <div><span style="color:#00d4aa;font-weight:700">High Density Residential</span> — Apartments 6+ storeys</div>
-              <div><span style="color:#00d4aa;font-weight:700">Character Residential</span> — Pre-1947 housing character areas</div>
-              <div><span style="color:#00d4aa;font-weight:700">Emerging Community</span> — Future urban land, broad-hectare subdivision</div>
-              <div><span style="color:#00d4aa;font-weight:700">Next Generation Neighbourhood</span> — Master-planned new communities</div>
-              <div><span style="color:#00d4aa;font-weight:700">Township</span> — Small rural towns, mixed residential/commercial</div>
+        <div id="zoneRefDropdown" style="display:none;padding:4px 10px 10px;font-size:8.5px;color:#94a3b8;line-height:1.55;max-height:60vh;overflow-y:auto">
+          <div style="font-size:8px;color:#64748b;margin-bottom:6px">Click a council to expand. Zone codes from each council's current planning scheme.</div>
+
+          <!-- BRISBANE -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Brisbane City (City Plan 2014) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses, 400m²+ lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes, small lots</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>High density residential — Apartments 6+ storeys (precincts: Up to 8 / Up to 15 storeys)</div>
+              <div>Character residential — Pre-1947 character housing (precincts: Character, Infill housing)</div>
+              <div>Emerging community — Future urban land for broadacre subdivision</div>
+              <div>Tourist accommodation — Short-stay tourist development</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Principal centre — CBD &amp; regional centres (precincts: City Centre, Regional centre)</div>
+              <div>Major centre — Major suburban hubs</div>
+              <div>District centre — Large suburban centres (precincts: District, Corridor)</div>
+              <div>Neighbourhood centre — Local shops, convenience retail</div>
+              <div>Specialised centre — Hospitals, universities, airports</div>
+              <div>Mixed use — Residential/commercial/retail combined (precincts: Centre frame, Corridor, Inner city)</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Warehousing, trade services, light manufacturing</div>
+              <div>Medium impact industry — Processing, heavy trade, transport depots</div>
+              <div>High impact industry — Heavy manufacturing, hazardous storage</div>
+              <div>Special industry — Noxious/offensive industries</div>
+              <div>Industry investigation — Reserved for future industrial</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Sport and recreation — Active sport, showgrounds (precincts: Local, District, Metropolitan)</div>
+              <div>Open space — Parks, passive recreation</div>
+              <div>Environmental management — Habitat, wetlands, riparian corridors</div>
+              <div>Conservation — Protected ecological areas</div>
+              <div>Community facilities — Schools, churches, hospitals, emergency services</div>
             </div>
           </div>
-          <!-- RURAL / RURAL RESIDENTIAL -->
-          <div style="margin-bottom:6px">
-            <div style="font-weight:800;color:#f59e0b;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127795; RURAL / RURAL RESIDENTIAL</div>
-            <div style="padding-left:8px">
-              <div><span style="color:#f59e0b;font-weight:700">Rural</span> — Broadacre farming, grazing, cropping (40ha+ typical)</div>
-              <div><span style="color:#f59e0b;font-weight:700">Rural Residential</span> — Acreage lifestyle lots (2,000m²-2ha)</div>
-              <div><span style="color:#f59e0b;font-weight:700">Park Residential</span> — Large rural-style lots near urban areas</div>
-              <div><span style="color:#f59e0b;font-weight:700">Emerging Community</span> — Designated for future urban conversion</div>
+
+          <!-- GOLD COAST -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Gold Coast City (City Plan) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached housing, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>High density residential — Apartments 6+ storeys, towers</div>
+              <div>Emerging community — Future growth fronts (Coomera, Pimpama, Ormeau)</div>
+              <div>Township — Small rural towns (Canungra, Tamborine Village)</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots, hinterland</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Principal centre — Surfers Paradise, Southport CBD</div>
+              <div>Major centre — Robina, Helensvale, Coomera Town Centre</div>
+              <div>District centre — Nerang, Mudgeeraba, Palm Beach</div>
+              <div>Local centre — Small suburban shopping</div>
+              <div>Neighbourhood centre — Corner shops, convenience</div>
+              <div>Specialised centre — Gold Coast University Hospital, airport</div>
+              <div>Mixed use — Residential/commercial combined</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Warehousing, light manufacturing</div>
+              <div>Medium impact industry — Processing, transport depots</div>
+              <div>High impact industry — Heavy manufacturing</div>
+              <div>Waterfront and marine industry — Boat building, marine services</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Sport and recreation — Active sport, showgrounds</div>
+              <div>Open space — Parks, passive recreation</div>
+              <div>Environmental management and conservation — Koala habitat, wetlands</div>
+              <div>Community facilities — Schools, hospitals, emergency</div>
+              <div>Special purpose — Cemeteries, utilities, rail</div>
             </div>
           </div>
-          <!-- CENTRE / COMMERCIAL -->
-          <div style="margin-bottom:6px">
-            <div style="font-weight:800;color:#3b82f6;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#128722; CENTRE / COMMERCIAL</div>
-            <div style="padding-left:8px">
-              <div><span style="color:#3b82f6;font-weight:700">Principal Centre</span> — Major CBD (Brisbane, Gold Coast, Sunshine Coast)</div>
-              <div><span style="color:#3b82f6;font-weight:700">Major Centre</span> — Regional shopping/business hubs</div>
-              <div><span style="color:#3b82f6;font-weight:700">District Centre</span> — Large suburban centres (e.g. North Lakes)</div>
-              <div><span style="color:#3b82f6;font-weight:700">Local Centre</span> — Neighbourhood shops, small retail clusters</div>
-              <div><span style="color:#3b82f6;font-weight:700">Neighbourhood Centre</span> — Corner shop, convenience retail</div>
-              <div><span style="color:#3b82f6;font-weight:700">Specialised Centre</span> — Hospitals, universities, airports</div>
-              <div><span style="color:#3b82f6;font-weight:700">Mixed Use</span> — Combined residential/commercial/retail</div>
+
+          <!-- LOGAN -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Logan City (Planning Scheme 2015) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses on standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes, small lots</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>Emerging community — Future growth areas (Yarrabilba, Flagstone, Park Ridge)</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Centre — All centre types (precincts by location)</div>
+              <div>Specialised centre — Major facilities</div>
+              <div>Mixed use — Residential/commercial</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, heavy trade</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sports fields</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, churches, hospitals</div>
+              <div>Special purpose — Utilities, rail corridors</div>
             </div>
           </div>
-          <!-- INDUSTRIAL -->
-          <div style="margin-bottom:6px">
-            <div style="font-weight:800;color:#8b5cf6;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127981; INDUSTRIAL</div>
-            <div style="padding-left:8px">
-              <div><span style="color:#8b5cf6;font-weight:700">Low Impact Industry</span> — Light manufacturing, warehousing, trade services</div>
-              <div><span style="color:#8b5cf6;font-weight:700">Medium Impact Industry</span> — Processing, heavy trade, transport depots</div>
-              <div><span style="color:#8b5cf6;font-weight:700">High Impact Industry</span> — Heavy manufacturing, hazardous storage</div>
-              <div><span style="color:#8b5cf6;font-weight:700">Special Industry</span> — Noxious/offensive industries, extractive</div>
-              <div><span style="color:#8b5cf6;font-weight:700">Industry Investigation</span> — Reserved for future industrial use</div>
+
+          <!-- MORETON BAY -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Moreton Bay (MBRC Planning Scheme) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>General residential — Standard housing (precincts: Coastal communities, Suburban neighbourhood, Next generation neighbourhood, Urban neighbourhood)</div>
+              <div>Emerging community — Future urban land (Caboolture West/Waraba, Burpengary East)</div>
+              <div>Township — Small rural towns (Woodford, Kilcoy, Dayboro)</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Centre — All centres (precincts: Caboolture, Morayfield, Strathpine, District, Local, Specialised)</div>
+              <div>Mixed use — Residential/commercial combined</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Industry — All industry (precincts: Low impact, Medium impact, Investigation, Brendale/Narangba enterprise)</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport, passive recreation</div>
+              <div>Environmental management and conservation — Protected habitat, koala corridors</div>
+              <div>Community facilities — Schools, hospitals (precincts: Abbey, Airfield, Utilities, Lakeside, Special use)</div>
             </div>
           </div>
-          <!-- RECREATION / OPEN SPACE -->
-          <div style="margin-bottom:6px">
-            <div style="font-weight:800;color:#22c55e;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127793; RECREATION / OPEN SPACE</div>
-            <div style="padding-left:8px">
-              <div><span style="color:#22c55e;font-weight:700">Recreation &amp; Open Space</span> — Parks, sports fields, playgrounds</div>
-              <div><span style="color:#22c55e;font-weight:700">Sport &amp; Recreation</span> — Active sport, showgrounds, racecourses</div>
-              <div><span style="color:#22c55e;font-weight:700">Open Space</span> — Passive recreation, conservation buffers</div>
-              <div><span style="color:#22c55e;font-weight:700">Environmental Management</span> — Koala habitat, wetlands, riparian corridors</div>
-              <div><span style="color:#22c55e;font-weight:700">Conservation</span> — Protected ecological areas, national parks buffer</div>
+
+          <!-- SUNSHINE COAST -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Sunshine Coast (Planning Scheme 2014) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>High density residential — Apartments 6+ storeys</div>
+              <div>Emerging community — Future growth (Palmview, Caloundra South/Aura, Beerwah East)</div>
+              <div>Township — Hinterland villages (Maleny, Montville, Mapleton)</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, horticulture, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Principal centre — Maroochydore CBD</div>
+              <div>Major centre — Caloundra, Nambour</div>
+              <div>District centre — Noosaville, Sippy Downs, Kawana</div>
+              <div>Local centre — Neighbourhood shopping</div>
+              <div>Neighbourhood centre — Corner shops, convenience</div>
+              <div>Specialised centre — University, hospitals</div>
+              <div>Mixed use — Residential/commercial combined</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Warehousing, light manufacturing</div>
+              <div>Medium impact industry — Processing, heavy trade</div>
+              <div>High impact industry — Heavy manufacturing</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Sport and recreation — Active sport, showgrounds</div>
+              <div>Open space — Parks, passive recreation</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, hospitals, emergency</div>
+              <div>Special purpose — Cemeteries, utilities, rail</div>
             </div>
           </div>
-          <!-- COMMUNITY / SPECIAL PURPOSE -->
-          <div style="margin-bottom:6px">
-            <div style="font-weight:800;color:#ec4899;font-size:10px;letter-spacing:.4px;margin-bottom:2px">&#127963; COMMUNITY / SPECIAL PURPOSE</div>
-            <div style="padding-left:8px">
-              <div><span style="color:#ec4899;font-weight:700">Community Facilities</span> — Schools, churches, community halls, childcare</div>
-              <div><span style="color:#ec4899;font-weight:700">Special Purpose</span> — Cemeteries, utilities, rail corridors, correctional</div>
-              <div><span style="color:#ec4899;font-weight:700">Limited Development</span> — Constrained land (steep terrain, flooding)</div>
-              <div><span style="color:#ec4899;font-weight:700">Extractive Industry</span> — Quarries, sand/gravel extraction</div>
+
+          <!-- IPSWICH -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Ipswich City (City Plan 2025) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments</div>
+              <div>High density residential — Apartments, towers</div>
+              <div>Character residential — Heritage/character housing areas</div>
+              <div>Emerging community — Future growth (Ripley Valley, Springfield, Walloon, Rosewood)</div>
+              <div>Township — Small rural towns</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing, cropping</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Principal centre — Ipswich CBD</div>
+              <div>Major centre — Springfield Central</div>
+              <div>District centre — Redbank Plains, Yamanto, Goodna</div>
+              <div>Local centre — Local shopping</div>
+              <div>Neighbourhood centre — Corner shops</div>
+              <div>Specialised centre — University, hospital, RAAF Amberley</div>
+              <div>Mixed use — Residential/commercial</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, transport depots</div>
+              <div>Industry investigation — Reserved for future industrial</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport, passive recreation</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, churches, hospitals</div>
+              <div>Special purpose — Utilities, defence, rail</div>
             </div>
           </div>
-          <div style="margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.08);font-size:8.5px;color:#64748b">
-            Zone names vary by council. This covers standard QLD Planning Regulation zones used across SEQ councils.
+
+          <!-- REDLAND -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Redland City (City Plan) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments</div>
+              <div>Character residential — Heritage/character housing</div>
+              <div>Emerging community — Future growth (Southern Thornlands PDA, Shoreline)</div>
+              <div>Tourist accommodation — Short-stay visitor accommodation</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div>Park residential — Large rural-style lots near urban edge</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Principal centre — Capalaba, Cleveland</div>
+              <div>Major centre — Victoria Point</div>
+              <div>District centre — Redland Bay</div>
+              <div>Local centre — Neighbourhood retail</div>
+              <div>Neighbourhood centre — Corner shops</div>
+              <div>Specialised centre — Redland Hospital, IndigiScapes</div>
+              <div>Mixed use — Residential/commercial</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, heavy trade</div>
+              <div>Waterfront and marine industry — Boat building, marine services</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport</div>
+              <div>Environmental management and conservation — Koala habitat, wetlands</div>
+              <div>Community facilities — Schools, hospitals</div>
+              <div>Special purpose — Utilities, SMBI infrastructure</div>
+            </div>
+          </div>
+
+          <!-- NOOSA -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Noosa Shire (Noosa Plan 2020) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses</div>
+              <div>Medium density residential — Units, townhouses</div>
+              <div>High density residential — Apartments</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Major centre — Noosa Civic (Noosaville)</div>
+              <div>Neighbourhood centre — Local retail</div>
+              <div>Innovation — Business/technology (Gateway West, Venture Drive)</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing</div>
+              <div>Medium impact industry — Processing, depots</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport</div>
+              <div>Environmental management and conservation — National park buffers</div>
+              <div>Community facilities — Schools, hospitals</div>
+            </div>
+          </div>
+
+          <!-- TOOWOOMBA -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Toowoomba Regional <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments</div>
+              <div>Character — Heritage/character housing areas</div>
+              <div>Emerging community — Future urban growth (Highfields, Westbrook)</div>
+              <div>Township — Small rural towns (Pittsworth, Oakey, Crows Nest)</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing, Darling Downs cropping</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Principal centre — Toowoomba CBD</div>
+              <div>Major centre — Kearneys Spring, Highfields, Wilsonton</div>
+              <div>District centre — Pittsworth, Oakey centres</div>
+              <div>Local centre — Neighbourhood retail</div>
+              <div>Neighbourhood centre — Corner shops</div>
+              <div>Specialised centre — Hospital, university, airport</div>
+              <div>Mixed use — Residential/commercial</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, Inland Rail intermodal</div>
+              <div>High impact industry — Heavy manufacturing</div>
+              <div>Rural industry — On-farm processing, rural services</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport, showgrounds</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, hospitals, government</div>
+              <div>Special purpose — Cemeteries, utilities, defence</div>
+            </div>
+          </div>
+
+          <!-- SCENIC RIM -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Scenic Rim (Planning Scheme 2020) <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses (Beaudesert, Boonah, Canungra)</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Emerging community — Future urban growth</div>
+              <div>Township — Villages (Kalbar, Harrisville, Peak Crossing, Rathdowney)</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Local centre — Beaudesert, Boonah, Tamborine Mountain centres</div>
+              <div>Neighbourhood centre — Village retail</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing</div>
+              <div>Medium impact industry — Processing, rural services</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport</div>
+              <div>Environmental management and conservation — National park buffers, scenic amenity</div>
+              <div>Community facilities — Schools, hospitals</div>
+            </div>
+          </div>
+
+          <!-- SOMERSET -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Somerset Regional <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>General residential — Standard housing (Esk, Lowood, Fernvale)</div>
+              <div>Township — Rural villages</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing (majority of LGA)</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Local centre — Town centres (Esk, Lowood, Fernvale, Kilcoy)</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing, rural services</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport, showgrounds</div>
+              <div>Environmental management and conservation — Wivenhoe/Somerset Dam catchments</div>
+              <div>Community facilities — Schools, community halls</div>
+            </div>
+          </div>
+
+          <!-- LOCKYER VALLEY -->
+          <div class="council-zone-block" style="margin-bottom:4px">
+            <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.cz-chev').textContent=this.nextElementSibling.style.display==='none'?'\u25B6':'\u25BC'" style="cursor:pointer;padding:4px 6px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);border-radius:4px;font-weight:700;color:#a78bfa;font-size:9.5px;display:flex;justify-content:space-between;align-items:center">
+              Lockyer Valley Regional <span class="cz-chev" style="font-size:8px">&#9654;</span>
+            </div>
+            <div style="display:none;padding:4px 8px">
+              <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
+              <div>Low density residential — Detached houses (Gatton, Laidley, Plainland)</div>
+              <div>Emerging community — Future urban growth areas</div>
+              <div>Township — Rural towns (Withcott, Forest Hill, Grantham)</div>
+              <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
+              <div>Rural — Broadacre farming, grazing, Lockyer Valley horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
+              <div>Local centre — Gatton, Laidley, Plainland centres</div>
+              <div>Neighbourhood centre — Village retail</div>
+              <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
+              <div>Low impact industry — Light manufacturing, rural services</div>
+              <div>Medium impact industry — Processing, transport (Inland Rail corridor)</div>
+              <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
+              <div>Recreation and open space — Parks, sport, showgrounds</div>
+              <div>Environmental management and conservation — Riparian corridors</div>
+              <div>Community facilities — Schools, hospitals</div>
+            </div>
+          </div>
+
+          <div style="margin-top:6px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.08);font-size:8px;color:#64748b">
+            Zone codes from each council's current planning scheme. Precincts noted where applicable.
           </div>
         </div>
         <div class="lp-group flood-expand-header" onclick="toggleFloodDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#60a5fa">
