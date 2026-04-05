@@ -570,6 +570,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('cadastral',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#6b7280"></div><div class="lp-label">Parcel Boundaries<span class="lp-desc">Property boundaries &amp; lot lines</span></div>
         </label>
+        <label class="lp-item" data-layer="contours">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#9ca3af"></div><div class="lp-label">Terrain (Contours)<span class="lp-desc">Contour lines for visualising elevation</span></div>
+        </label>
         <div class="lp-item" style="flex-direction:column;align-items:flex-start;padding:6px 14px 10px">
           <div style="font-size:9px;color:#d4a017;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">&#128270; Land Size Filter</div>
           <div class="size-filter-bar" id="sizeFilterBar">
@@ -994,11 +998,47 @@ tr:hover td{background:rgba(255,255,255,.015)}
             Zone codes from each council's current planning scheme. Precincts noted where applicable.
           </div>
         </div>
-        <div class="lp-group flood-expand-header" onclick="toggleFloodDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#60a5fa">
-          <span>Flood Mapping</span>
-          <span id="floodChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
+        <!-- Flood Mapping moved into Hazards collapsible section -->
+        <!-- ═══ HAZARDS (collapsible) ═══ -->
+        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('hazards')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#f97316">
+          <span>Hazards</span>
+          <span class="lp-section-chev" id="hazardsChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
         </div>
-        <div id="floodDropdown" style="display:none">
+        <div id="hazardsSection" style="display:none">
+          <label class="lp-item" data-layer="bushfire">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#f97316"></div><div class="lp-label">Bushfire Prone Areas<span class="lp-desc">State &amp; council bushfire mapping</span></div>
+          </label>
+          <div style="padding:2px 14px 4px;font-size:9px;color:#22c55e;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Environment &amp; Biodiversity</div>
+          <label class="lp-item" data-layer="mses">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('mses',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#22c55e"></div><div class="lp-label">Environmental (MSES)<span class="lp-desc">Matters of State Environmental Significance</span></div>
+          </label>
+          <label class="lp-item" data-layer="koala">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#16a34a"></div><div class="lp-label">Koala Habitat (SEQ)<span class="lp-desc">Koala priority areas &amp; habitat</span></div>
+          </label>
+          <label class="lp-item" data-layer="bpa">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bpa',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#84cc16"></div><div class="lp-label">Biodiversity Significance<span class="lp-desc">State &amp; council biodiversity assessment</span></div>
+          </label>
+          <label class="lp-item" data-layer="regveg">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('regveg',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#65a30d"></div><div class="lp-label">Regulated Vegetation<span class="lp-desc">Clearing restrictions &amp; approvals</span></div>
+          </label>
+          <label class="lp-item" data-layer="recos">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('recos',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#4d7c0f"></div><div class="lp-label">Regional Ecosystems<span class="lp-desc">Remnant vegetation mapping</span></div>
+          </label>
+          <label class="lp-item" data-layer="wetlands">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('wetlands',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#0d9488"></div><div class="lp-label">Wetlands<span class="lp-desc">Wetland areas &amp; protection zones</span></div>
+          </label>
+          <label class="lp-item" data-layer="biocorridors">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('biocorridors',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#059669"></div><div class="lp-label">Biodiversity Corridors<span class="lp-desc">Terrestrial &amp; riparian corridors</span></div>
+          </label>
+          <div style="padding:2px 14px 4px;font-size:9px;color:#60a5fa;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Flood Mapping</div>
           <label class="lp-item" data-layer="flood">
             <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood',this.checked)"><span class="lp-slider"></span></div>
             <div class="lp-dot" style="background:#1e40af"></div><div class="lp-label">Comprehensive Studies<span class="lp-desc">Detailed flood modelling</span></div>
@@ -1019,87 +1059,57 @@ tr:hover td{background:rgba(255,255,255,.015)}
             <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodInland',this.checked)"><span class="lp-slider"></span></div>
             <div class="lp-dot" style="background:#93c5fd"></div><div class="lp-label">Inland Flood Waters<span class="lp-desc">Broader inland flood extent</span></div>
           </label>
-          <div style="padding:4px 12px 8px;font-size:10px;color:#94a3b8;line-height:1.4">
-            <span style="color:#60a5fa">&#9432;</span> Detailed Cat 1–5 hazard categories available via council mapping links in property panel
+        </div>
+        <!-- ═══ SERVICES & UTILITIES (collapsible) ═══ -->
+        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('services')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#0ea5e9">
+          <span>Services &amp; Utilities</span>
+          <span class="lp-section-chev" id="servicesChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
+        </div>
+        <div id="servicesSection" style="display:none">
+          <label class="lp-item" data-layer="serviceRadar">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#ff47a3"></div><div class="lp-label">Service Radar<span class="lp-desc">Where services reach from existing housing</span></div>
+          </label>
+          <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
+            <div style="display:flex;gap:10px;margin-bottom:2px">
+              <span><span style="display:inline-block;width:14px;height:0;border-top:3px solid #ff47a3;vertical-align:middle;margin-right:3px"></span> Services edge</span>
+              <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px solid #f59e0b;vertical-align:middle;margin-right:3px"></span> Extension zone</span>
+              <span style="color:#f59e0b">\u2194 km gap</span>
+            </div>
+            Pink = current housing edge. Amber = 1-3km feasible extension. Label shows distance between.
           </div>
         </div>
-        <div class="lp-group" style="color:#f97316">Hazards</div>
-        <label class="lp-item" data-layer="bushfire">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#f97316"></div><div class="lp-label">Bushfire Prone Areas<span class="lp-desc">State &amp; council bushfire mapping</span></div>
-        </label>
-        <div class="lp-group" style="color:#a78bfa">Terrain</div>
-        <label class="lp-item" data-layer="contours">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#a78bfa"></div><div class="lp-label">Contours (Elevation)<span class="lp-desc">Contour lines for visualising elevation</span></div>
-        </label>
-        <div class="lp-group" style="color:#22c55e">Environment &amp; Biodiversity</div>
-        <label class="lp-item" data-layer="mses">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('mses',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#22c55e"></div><div class="lp-label">Environmental (MSES)<span class="lp-desc">Matters of State Environmental Significance</span></div>
-        </label>
-        <label class="lp-item" data-layer="koala">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#16a34a"></div><div class="lp-label">Koala Habitat (SEQ)<span class="lp-desc">Koala priority areas &amp; habitat</span></div>
-        </label>
-        <label class="lp-item" data-layer="bpa">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bpa',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#84cc16"></div><div class="lp-label">Biodiversity Significance<span class="lp-desc">State &amp; council biodiversity assessment</span></div>
-        </label>
-        <label class="lp-item" data-layer="regveg">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('regveg',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#65a30d"></div><div class="lp-label">Regulated Vegetation<span class="lp-desc">Clearing restrictions &amp; approvals</span></div>
-        </label>
-        <label class="lp-item" data-layer="recos">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('recos',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#4d7c0f"></div><div class="lp-label">Regional Ecosystems<span class="lp-desc">Remnant vegetation mapping</span></div>
-        </label>
-        <label class="lp-item" data-layer="wetlands">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('wetlands',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#0d9488"></div><div class="lp-label">Wetlands<span class="lp-desc">Wetland areas &amp; protection zones</span></div>
-        </label>
-        <label class="lp-item" data-layer="biocorridors">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('biocorridors',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#059669"></div><div class="lp-label">Biodiversity Corridors<span class="lp-desc">Terrestrial &amp; riparian corridors</span></div>
-        </label>
-        <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
-        <label class="lp-item" data-layer="serviceRadar">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#ff47a3"></div><div class="lp-label">Service Radar<span class="lp-desc">Where services reach from existing housing</span></div>
-        </label>
-        <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
-          <div style="display:flex;gap:10px;margin-bottom:2px">
-            <span><span style="display:inline-block;width:14px;height:0;border-top:3px solid #ff47a3;vertical-align:middle;margin-right:3px"></span> Services edge</span>
-            <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px solid #f59e0b;vertical-align:middle;margin-right:3px"></span> Extension zone</span>
-            <span style="color:#f59e0b">\u2194 km gap</span>
-          </div>
-          Pink = current housing edge. Amber = 1-3km feasible extension. Label shows distance between.
+        <!-- ═══ GROWTH INTELLIGENCE (collapsible) ═══ -->
+        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('growth')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#ec4899">
+          <span>Growth Intelligence</span>
+          <span class="lp-section-chev" id="growthChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
         </div>
-        <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
-        <label class="lp-item" data-layer="pdaMarkers">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#ec4899"></div><div class="lp-label">PDA Hotspots<span class="lp-desc">Priority Development Areas</span></div>
-        </label>
-        <label class="lp-item" data-layer="infraMarkers">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('infraMarkers',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#f59e0b"></div><div class="lp-label">Infrastructure Projects<span class="lp-desc">Major roads, rail, utilities</span></div>
-        </label>
-        <label class="lp-item" data-layer="devMarkers">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('devMarkers',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#ef4444"></div><div class="lp-label">Major Dev Estates<span class="lp-desc">Competitor master-planned communities</span></div>
-        </label>
-        <label class="lp-item" data-layer="pfgaMarkers">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pfgaMarkers',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label">Future Growth Areas<span class="lp-desc">Planned future growth frontiers</span></div>
-        </label>
-        <label class="lp-item" data-layer="cat1Markers">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('cat1Markers',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#14b8a6"></div><div class="lp-label">Cat 1 Dev Areas<span class="lp-desc">Category 1 development zones</span></div>
-        </label>
-        <label class="lp-item" data-layer="targetCorridors">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('targetCorridors',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#ff006e"></div><div class="lp-label">Target Corridors<span class="lp-desc">Our primary target areas</span></div>
-        </label>
+        <div id="growthSection" style="display:none">
+          <label class="lp-item" data-layer="pdaMarkers">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#ec4899"></div><div class="lp-label">PDA Hotspots<span class="lp-desc">Priority Development Areas</span></div>
+          </label>
+          <label class="lp-item" data-layer="infraMarkers">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('infraMarkers',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#f59e0b"></div><div class="lp-label">Infrastructure Projects<span class="lp-desc">Major roads, rail, utilities</span></div>
+          </label>
+          <label class="lp-item" data-layer="devMarkers">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('devMarkers',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#ef4444"></div><div class="lp-label">Major Dev Estates<span class="lp-desc">Competitor master-planned communities</span></div>
+          </label>
+          <label class="lp-item" data-layer="pfgaMarkers">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pfgaMarkers',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label">Future Growth Areas<span class="lp-desc">Planned future growth frontiers</span></div>
+          </label>
+          <label class="lp-item" data-layer="cat1Markers">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('cat1Markers',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#14b8a6"></div><div class="lp-label">Cat 1 Dev Areas<span class="lp-desc">Category 1 development zones</span></div>
+          </label>
+          <label class="lp-item" data-layer="targetCorridors">
+            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('targetCorridors',this.checked)"><span class="lp-slider"></span></div>
+            <div class="lp-dot" style="background:#ff006e"></div><div class="lp-label">Target Corridors<span class="lp-desc">Our primary target areas</span></div>
+          </label>
+        </div>
 
         <div class="lp-group" style="color:#3b82f6">Property Tracking <span id="trackedBadge" style="font-size:9px;background:#3b82f6;color:#fff;padding:1px 6px;border-radius:8px;margin-left:6px;display:none">0</span></div>
         <label class="lp-item" data-layer="trackedProps">
@@ -3741,6 +3751,19 @@ function toggleFloodDropdown() {
     chev.style.transform = 'rotate(180deg)';
   } else {
     dd.style.display = 'none';
+    chev.style.transform = 'rotate(0deg)';
+  }
+}
+
+function toggleLpSection(name) {
+  var section = document.getElementById(name + 'Section');
+  var chev = document.getElementById(name + 'Chevron');
+  if (!section || !chev) return;
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    chev.style.transform = 'rotate(180deg)';
+  } else {
+    section.style.display = 'none';
     chev.style.transform = 'rotate(0deg)';
   }
 }
