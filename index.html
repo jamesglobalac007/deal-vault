@@ -589,9 +589,13 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div id="sizeFilterStatus" style="font-size:9px;margin-top:4px;min-height:12px"></div>
         </div>
         <div class="lp-group" style="color:#a78bfa">Planning</div>
+        <label class="lp-item" data-layer="zoning">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('zoning',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#a78bfa"></div><div class="lp-label">Zoning (Planning Scheme)<span class="lp-desc">Council zone colours — LDR, MDR, EC etc</span></div>
+        </label>
         <label class="lp-item" data-layer="landuse">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#8b5cf6"></div><div class="lp-label">Land Use (Current Use)<span class="lp-desc">Planning zones overlay</span></div>
+          <div class="lp-dot" style="background:#8b5cf6"></div><div class="lp-label">Land Use (ALUMC)<span class="lp-desc">Current land use classification</span></div>
         </label>
         <div class="lp-group flood-expand-header" onclick="toggleZoneRef()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#a78bfa">
           <span>Zone Codes by Council</span>
@@ -3563,6 +3567,10 @@ const qldServices = {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandUse/MapServer',
     layers: [0], opacity: 0.45, minZoom: 10, maxZoom: 19
   },
+  zoning: {
+    url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer',
+    layers: [73], opacity: 0.5, minZoom: 8, maxZoom: 22
+  },
   pda: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PriorityDevelopmentAreas/MapServer',
     layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
@@ -3869,6 +3877,16 @@ function initFullMapLayers() {
     minZoom: svc.minZoom, maxZoom: svc.maxZoom,
     attribution: '© QLD Govt DCDB'
   }).addTo(mapFull);
+
+  // Zoning layer on by default — QPP state-wide planning zones (coloured)
+  var zoneSvc = qldServices.zoning;
+  activeLayers.zoning = L.esri.dynamicMapLayer({
+    url: zoneSvc.url, layers: zoneSvc.layers, opacity: zoneSvc.opacity,
+    minZoom: zoneSvc.minZoom, maxZoom: zoneSvc.maxZoom,
+    attribution: '© QLD Govt QPP'
+  }).addTo(mapFull);
+  // Put zoning behind cadastral so parcel borders show on top
+  if (activeLayers.zoning.bringToBack) activeLayers.zoning.bringToBack();
 
   // Listen for popup opens — means a marker was clicked, not empty space
   mapFull.on('popupopen', function() { _markerClicked = true; });
@@ -5151,31 +5169,46 @@ function renderPropPanel(latlng, r) {
   if (Object.keys(sz).length > 0) console.log('SEQ Zone keys:', Object.keys(sz).join(', '));
   const seqZoneName = findField(sz, ['Name','name','category','cat_desc','zone','zone_name','designation','land_use_category','description','type','sub_category','value']) || null;
 
-  // Council Planning Scheme Zone — BULLETPROOF fallback chain (never loses zone)
+  // ══════════════════════════════════════════════════════════════════
+  // ZONE RESOLUTION — BULLETPROOF — DO NOT REMOVE OR REFACTOR
+  // This block determines the planning zone for the clicked property.
+  // It uses ONLY planning zone data (NOT land use / ALUMC).
+  // Fallback: council zone → state QPP zone → SEQ regional zone
+  // NEVER falls back to landUseClass (that's ALUMC, not zoning).
+  // ══════════════════════════════════════════════════════════════════
   const cz = r.councilZone || {};
-  // Try council zone first, then dig through raw attributes if main field missed
   let _czZone = cz.zone || null;
+
+  // If council zone query returned data but main .zone field empty, search raw attrs
   if (!_czZone && cz.raw) {
-    // Brute-force search all attributes for anything that looks like a zone name
     _czZone = findField(cz.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','LVL1_ZONE','NAME','DESCRIPT','HEADING','LABEL','New_Noosa_Plan_Zones','CODE','ZONE_CODE','description','name','category']) || null;
-    if (_czZone) console.log('Zone recovered from raw attrs:', _czZone);
+    if (_czZone) console.log('Zone recovered from council raw attrs:', _czZone);
   }
-  // State zone fallback
+
+  // State QPP zone fallback (covers all of QLD — Layer 73)
   if (!_czZone && r.stateZone) {
     _czZone = r.stateZone.zone || null;
     if (!_czZone && r.stateZone.raw) {
       _czZone = findField(r.stateZone.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','NAME','DESCRIPT','description','name','category']) || null;
+      if (_czZone) console.log('Zone recovered from state raw attrs:', _czZone);
     }
   }
-  // SEQ zone fallback
+
+  // SEQ Regional zone (ShapingSEQ) — broad category only
   if (!_czZone && seqZoneName) _czZone = seqZoneName;
-  // Land use fallback (skip the dash placeholder)
-  if (!_czZone && landUseClass && landUseClass !== '\u2014') _czZone = landUseClass;
+
+  // IMPORTANT: Do NOT fall back to landUseClass here.
+  // landUseClass is ALUMC (e.g. "Residential and farm infrastructure")
+  // which is NOT a planning zone code. Zone must come from planning data only.
 
   const councilZoneName = _czZone || null;
   const councilZonePrecinct = cz.precinct || null;
-  const councilZoneSource = (cz.zone || (cz.raw && _czZone)) ? 'Council' : (r.stateZone && (r.stateZone.zone || (r.stateZone.raw && _czZone)) ? 'State QPP' : (seqZoneName && _czZone === seqZoneName ? 'SEQ Regional' : (landUseClass && _czZone === landUseClass ? 'Land Use' : '')));
-  console.log('ZONE RESULT:', councilZoneName, '| Source:', councilZoneSource, '| councilZone:', JSON.stringify(cz), '| stateZone:', JSON.stringify(r.stateZone || {}), '| seqZone:', seqZoneName, '| landUse:', landUseClass);
+  const councilZoneSource = cz.zone ? 'Council' : (r.stateZone && _czZone ? 'State QPP' : (seqZoneName && _czZone === seqZoneName ? 'SEQ Regional' : ''));
+  console.log('ZONE RESULT:', councilZoneName, '| Source:', councilZoneSource);
+  console.log('  councilZone:', JSON.stringify(cz));
+  console.log('  stateZone:', JSON.stringify(r.stateZone || {}));
+  console.log('  seqZone:', seqZoneName);
+  // ══════════════════════════════════════════════════════════════════
 
   // Zone categorization — highlight residential, rural, industrial
   // ── ShapingSEQ 2023 Growth Data by LGA ──
