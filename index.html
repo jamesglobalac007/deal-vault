@@ -5151,12 +5151,31 @@ function renderPropPanel(latlng, r) {
   if (Object.keys(sz).length > 0) console.log('SEQ Zone keys:', Object.keys(sz).join(', '));
   const seqZoneName = findField(sz, ['Name','name','category','cat_desc','zone','zone_name','designation','land_use_category','description','type','sub_category','value']) || null;
 
-  // Council Planning Scheme Zone — with SEQ and land use fallbacks
+  // Council Planning Scheme Zone — BULLETPROOF fallback chain (never loses zone)
   const cz = r.councilZone || {};
-  const councilZoneName = cz.zone || seqZoneName || landUseClass || null;
+  // Try council zone first, then dig through raw attributes if main field missed
+  let _czZone = cz.zone || null;
+  if (!_czZone && cz.raw) {
+    // Brute-force search all attributes for anything that looks like a zone name
+    _czZone = findField(cz.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','LVL1_ZONE','NAME','DESCRIPT','HEADING','LABEL','New_Noosa_Plan_Zones','CODE','ZONE_CODE','description','name','category']) || null;
+    if (_czZone) console.log('Zone recovered from raw attrs:', _czZone);
+  }
+  // State zone fallback
+  if (!_czZone && r.stateZone) {
+    _czZone = r.stateZone.zone || null;
+    if (!_czZone && r.stateZone.raw) {
+      _czZone = findField(r.stateZone.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','NAME','DESCRIPT','description','name','category']) || null;
+    }
+  }
+  // SEQ zone fallback
+  if (!_czZone && seqZoneName) _czZone = seqZoneName;
+  // Land use fallback (skip the dash placeholder)
+  if (!_czZone && landUseClass && landUseClass !== '\u2014') _czZone = landUseClass;
+
+  const councilZoneName = _czZone || null;
   const councilZonePrecinct = cz.precinct || null;
-  const councilZoneSource = cz.zone ? 'Council' : (seqZoneName ? 'SEQ Regional' : (landUseClass !== '—' ? 'Land Use' : ''));
-  if (councilZoneName) console.log('Zone:', councilZoneName, '| Source:', councilZoneSource, '| Precinct:', councilZonePrecinct);
+  const councilZoneSource = (cz.zone || (cz.raw && _czZone)) ? 'Council' : (r.stateZone && (r.stateZone.zone || (r.stateZone.raw && _czZone)) ? 'State QPP' : (seqZoneName && _czZone === seqZoneName ? 'SEQ Regional' : (landUseClass && _czZone === landUseClass ? 'Land Use' : '')));
+  console.log('ZONE RESULT:', councilZoneName, '| Source:', councilZoneSource, '| councilZone:', JSON.stringify(cz), '| stateZone:', JSON.stringify(r.stateZone || {}), '| seqZone:', seqZoneName, '| landUse:', landUseClass);
 
   // Zone categorization — highlight residential, rural, industrial
   // ── ShapingSEQ 2023 Growth Data by LGA ──
@@ -5337,6 +5356,7 @@ function renderPropPanel(latlng, r) {
   html += `<div class="pp-section">
     <div class="pp-section-title">Property Details</div>
     <div class="pp-grid">
+      <div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Zone</div><div class="pp-field-val" style="color:${zoneCat.color};font-weight:600">${councilZoneName || 'Querying...'}</div></div>
       <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
       <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
       <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
