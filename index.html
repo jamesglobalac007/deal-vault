@@ -668,10 +668,11 @@ tr:hover td{background:rgba(255,255,255,.015)}
         </label>
         <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
           <div style="display:flex;gap:10px;margin-bottom:2px">
-            <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px solid #ff47a3;vertical-align:middle;margin-right:3px"></span> Services here</span>
-            <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px dashed #ff47a3;vertical-align:middle;margin-right:3px;opacity:0.5"></span> 1-3km extension</span>
+            <span><span style="display:inline-block;width:14px;height:0;border-top:3px solid #ff47a3;vertical-align:middle;margin-right:3px"></span> Services edge</span>
+            <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px solid #f59e0b;vertical-align:middle;margin-right:3px"></span> Extension zone</span>
+            <span style="color:#f59e0b">\u2194 km gap</span>
           </div>
-          Land inside the solid ring = services available. Dashed ring = feasible extension.
+          Pink = current housing edge. Amber = 1-3km feasible extension. Label shows distance between.
         </div>
         <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
         <label class="lp-item" data-layer="pdaMarkers">
@@ -2804,15 +2805,14 @@ function addGrowthIntelligence(mi) {
       interactive: false
     });
 
-    // Outer ring — dashed hot pink — "extension zone"
+    // Outer ring — solid amber/orange — "extension zone"
     var outer = L.circle([area.lat, area.lng], {
       radius: area.r + area.ext,
-      color: '#ff47a3',
-      weight: 2,
-      opacity: 0.55,
+      color: '#f59e0b',
+      weight: 2.5,
+      opacity: 0.75,
       fillColor: 'transparent',
       fillOpacity: 0,
-      dashArray: '8 6',
       interactive: false
     });
 
@@ -2827,7 +2827,7 @@ function addGrowthIntelligence(mi) {
       interactive: false,
       icon: L.divIcon({
         className: '',
-        html: '<div style="font-size:9px;font-weight:800;color:#ff47a3;text-shadow:0 1px 3px rgba(0,0,0,0.85),-1px 0 3px rgba(0,0,0,0.7);white-space:nowrap;letter-spacing:.3px;background:rgba(15,20,30,0.6);padding:1px 5px;border-radius:3px;border:1px solid rgba(255,71,163,0.4)">\u2194 ' + extKm + ' km</div>',
+        html: '<div style="font-size:9px;font-weight:800;color:#f59e0b;text-shadow:0 1px 3px rgba(0,0,0,0.85),-1px 0 3px rgba(0,0,0,0.7);white-space:nowrap;letter-spacing:.3px;background:rgba(15,20,30,0.7);padding:1px 5px;border-radius:3px;border:1px solid rgba(245,158,11,0.5)">\u2194 ' + extKm + ' km</div>',
         iconSize: [60, 16], iconAnchor: [30, 8]
       })
     });
@@ -2859,9 +2859,9 @@ function addGrowthIntelligence(mi) {
       '</div>' +
       '<div style="font-size:10.5px;color:#555;line-height:1.5">' + area.note + '</div>' +
       '<div style="font-size:9px;color:#888;margin-top:6px;border-top:1px solid #eee;padding-top:4px">' +
-        '<strong>Solid ring</strong> = current housing/services edge<br>' +
-        '<strong>Dashed ring</strong> = ' + extKm + 'km feasible extension zone<br>' +
-        '<strong>\u2194 label</strong> = distance between rings' +
+        '<span style="color:#ff47a3;font-weight:700">\u2501\u2501</span> <strong>Pink ring</strong> = current housing/services edge<br>' +
+        '<span style="color:#f59e0b;font-weight:700">\u2501\u2501</span> <strong>Amber ring</strong> = ' + extKm + 'km extension zone<br>' +
+        '<strong>\u2194 ' + extKm + ' km</strong> = distance between rings' +
       '</div></div>', {maxWidth: 280}
     );
 
