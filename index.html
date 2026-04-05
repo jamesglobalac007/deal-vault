@@ -294,10 +294,18 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .tracked-tooltip{background:rgba(15,18,28,.92)!important;border:1px solid var(--border)!important;color:var(--text)!important;font-size:10px!important;padding:4px 8px!important;border-radius:4px!important;box-shadow:0 2px 8px rgba(0,0,0,.4)!important}
 .tracked-tooltip .leaflet-tooltip-arrow{display:none}
 .tracked-count-badge{position:absolute;top:8px;right:8px;background:#3b82f6;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;z-index:1002;display:none}
-.size-filter-bar{display:flex;gap:4px;flex-wrap:wrap}
+.size-filter-bar{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
 .size-btn{padding:4px 9px;border-radius:4px;font-size:9px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--dim);transition:all .15s;letter-spacing:.3px}
 .size-btn:hover{border-color:#d4a017;color:#d4a017}
 .size-btn.active{background:#d4a017;color:#0a0d14;border-color:#d4a017}
+.size-legend{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap}
+.size-legend-item{display:flex;align-items:center;gap:4px;font-size:8.5px;color:var(--dim)}
+.size-legend-swatch{width:12px;height:8px;border-radius:2px;border:1px solid rgba(255,255,255,0.2)}
+.size-opacity-row{display:flex;align-items:center;gap:6px;margin-top:5px}
+.size-opacity-row label{font-size:8.5px;color:var(--dim);white-space:nowrap}
+.size-opacity-slider{-webkit-appearance:none;appearance:none;width:80px;height:4px;border-radius:2px;background:#2a2d36;outline:none}
+.size-opacity-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:12px;height:12px;border-radius:50%;background:#d4a017;cursor:pointer}
+.size-opacity-slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#d4a017;cursor:pointer;border:none}
 .size-filter-loading{font-size:9px;color:#d4a017;padding:4px 0;animation:pp-spin .8s linear infinite}
 .selected-parcel-glow{filter:drop-shadow(0 0 6px rgba(255,255,255,.5)) drop-shadow(0 0 12px rgba(255,255,255,.25))}
 .pp-loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--dim);font-size:12px;gap:8px}
@@ -557,11 +565,18 @@ tr:hover td{background:rgba(255,255,255,.015)}
         <div class="lp-item" style="flex-direction:column;align-items:flex-start;padding:6px 14px 10px">
           <div style="font-size:9px;color:#d4a017;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">&#128270; Land Size Filter</div>
           <div class="size-filter-bar" id="sizeFilterBar">
-            <button class="size-btn" onclick="toggleSizeFilter(0)" data-size="0">Off</button>
-            <button class="size-btn" onclick="toggleSizeFilter(4000)" data-size="4000">4,000m²+</button>
-            <button class="size-btn" onclick="toggleSizeFilter(4047)" data-size="4047">1 Acre+</button>
-            <button class="size-btn" onclick="toggleSizeFilter(10000)" data-size="10000">1 Ha+</button>
-            <button class="size-btn" onclick="toggleSizeFilter(20000)" data-size="20000">2 Ha+</button>
+            <button class="size-btn active" onclick="toggleSizeFilter(false)" data-size="off">Off</button>
+            <button class="size-btn" onclick="toggleSizeFilter(true)" data-size="on">Show All</button>
+          </div>
+          <div class="size-legend" id="sizeLegend" style="display:none">
+            <div class="size-legend-item"><span class="size-legend-swatch" style="background:rgba(134,239,172,0.5)"></span>1–5 Acres</div>
+            <div class="size-legend-item"><span class="size-legend-swatch" style="background:rgba(125,211,252,0.5)"></span>5–10 Acres</div>
+            <div class="size-legend-item"><span class="size-legend-swatch" style="background:rgba(196,181,253,0.5)"></span>10+ Acres</div>
+          </div>
+          <div class="size-opacity-row" id="sizeOpacityRow" style="display:none">
+            <label>Opacity</label>
+            <input type="range" class="size-opacity-slider" id="sizeOpacitySlider" min="10" max="100" value="50" oninput="updateSizeOpacity(this.value)">
+            <span id="sizeOpacityVal" style="font-size:8.5px;color:var(--dim);width:26px">50%</span>
           </div>
           <div id="sizeFilterStatus" style="font-size:9px;margin-top:4px;min-height:12px"></div>
         </div>
@@ -3586,49 +3601,68 @@ function showTrackingModal(lotPlan, address, lat, lng, lga, zone, area) {
   modal.innerHTML = html;
 }
 
-// ─── LAND SIZE FILTER ───
-var activeSizeFilter = 0;
+// ─── LAND SIZE FILTER (3-Tier Color Coded) ───
+var sizeFilterActive = false;
 var sizeFilterLayer = null;
-var sizeFilterAbort = null; // abort controller for in-flight requests
+var sizeFilterAbort = null;
+var sizeFilterOpacity = 0.5; // default 50%
+// Tier colors — light, distinct pastels
+var SIZE_TIERS = [
+  { min: 4047,  max: 20234, color: '#86efac', label: '1–5 Acres' },   // light green
+  { min: 20234, max: 40469, color: '#7dd3fc', label: '5–10 Acres' },  // light blue
+  { min: 40469, max: 999999999, color: '#c4b5fd', label: '10+ Acres' } // light violet
+];
 
-function toggleSizeFilter(minSqm) {
-  // Update button states
+function toggleSizeFilter(on) {
   document.querySelectorAll('.size-btn').forEach(function(b) {
-    b.classList.toggle('active', parseInt(b.dataset.size) === minSqm);
+    b.classList.toggle('active', (on && b.dataset.size === 'on') || (!on && b.dataset.size === 'off'));
   });
 
-  // Abort any in-flight query
   if (sizeFilterAbort) { try { sizeFilterAbort.abort(); } catch(e){} sizeFilterAbort = null; }
 
-  // If same filter clicked or Off, remove existing
-  if (minSqm === 0 || minSqm === activeSizeFilter) {
-    if (sizeFilterLayer && mapFull) {
-      mapFull.removeLayer(sizeFilterLayer);
-      sizeFilterLayer = null;
-    }
-    activeSizeFilter = 0;
-    document.querySelectorAll('.size-btn[data-size="0"]').forEach(function(b){ b.classList.add('active'); });
+  if (!on) {
+    if (sizeFilterLayer && mapFull) { mapFull.removeLayer(sizeFilterLayer); sizeFilterLayer = null; }
+    sizeFilterActive = false;
+    document.getElementById('sizeLegend').style.display = 'none';
+    document.getElementById('sizeOpacityRow').style.display = 'none';
     document.getElementById('sizeFilterStatus').textContent = '';
     return;
   }
 
-  activeSizeFilter = minSqm;
+  sizeFilterActive = true;
+  document.getElementById('sizeLegend').style.display = 'flex';
+  document.getElementById('sizeOpacityRow').style.display = 'flex';
 
-  // Remove old layer
-  if (sizeFilterLayer && mapFull) {
-    mapFull.removeLayer(sizeFilterLayer);
-    sizeFilterLayer = null;
-  }
-
-  // Show loading
-  document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#00d4aa">Loading parcels...</span>';
-
-  // Query current map bounds
-  fetchSizeParcels(minSqm);
+  if (sizeFilterLayer && mapFull) { mapFull.removeLayer(sizeFilterLayer); sizeFilterLayer = null; }
+  document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#86efac">Loading parcels...</span>';
+  fetchSizeParcels();
 }
 
-function fetchSizeParcels(minSqm) {
-  if (!mapFull || activeSizeFilter !== minSqm) return;
+function updateSizeOpacity(val) {
+  sizeFilterOpacity = parseInt(val) / 100;
+  document.getElementById('sizeOpacityVal').textContent = val + '%';
+  if (sizeFilterLayer) {
+    sizeFilterLayer.eachLayer(function(poly) {
+      var tier = poly._sizeTier;
+      if (tier) {
+        poly.setStyle({
+          fillOpacity: sizeFilterOpacity * 0.6,
+          opacity: Math.min(1, sizeFilterOpacity + 0.3)
+        });
+      }
+    });
+  }
+}
+
+function getTierForArea(areaSqm) {
+  for (var i = 0; i < SIZE_TIERS.length; i++) {
+    if (areaSqm >= SIZE_TIERS[i].min && areaSqm < SIZE_TIERS[i].max) return SIZE_TIERS[i];
+  }
+  return null;
+}
+
+function fetchSizeParcels() {
+  if (!mapFull || !sizeFilterActive) return;
 
   var bounds = mapFull.getBounds();
   var zoom = mapFull.getZoom();
@@ -3638,17 +3672,16 @@ function fetchSizeParcels(minSqm) {
   }
 
   var envStr = bounds.getWest() + ',' + bounds.getSouth() + ',' + bounds.getEast() + ',' + bounds.getNorth();
-
   var cadastralUrl = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandParcelPropertyFramework/MapServer/4/query';
   var qp = new URLSearchParams({
     geometry: envStr,
     geometryType: 'esriGeometryEnvelope',
     inSR: '4326',
     spatialRel: 'esriSpatialRelIntersects',
-    where: 'lot_area >= ' + minSqm,
+    where: 'lot_area >= 4047',
     outFields: 'lot_area,lotplan,shire_name,locality',
     returnGeometry: 'true',
-    resultRecordCount: '500',
+    resultRecordCount: '800',
     outSR: '4326',
     f: 'json'
   });
@@ -3657,57 +3690,62 @@ function fetchSizeParcels(minSqm) {
   fetch(cadastralUrl + '?' + qp.toString(), {signal: sizeFilterAbort.signal})
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (activeSizeFilter !== minSqm) return; // filter changed while loading
-      // Remove old layer
-      if (sizeFilterLayer && mapFull) {
-        mapFull.removeLayer(sizeFilterLayer);
-      }
+      if (!sizeFilterActive) return;
+      if (sizeFilterLayer && mapFull) { mapFull.removeLayer(sizeFilterLayer); }
 
       var group = L.layerGroup();
-      var count = 0;
+      var counts = {tier1: 0, tier2: 0, tier3: 0};
 
       if (data.features && data.features.length > 0) {
         data.features.forEach(function(f) {
           if (!f.geometry || !f.geometry.rings) return;
           var attrs = f.attributes || {};
           var areaSqm = attrs.lot_area || 0;
+          var tier = getTierForArea(areaSqm);
+          if (!tier) return;
 
-          // Convert ArcGIS rings [lng,lat] to Leaflet [lat,lng]
           var latlngs = f.geometry.rings.map(function(ring) {
             return ring.map(function(pt) { return [pt[1], pt[0]]; });
           });
 
-          // Graduated colour — bigger = brighter
-          var intensity = Math.min(1, areaSqm / 40000);
-          var fillOp = 0.18 + (intensity * 0.17);
-
           var poly = L.polygon(latlngs, {
-            color: '#00d4aa',
-            weight: 2.5,
-            opacity: 0.9,
-            fillColor: '#00d4aa',
-            fillOpacity: fillOp
+            color: tier.color,
+            weight: 2,
+            opacity: Math.min(1, sizeFilterOpacity + 0.3),
+            fillColor: tier.color,
+            fillOpacity: sizeFilterOpacity * 0.6
           });
+          poly._sizeTier = tier;
 
-          // Tooltip with area info
-          var areaDisp = areaSqm > 10000 ? (areaSqm / 10000).toFixed(2) + ' ha' : Math.round(areaSqm).toLocaleString() + ' m\u00B2';
+          // Tooltip
+          var acres = (areaSqm / 4047).toFixed(2);
+          var areaDisp = areaSqm >= 10000 ? (areaSqm / 10000).toFixed(2) + ' ha' : Math.round(areaSqm).toLocaleString() + ' m\u00B2';
           var lotplan = attrs.lotplan || attrs.lot_plan || '';
           poly.bindTooltip(
-            '<div style="font-size:12px;font-weight:700;color:#00d4aa">' + areaDisp + '</div>' +
+            '<div style="font-size:12px;font-weight:700;color:' + tier.color + '">' + acres + ' acres (' + areaDisp + ')</div>' +
+            '<div style="font-size:9px;color:#e2e8f0;margin-top:2px">' + tier.label + '</div>' +
             (lotplan ? '<div style="font-size:10px;color:#e2e8f0">' + lotplan + '</div>' : '') +
             (attrs.shire_name ? '<div style="font-size:9px;color:#94a3b8">' + attrs.shire_name + '</div>' : ''),
             {className: 'tracked-tooltip', direction: 'top', offset: [0, -5], sticky: true}
           );
 
           group.addLayer(poly);
-          count++;
+          if (areaSqm < 20234) counts.tier1++;
+          else if (areaSqm < 40469) counts.tier2++;
+          else counts.tier3++;
         });
       }
 
       sizeFilterLayer = group;
       sizeFilterLayer.addTo(mapFull);
-      document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#00d4aa">' + count + ' parcel' + (count !== 1 ? 's' : '') + ' found</span>';
-      console.log('Size filter: ' + count + ' parcels >= ' + minSqm + ' m\u00B2 in view');
+      var total = counts.tier1 + counts.tier2 + counts.tier3;
+      document.getElementById('sizeFilterStatus').innerHTML =
+        '<span style="color:#86efac">' + counts.tier1 + '</span>' +
+        '<span style="color:var(--dim)"> · </span>' +
+        '<span style="color:#7dd3fc">' + counts.tier2 + '</span>' +
+        '<span style="color:var(--dim)"> · </span>' +
+        '<span style="color:#c4b5fd">' + counts.tier3 + '</span>' +
+        '<span style="color:var(--dim)"> &nbsp;(' + total + ' total)</span>';
     })
     .catch(function(err) {
       if (err.name === 'AbortError') return;
@@ -3719,10 +3757,10 @@ function fetchSizeParcels(minSqm) {
 // Re-query when map moves (debounced)
 var _sizeFilterTimer = null;
 function _onMapMoveSize() {
-  if (!activeSizeFilter) return;
+  if (!sizeFilterActive) return;
   clearTimeout(_sizeFilterTimer);
   _sizeFilterTimer = setTimeout(function() {
-    fetchSizeParcels(activeSizeFilter);
+    fetchSizeParcels();
   }, 600);
 }
 
