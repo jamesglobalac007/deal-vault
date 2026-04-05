@@ -3462,75 +3462,160 @@ function trackProperty(lotPlan, address, lat, lng, lga, zone, area) {
   return prop;
 }
 
-// ── Per-Property Service Assessment ──
-// Determines likely service availability based on zone, LGA, and lot attributes
-function assessPropertyServices(zoneName, lga, cadastral) {
+// ── Per-Property Service Assessment (Distance-Based) ──
+// Known infrastructure database for distance calculations
+var knownInfra = {
+  power: [
+    {name:'Ripley Zone Sub',lat:-27.670,lng:152.760,cap:'100 MVA',op:'Energex'},
+    {name:'Yarrabilba Zone Sub',lat:-27.785,lng:153.105,cap:'80 MVA',op:'Energex'},
+    {name:'Coomera Zone Sub',lat:-27.870,lng:153.310,cap:'120 MVA',op:'Energex'},
+    {name:'Flagstone Zone Sub',lat:-27.845,lng:152.945,cap:'80 MVA',op:'Energex'},
+    {name:'Springfield Zone Sub',lat:-27.665,lng:152.900,cap:'100 MVA',op:'Energex'},
+    {name:'Caboolture Zone Sub',lat:-27.085,lng:152.945,cap:'90 MVA',op:'Energex'},
+    {name:'Caloundra Zone Sub',lat:-26.800,lng:153.040,cap:'80 MVA',op:'Energex'},
+    {name:'Highfields Zone Sub',lat:-27.445,lng:151.950,cap:'60 MVA',op:'Ergon'},
+    {name:'Thornlands Zone Sub',lat:-27.565,lng:153.250,cap:'80 MVA',op:'Energex'},
+    {name:'Richlands Zone Sub',lat:-27.600,lng:152.970,cap:'100 MVA',op:'Energex'},
+    {name:'Eight Mile Plains Sub',lat:-27.575,lng:153.100,cap:'90 MVA',op:'Energex'},
+    {name:'Helensvale Zone Sub',lat:-27.915,lng:153.330,cap:'90 MVA',op:'Energex'},
+    {name:'Narangba Zone Sub',lat:-27.195,lng:152.975,cap:'80 MVA',op:'Energex'},
+    {name:'Toowoomba Zone Sub',lat:-27.560,lng:151.955,cap:'80 MVA',op:'Ergon'},
+    {name:'Beaudesert Zone Sub',lat:-27.990,lng:153.000,cap:'40 MVA',op:'Energex'}
+  ],
+  sewer: [
+    {name:'Bundamba STP',lat:-27.620,lng:152.800,cap:'66 ML/day',op:'Urban Utilities'},
+    {name:'Oxley Creek STP',lat:-27.582,lng:152.985,cap:'55 ML/day',op:'Urban Utilities'},
+    {name:'Goodna STP',lat:-27.615,lng:152.885,cap:'25 ML/day',op:'Urban Utilities'},
+    {name:'Luggage Point STP',lat:-27.385,lng:153.120,cap:'215 ML/day',op:'Urban Utilities'},
+    {name:'Pimpama STP',lat:-27.820,lng:153.305,cap:'50 ML/day',op:'Gold Coast Water'},
+    {name:'Coombabah STP',lat:-27.895,lng:153.365,cap:'70 ML/day',op:'Gold Coast Water'},
+    {name:'Merrimac STP',lat:-28.035,lng:153.385,cap:'55 ML/day',op:'Gold Coast Water'},
+    {name:'Murrumba Downs STP',lat:-27.283,lng:152.965,cap:'50 ML/day',op:'Unitywater'},
+    {name:'South Caboolture STP',lat:-27.095,lng:152.935,cap:'40 ML/day',op:'Unitywater'},
+    {name:'Kawana STP',lat:-26.715,lng:153.135,cap:'50 ML/day',op:'Unitywater'},
+    {name:'Brendale STP',lat:-27.320,lng:152.980,cap:'35 ML/day',op:'Unitywater'},
+    {name:'Beaudesert STP',lat:-27.995,lng:153.000,cap:'8 ML/day',op:'Scenic Rim'},
+    {name:'Flagstone STP (planned)',lat:-27.830,lng:152.960,cap:'TBC',op:'Urban Utilities'}
+  ],
+  water: [
+    {name:'Mt Crosby WTP',lat:-27.533,lng:152.770,cap:'860 ML/day',op:'Seqwater'},
+    {name:'North Pine WTP',lat:-27.268,lng:152.935,cap:'200 ML/day',op:'Seqwater'},
+    {name:'Molendinar WTP',lat:-27.960,lng:153.375,cap:'210 ML/day',op:'Seqwater'},
+    {name:'Image Flat WTP',lat:-26.590,lng:152.945,cap:'130 ML/day',op:'Seqwater'},
+    {name:'Beaudesert WTP',lat:-27.985,lng:153.005,cap:'12 ML/day',op:'Seqwater'},
+    {name:'Lowood WTP',lat:-27.465,lng:152.580,cap:'20 ML/day',op:'Seqwater'}
+  ]
+};
+
+// Haversine distance in km
+function haversineKm(lat1, lng1, lat2, lng2) {
+  var R = 6371;
+  var dLat = (lat2 - lat1) * Math.PI / 180;
+  var dLng = (lng2 - lng1) * Math.PI / 180;
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLng/2) * Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function findNearestInfra(lat, lng, type) {
+  var list = knownInfra[type] || [];
+  var best = null, bestDist = 999999;
+  list.forEach(function(pt) {
+    var d = haversineKm(lat, lng, pt.lat, pt.lng);
+    if (d < bestDist) { bestDist = d; best = pt; }
+  });
+  return best ? {name: best.name, dist: bestDist, cap: best.cap, op: best.op} : null;
+}
+
+// Distance rating for subdivision feasibility
+function distanceRating(km) {
+  if (km <= 1) return {label:'NEARBY', color:'#22c55e', bg:'rgba(34,197,94,.1)', cost:'Low connection cost'};
+  if (km <= 3) return {label:'CLOSE', color:'#0ea5e9', bg:'rgba(14,165,233,.1)', cost:'Standard extension'};
+  if (km <= 8) return {label:'MODERATE', color:'#f59e0b', bg:'rgba(245,158,11,.1)', cost:'Trunk extension required'};
+  return {label:'DISTANT', color:'#ef4444', bg:'rgba(239,68,68,.1)', cost:'Major infrastructure cost'};
+}
+
+function assessPropertyServices(zoneName, lga, cadastral, latlng) {
   var z = (zoneName || '').toLowerCase();
   var lgaL = (lga || '').toLowerCase();
-  var area = cadastral ? (cadastral.lot_area || cadastral.LOT_AREA || 0) : 0;
+  var lat = latlng ? latlng.lat : 0;
+  var lng = latlng ? latlng.lng : 0;
 
-  // Urban zones — residential, commercial, industrial, mixed use, centre, community
   var isUrban = /residen|mixed|centre|commercial|industrial|community|township|village|emerging|next gen|medium|high density|low density|character/i.test(z);
-  // Rural zones
-  var isRural = /rural|environmental|conservation|open space|sport|recreation|limited development/i.test(z);
-  // Large lot (>2ha) even in urban zones might be unserviced
-  var isLargeLot = area > 20000;
 
-  // SEQ council areas with full reticulated services
-  var fullServiceLGAs = ['brisbane','gold coast','logan','moreton bay','ipswich','sunshine coast','noosa','redland'];
-  var isFullServiceLGA = fullServiceLGAs.some(function(l){ return lgaL.indexOf(l) !== -1; });
-
-  // Regional councils — mixed services
-  var regionalLGAs = ['toowoomba','scenic rim','somerset','lockyer','bundaberg','fraser','gympie'];
-  var isRegionalLGA = regionalLGAs.some(function(l){ return lgaL.indexOf(l) !== -1; });
+  // Find nearest infrastructure for each type
+  var nearPower = findNearestInfra(lat, lng, 'power');
+  var nearSewer = findNearestInfra(lat, lng, 'sewer');
+  var nearWater = findNearestInfra(lat, lng, 'water');
 
   var services = [];
 
-  // POWER — almost everywhere in QLD has access to power grid
-  if (isUrban || isFullServiceLGA) {
-    services.push({icon:'\u26A1', name:'Power', status:'Available', note: isFullServiceLGA ? 'Energex network' : 'Ergon Energy'});
-  } else if (isRegionalLGA) {
-    services.push({icon:'\u26A1', name:'Power', status:'Likely', note:'Ergon Energy — check feeder capacity'});
-  } else {
-    services.push({icon:'\u26A1', name:'Power', status:'Likely', note:'Confirm with Ergon/Energex'});
+  // POWER
+  if (nearPower) {
+    var pr = distanceRating(nearPower.dist);
+    // Urban areas have street-level power everywhere regardless of substation distance
+    if (isUrban && nearPower.dist < 15) {
+      pr = {label:'AT BOUNDARY', color:'#22c55e', bg:'rgba(34,197,94,.1)', cost:'Connection at lot boundary'};
+    }
+    services.push({
+      icon:'\u26A1', name:'Power', dist: isUrban ? 'At boundary' : nearPower.dist.toFixed(1) + ' km',
+      rating: pr, nearest: nearPower.name, cap: nearPower.cap, op: nearPower.op
+    });
   }
 
-  // WATER — urban SEQ = yes, rural/regional = check
-  if (isUrban && isFullServiceLGA) {
-    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Available', note: lgaL.indexOf('gold coast') !== -1 ? 'Gold Coast Water' : lgaL.indexOf('sunshine') !== -1 || lgaL.indexOf('moreton') !== -1 || lgaL.indexOf('noosa') !== -1 ? 'Unitywater' : 'Urban Utilities'});
-  } else if (isRegionalLGA && isUrban) {
-    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Likely', note:'Council reticulated — check trunk main distance'});
-  } else if (isRural || isLargeLot) {
-    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Check', note:'May require bore or tank — verify with council'});
-  } else {
-    services.push({icon:'\uD83D\uDCA7', name:'Water', status:'Likely', note:'Confirm with water provider'});
+  // WATER
+  if (nearWater) {
+    var wr = distanceRating(nearWater.dist);
+    if (isUrban && nearWater.dist < 30) {
+      wr = {label:'RETICULATED', color:'#22c55e', bg:'rgba(34,197,94,.1)', cost:'Town water available'};
+    }
+    services.push({
+      icon:'\uD83D\uDCA7', name:'Water', dist: isUrban ? 'Town water' : nearWater.dist.toFixed(1) + ' km to WTP',
+      rating: wr, nearest: nearWater.name, cap: nearWater.cap, op: nearWater.op
+    });
   }
 
-  // SEWER — urban SEQ = yes, rural = on-site, fringe = check trunk distance
-  if (isUrban && isFullServiceLGA) {
-    services.push({icon:'\u26AB', name:'Sewer', status:'Available', note:'Reticulated sewer network'});
-  } else if (isUrban && isRegionalLGA) {
-    services.push({icon:'\u26AB', name:'Sewer', status:'Check', note:'May need trunk extension — check with council'});
-  } else if (isRural || isLargeLot) {
-    services.push({icon:'\u26AB', name:'Sewer', status:'Check', note:'Likely on-site (septic) — key cost for subdivision'});
-  } else {
-    services.push({icon:'\u26AB', name:'Sewer', status:'Check', note:'Verify sewer trunk connection availability'});
+  // SEWER — most critical for subdivision cost
+  if (nearSewer) {
+    var sr = distanceRating(nearSewer.dist);
+    if (isUrban && nearSewer.dist < 10) {
+      sr = {label:'RETICULATED', color:'#22c55e', bg:'rgba(34,197,94,.1)', cost:'Sewer trunk accessible'};
+    }
+    services.push({
+      icon:'\u26AB', name:'Sewer', dist: nearSewer.dist.toFixed(1) + ' km to STP',
+      rating: sr, nearest: nearSewer.name, cap: nearSewer.cap, op: nearSewer.op
+    });
   }
 
-  // NBN — most of SEQ urban has FTTP or FTTC, rural = fixed wireless or satellite
-  if (isUrban && (isFullServiceLGA || isRegionalLGA)) {
-    services.push({icon:'\uD83D\uDCE1', name:'NBN', status:'Available', note:'FTTP/FTTC likely — check nbnco.com.au'});
-  } else if (isRural) {
-    services.push({icon:'\uD83D\uDCE1', name:'NBN', status:'Check', note:'Fixed wireless or satellite — check coverage map'});
+  // STORMWATER — no specific point, based on zone
+  if (isUrban) {
+    services.push({
+      icon:'\uD83C\uDF0A', name:'Stormwater', dist:'Council network',
+      rating:{label:'AVAILABLE', color:'#22c55e', bg:'rgba(34,197,94,.1)', cost:'Council drainage'},
+      nearest:'Council network', cap:'', op:''
+    });
   } else {
-    services.push({icon:'\uD83D\uDCE1', name:'NBN', status:'Likely', note:'Verify technology type at nbnco.com.au'});
+    services.push({
+      icon:'\uD83C\uDF0A', name:'Stormwater', dist:'On-site',
+      rating:{label:'ON-SITE', color:'#f59e0b', bg:'rgba(245,158,11,.1)', cost:'Detention basin likely required'},
+      nearest:'On-site management', cap:'', op:''
+    });
   }
 
-  // STORMWATER — important for subdivision
-  if (isUrban && isFullServiceLGA) {
-    services.push({icon:'\uD83C\uDF0A', name:'Stormwater', status:'Available', note:'Council stormwater network'});
+  // NBN
+  if (isUrban) {
+    services.push({
+      icon:'\uD83D\uDCE1', name:'NBN', dist:'FTTP/FTTC',
+      rating:{label:'AVAILABLE', color:'#22c55e', bg:'rgba(34,197,94,.1)', cost:'NBN fibre ready'},
+      nearest:'nbnco.com.au', cap:'', op:'NBN Co'
+    });
   } else {
-    services.push({icon:'\uD83C\uDF0A', name:'Stormwater', status:'Check', note:'On-site detention may be required'});
+    services.push({
+      icon:'\uD83D\uDCE1', name:'NBN', dist:'Check coverage',
+      rating:{label:'CHECK', color:'#f59e0b', bg:'rgba(245,158,11,.1)', cost:'Fixed wireless or new lead-in'},
+      nearest:'nbnco.com.au', cap:'', op:'NBN Co'
+    });
   }
 
   return services;
@@ -4659,19 +4744,26 @@ function renderPropPanel(latlng, r) {
     html += '</div></div>';
   }
 
-  // ── Per-Property Service Assessment ──
-  var svcAssess = assessPropertyServices(councilZoneName, lga, r.cadastral);
+  // ── Per-Property Service Assessment (Distance-Based) ──
+  var svcAssess = assessPropertyServices(councilZoneName, lga, r.cadastral, latlng);
   html += '<div class="pp-section"><div class="pp-section-title">Services &amp; Utilities</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  html += '<div style="display:flex;flex-direction:column;gap:5px">';
   svcAssess.forEach(function(s) {
-    var bg = s.status === 'Available' ? 'rgba(34,197,94,.1)' : s.status === 'Likely' ? 'rgba(14,165,233,.1)' : s.status === 'Check' ? 'rgba(245,158,11,.1)' : 'rgba(239,68,68,.1)';
-    var col = s.status === 'Available' ? '#22c55e' : s.status === 'Likely' ? '#0ea5e9' : s.status === 'Check' ? '#f59e0b' : '#ef4444';
-    html += '<div style="padding:6px 8px;border-radius:6px;background:' + bg + ';border:1px solid ' + col + '22">' +
+    var rt = s.rating;
+    html += '<div style="padding:7px 10px;border-radius:6px;background:' + rt.bg + ';border:1px solid ' + rt.color + '22">' +
       '<div style="display:flex;align-items:center;justify-content:space-between">' +
-      '<span style="font-size:11px;font-weight:600;color:var(--text)">' + s.icon + ' ' + s.name + '</span>' +
-      '<span style="font-size:9px;font-weight:700;color:' + col + ';letter-spacing:.3px">' + s.status.toUpperCase() + '</span></div>' +
-      (s.note ? '<div style="font-size:8.5px;color:var(--dim);margin-top:2px">' + s.note + '</div>' : '') +
-      '</div>';
+        '<div style="display:flex;align-items:center;gap:6px">' +
+          '<span style="font-size:13px">' + s.icon + '</span>' +
+          '<div><div style="font-size:11px;font-weight:700;color:var(--text)">' + s.name + '</div>' +
+          '<div style="font-size:9px;color:var(--dim)">' + s.dist + '</div></div>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<div style="font-size:9px;font-weight:700;color:' + rt.color + ';letter-spacing:.4px">' + rt.label + '</div>' +
+          '<div style="font-size:8px;color:var(--dim)">' + rt.cost + '</div>' +
+        '</div>' +
+      '</div>' +
+      (s.nearest && s.cap ? '<div style="font-size:8.5px;color:var(--dim);margin-top:3px;border-top:1px solid ' + rt.color + '15;padding-top:3px">Nearest: ' + s.nearest + (s.cap ? ' (' + s.cap + ')' : '') + (s.op ? ' — ' + s.op : '') + '</div>' : '') +
+    '</div>';
   });
   html += '</div></div>';
 
