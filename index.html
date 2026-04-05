@@ -3918,35 +3918,38 @@ function initFullMapLayers() {
     var tip = code ? (code + ' — ' + name) : name;
     layer.bindTooltip(tip, {sticky: true, className: 'zone-tooltip', opacity: 0.9});
   }
+  // ══════════════════════════════════════════════════════════════════
+  // ALL zone layers use L.esri.featureLayer (client-side vector rendering).
+  // This works for BOTH FeatureServer AND MapServer layer URLs.
+  // DO NOT use dynamicMapLayer — it renders server-side and disappears
+  // at high zoom due to server scale limits. featureLayer renders as
+  // vectors on the client so colours NEVER disappear at any zoom level.
+  // ══════════════════════════════════════════════════════════════════
   (function loadCouncilZoneLayers() {
     var zoningGroup = L.layerGroup();
     for (var key in councilZoneServices) {
       var svc = councilZoneServices[key];
-      if (svc.isMapServer) {
-        // MapServer layers need dynamicMapLayer (e.g. Logan)
-        var ml = L.esri.dynamicMapLayer({
-          url: svc.url.replace(/\/\d+$/, ''), // strip layer number for dynamicMapLayer
-          layers: [parseInt(svc.url.split('/').pop())],
-          opacity: 0.35, minZoom: 10,
-          attribution: '© ' + key
-        });
-        zoningGroup.addLayer(ml);
-      } else {
-        // FeatureServer layers — render as vectors at all zoom levels
-        var fl = L.esri.featureLayer({
-          url: svc.url,
-          minZoom: 10,
-          style: zoneColourStyle,
-          onEachFeature: zoneTooltipBind
-        });
-        zoningGroup.addLayer(fl);
-      }
+      var fl = L.esri.featureLayer({
+        url: svc.url,
+        minZoom: 10,
+        style: zoneColourStyle,
+        onEachFeature: zoneTooltipBind,
+        // Ensure features load correctly across all zoom levels
+        simplifyFactor: 0.5,
+        precision: 5
+      });
+      fl._councilName = key;
+      // Log load/error events for debugging
+      fl.on('load', function(){ console.log('Zone layer loaded: ' + this._councilName); }.bind(fl));
+      fl.on('error', function(e){ console.warn('Zone layer error (' + this._councilName + '):', e.error || e); }.bind(fl));
+      fl.on('requeststart', function(){ console.log('Zone layer requesting: ' + this._councilName); }.bind(fl));
+      zoningGroup.addLayer(fl);
     }
     zoningGroup.addTo(mapFull);
     activeLayers.zoning = zoningGroup;
     // Put zoning behind cadastral so parcel borders show on top
     zoningGroup.eachLayer(function(l) { if (l.bringToBack) l.bringToBack(); });
-    console.log('Loaded ' + Object.keys(councilZoneServices).length + ' council zone layers as vectors');
+    console.log('Loaded ' + Object.keys(councilZoneServices).length + ' council zone layers as client-side vectors');
   })();
 
   // Listen for popup opens — means a marker was clicked, not empty space
@@ -4697,7 +4700,7 @@ function arcgisIdentify(serviceUrl, latlng, layerSpec, tolerance, callback) {
 // COUNCIL ZONE SERVICES — ALL URLs VERIFIED LIVE 2026-04-05
 // Each council publishes zone data on their own ArcGIS service.
 // Old ArcGIS Online org IDs were deleted/migrated — updated to new orgs.
-// MapServer endpoints use isMapServer:true for dynamicMapLayer rendering.
+// MapServer endpoints have isMapServer:true (used for query method selection, NOT rendering).
 // DO NOT change URLs without testing them first via /query endpoint.
 // ══════════════════════════════════════════════════════════════════
 const councilZoneServices = {
