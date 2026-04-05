@@ -279,7 +279,12 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .map-zoom-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid rgba(20,23,34,.9);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:transform .12s}
 .map-zoom-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
 .map-zoom-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid rgba(20,23,34,.9);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4)}
-.map-style-toggle{position:absolute;top:12px;left:12px;z-index:1003;display:flex;gap:0;border-radius:4px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.map-style-toggle{position:absolute;top:12px;left:12px;z-index:1003;display:flex;flex-direction:column;gap:0;border-radius:6px;overflow:visible;border:none;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.map-style-btns{display:flex;gap:0;border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.map-size-legend{display:none;margin-top:6px;padding:7px 10px;background:rgba(20,23,34,.92);backdrop-filter:blur(12px);border-radius:4px;border:1px solid var(--border)}
+.map-size-legend.visible{display:flex;gap:10px;align-items:center}
+.map-size-legend-item{display:flex;align-items:center;gap:4px;font-size:9.5px;font-weight:600;color:#e2e8f0;letter-spacing:.2px}
+.map-size-legend-dot{width:10px;height:10px;border-radius:2px;border:1px solid rgba(255,255,255,0.15)}
 .map-style-btn{padding:9px 14px;font-size:11px;font-weight:700;background:rgba(20,23,34,.94);backdrop-filter:blur(12px);color:var(--dim);border:none;cursor:pointer;transition:all .15s;letter-spacing:.4px;text-transform:uppercase}
 .map-style-btn:hover{color:var(--text);background:rgba(40,45,65,.95)}
 .map-style-btn.active{background:var(--accent);color:#0a0d14}
@@ -2383,9 +2388,16 @@ setTimeout(() => {
 function addMapStyleToggle(mi, streetL, satL) {
   var container = L.DomUtil.create('div','map-style-toggle');
   L.DomEvent.disableClickPropagation(container);
-  container.innerHTML = '<button class="map-style-btn active" data-style="street">Street</button>'
+  container.innerHTML = '<div class="map-style-btns">'
+    +'<button class="map-style-btn active" data-style="street">Street</button>'
     +'<button class="map-style-btn" data-style="hybrid">Hybrid</button>'
-    +'<button class="map-style-btn" data-style="satellite">Satellite</button>';
+    +'<button class="map-style-btn" data-style="satellite">Satellite</button>'
+    +'</div>'
+    +'<div class="map-size-legend" id="mapSizeLegend">'
+    +'<div class="map-size-legend-item"><span class="map-size-legend-dot" style="background:#86efac"></span>1–5 Ac</div>'
+    +'<div class="map-size-legend-item"><span class="map-size-legend-dot" style="background:#7dd3fc"></span>5–10 Ac</div>'
+    +'<div class="map-size-legend-item"><span class="map-size-legend-dot" style="background:#c4b5fd"></span>10+ Ac</div>'
+    +'</div>';
   mi.getContainer().appendChild(container);
 
   // Label overlay for hybrid mode
@@ -3620,18 +3632,22 @@ function toggleSizeFilter(on) {
 
   if (sizeFilterAbort) { try { sizeFilterAbort.abort(); } catch(e){} sizeFilterAbort = null; }
 
+  var mapLegend = document.getElementById('mapSizeLegend');
+
   if (!on) {
     if (sizeFilterLayer && mapFull) { mapFull.removeLayer(sizeFilterLayer); sizeFilterLayer = null; }
     sizeFilterActive = false;
     document.getElementById('sizeLegend').style.display = 'none';
     document.getElementById('sizeOpacityRow').style.display = 'none';
     document.getElementById('sizeFilterStatus').textContent = '';
+    if (mapLegend) mapLegend.classList.remove('visible');
     return;
   }
 
   sizeFilterActive = true;
   document.getElementById('sizeLegend').style.display = 'flex';
   document.getElementById('sizeOpacityRow').style.display = 'flex';
+  if (mapLegend) mapLegend.classList.add('visible');
 
   if (sizeFilterLayer && mapFull) { mapFull.removeLayer(sizeFilterLayer); sizeFilterLayer = null; }
   document.getElementById('sizeFilterStatus').innerHTML = '<span style="color:#86efac">Loading parcels...</span>';
