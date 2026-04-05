@@ -4001,6 +4001,26 @@ const councilZoneServices = {
   'Logan City': {
     url: 'https://arcgis.lcc.wspdigital.com/server/rest/services/LoganHub/Logan_Planning_Scheme_v9_2_TLPI_No_1_2024_20250527/MapServer/368',
     zoneField: 'Zone', codeField: 'Zone', precinctField: null, isMapServer: true
+  },
+  'Redland City': {
+    url: 'https://services-ap1.arcgis.com/O0Fmi6M1WkpKLB6C/arcgis/rest/services/City_Plan_Zones_20230928/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
+  },
+  'Scenic Rim Regional': {
+    url: 'https://services-ap1.arcgis.com/i6WPzjrFWIq7Z4Nq/arcgis/rest/services/Scenic_Rim_Planning_Scheme_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
+  },
+  'Somerset Regional': {
+    url: 'https://services-ap1.arcgis.com/kSaELiOjBqAbJL73/arcgis/rest/services/Somerset_PS_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
+  },
+  'Lockyer Valley Regional': {
+    url: 'https://services-ap1.arcgis.com/kSaELiOjBqAbJL73/arcgis/rest/services/LV_Planning_Scheme_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
+  },
+  'Toowoomba Regional': {
+    url: 'https://services-ap1.arcgis.com/OBBhNGHEzMAubfAY/arcgis/rest/services/TRC_Planning_Scheme_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
   }
 };
 
@@ -4012,6 +4032,37 @@ function findCouncilZoneService(lgaName) {
     if (lga.indexOf(key.split(' ')[0].toLowerCase()) !== -1) return councilZoneServices[key];
   }
   return null;
+}
+
+// State-level QPP zoning fallback (covers all of QLD)
+function queryStateZone(latlng, callback) {
+  var qp = new URLSearchParams({
+    geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
+    geometryType: 'esriGeometryPoint',
+    spatialRel: 'esriSpatialRelIntersects',
+    outFields: '*',
+    returnGeometry: 'false',
+    resultRecordCount: '1',
+    f: 'json'
+  });
+  // QLD Planning Framework — state-wide zoning layer
+  var url = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/73/query';
+  fetch(url + '?' + qp.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.features && data.features.length > 0) {
+        var attrs = data.features[0].attributes;
+        console.log('State zone fallback attrs:', JSON.stringify(attrs));
+        var zone = attrs.ZONE_DESCR || attrs.ZONE_NAME || attrs.LVL2_ZONE || attrs.NAME || attrs.ZONE || null;
+        var precinct = attrs.PRECINCT || attrs.ZONE_PREC || null;
+        if (zone) {
+          callback({zone: zone, precinct: precinct, council: 'QLD State', raw: attrs});
+          return;
+        }
+      }
+      callback(null);
+    })
+    .catch(function(err){ console.log('State zone fallback error:', err); callback(null); });
 }
 
 // Query council zone for a point
@@ -4123,14 +4174,16 @@ function identifyParcel(latlng) {
     koala: null, heritage: null, acid: null, seqZone: null, councilZone: null
   };
   let completed = 0;
-  const total = 13;
+  const baseTotal = 12; // 12 base queries (address, cadastral, landuse, pda, flood, floodplain, contour, mses, koala, heritage, acid, seqZone)
   let zoneQueryFired = false;
+  let rendered = false;
 
   function checkComplete() {
     completed++;
+    var displayTotal = zoneQueryFired ? baseTotal + 1 : baseTotal;
     // Update loading text with progress
-    if (completed < total) {
-      content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying... (' + completed + '/' + total + ' services)</div>';
+    if (!rendered) {
+      content.innerHTML = '<div class="pp-loading"><div class="pp-spinner"></div>Querying... (' + Math.min(completed, displayTotal) + '/' + displayTotal + ' services)</div>';
     }
     // Fire council zone query as soon as we know the LGA
     if (!zoneQueryFired) {
@@ -4139,14 +4192,27 @@ function identifyParcel(latlng) {
       if (!lgaName && results.address) lgaName = results.address.local_authority || results.address.LOCAL_AUTHORITY;
       if (lgaName) {
         zoneQueryFired = true;
+        // Try council-level zone first, fall back to state QPP zone
         queryCouncilZone(latlng, lgaName, function(zoneData){
-          results.councilZone = zoneData;
-          checkComplete();
+          if (zoneData) {
+            results.councilZone = zoneData;
+          }
+          // If council query failed, try state-level QPP zoning
+          if (!zoneData || !zoneData.zone) {
+            queryStateZone(latlng, function(stateZone){
+              if (stateZone && !results.councilZone) results.councilZone = stateZone;
+              else if (stateZone && results.councilZone && !results.councilZone.zone) results.councilZone = stateZone;
+              checkComplete();
+            });
+          } else {
+            checkComplete();
+          }
         });
       }
     }
-    if (completed >= total) {
-      // If zone query never fired (no LGA found), just render
+    // Render when base queries done + zone query done (or never fired)
+    if (!rendered && completed >= baseTotal && (!zoneQueryFired || completed >= baseTotal + 1)) {
+      rendered = true;
       renderPropPanel(latlng, results);
     }
   }
@@ -4301,13 +4367,13 @@ function identifyParcel(latlng) {
     checkComplete();
   });
 
-  // Timeout fallback — render whatever we have after 10s
+  // Timeout fallback — render whatever we have after 8s
   setTimeout(function() {
-    if (completed < total) {
-      completed = total;
+    if (!rendered) {
+      rendered = true;
       renderPropPanel(latlng, results);
     }
-  }, 10000);
+  }, 8000);
 }
 
 function renderPropPanel(latlng, r) {
