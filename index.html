@@ -5313,17 +5313,7 @@ function renderPropPanel(latlng, r) {
     ${fullAddress && locality !== '—' ? '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + locality + (lga !== '—' ? ' — ' + lga : '') + '</div>' : ''}
   </div>`;
 
-  // Property Details section (right after address)
-  html += `<div class="pp-section">
-    <div class="pp-section-title">Property Details</div>
-    <div class="pp-grid">
-      <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
-      <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
-      <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
-    </div>
-  </div>`;
-
-  // Zone badge
+  // Zone badge (first after address)
   if (councilZoneName) {
     html += `<div style="margin-bottom:12px;padding:8px 12px;background:${zoneCat.bg};border:1px solid ${zoneCat.color}33;border-radius:8px;display:flex;align-items:center;gap:8px">
       ${zoneCat.icon ? '<span style="font-size:18px">' + zoneCat.icon + '</span>' : ''}
@@ -5334,6 +5324,16 @@ function renderPropPanel(latlng, r) {
       <span style="background:${zoneCat.color};color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700">${zoneCat.label}</span>
     </div>`;
   }
+
+  // Property Details section (Zone → Land Size → LGA → Lot/Plan)
+  html += `<div class="pp-section">
+    <div class="pp-section-title">Property Details</div>
+    <div class="pp-grid">
+      <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
+      <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
+      <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
+    </div>
+  </div>`;
 
   // Koala habitat
   const koalaStatus = r.koala ? 'Habitat Identified' : 'Unaffected';
