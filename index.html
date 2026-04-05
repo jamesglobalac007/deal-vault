@@ -662,24 +662,18 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-dot" style="background:#059669"></div><div class="lp-label">Biodiversity Corridors<span class="lp-desc">Terrestrial &amp; riparian corridors</span></div>
         </label>
         <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
-        <label class="lp-item" data-layer="serviceMarkers">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceMarkers',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#0ea5e9"></div><div class="lp-label">Major Plants &amp; Facilities<span class="lp-desc">Treatment plants, dams, substations</span></div>
+        <label class="lp-item" data-layer="serviceRadar">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#0ea5e9"></div><div class="lp-label">Service Coverage Scan<span class="lp-desc">Power · Water · Sewer · NBN per area</span></div>
         </label>
-        <label class="lp-item" data-layer="energexHV">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('energexHV',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#f59e0b"></div><div class="lp-label">Power Lines (HV Network)<span class="lp-desc">11kV &amp; 33kV distribution lines</span></div>
-        </label>
-        <label class="lp-item" data-layer="energexLV">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('energexLV',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#fbbf24"></div><div class="lp-label">Power Lines (LV / Street)<span class="lp-desc">Low voltage street-level lines</span></div>
-        </label>
-        <label class="lp-item" data-layer="energexSubs">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('energexSubs',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#f97316"></div><div class="lp-label">Substations<span class="lp-desc">Zone &amp; distribution substations</span></div>
-        </label>
-        <div style="padding:4px 12px 8px;font-size:10px;color:#94a3b8;line-height:1.4">
-          <span style="color:#0ea5e9">&#9432;</span> Water &amp; sewer network maps linked in property panel under Service Connections
+        <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+            <span>&#9889; Power</span>
+            <span>&#128167; Water</span>
+            <span>&#9899; Sewer</span>
+            <span>&#128225; NBN</span>
+          </div>
+          <span style="color:#0ea5e9">&#9432;</span> Shows service availability by growth area. Click any area for details.
         </div>
         <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
         <label class="lp-item" data-layer="pdaMarkers">
@@ -2740,73 +2734,105 @@ function addGrowthIntelligence(mi) {
 
   console.log('Growth Intelligence loaded: ' + pdaDatabase.length + ' PDAs, ' + infraDatabase.length + ' infrastructure, ' + devEstatesDatabase.length + ' estates, ' + pfgaDatabase.length + ' PFGAs, ' + cat1DevAreas.length + ' Cat 1 areas');
 
-  // ── SERVICES & UTILITIES MARKERS ──
-  // Key water, sewer, power infrastructure across SEQ growth corridors
-  var servicesDatabase = [
-    // Water Treatment Plants
-    {name:'Mt Crosby Water Treatment Plant',lat:-27.533,lng:152.770,type:'Water',sub:'Treatment Plant',capacity:'860 ML/day',operator:'Seqwater',desc:'Largest WTP in SEQ. Supplies bulk treated water to Brisbane, Ipswich, Logan, Scenic Rim. Draws from Wivenhoe/Somerset dams via Brisbane River.'},
-    {name:'North Pine Water Treatment Plant',lat:-27.268,lng:152.935,type:'Water',sub:'Treatment Plant',capacity:'200 ML/day',operator:'Seqwater',desc:'Supplies Moreton Bay region from North Pine Dam. Key supply for Caboolture West (Waraba) growth area.'},
-    {name:'Molendinar Water Treatment Plant',lat:-27.960,lng:153.375,type:'Water',sub:'Treatment Plant',capacity:'210 ML/day',operator:'Seqwater',desc:'Primary WTP for Gold Coast. Fed by Hinze Dam. Services Coomera, Pimpama, Ormeau growth corridors.'},
-    {name:'Image Flat Water Treatment Plant',lat:-26.590,lng:152.945,type:'Water',sub:'Treatment Plant',capacity:'130 ML/day',operator:'Seqwater',desc:'Supplies Sunshine Coast via Baroon Pocket Dam. Services Caloundra South (Aura) and Beerwah growth areas.'},
-    {name:'Lowood Water Treatment Plant',lat:-27.465,lng:152.580,type:'Water',sub:'Treatment Plant',capacity:'20 ML/day',operator:'Seqwater',desc:'Regional WTP for Somerset/Lockyer Valley. Supports rural residential growth west of Ipswich.'},
-    {name:'Beaudesert Water Treatment Plant',lat:-27.985,lng:153.005,type:'Water',sub:'Treatment Plant',capacity:'12 ML/day',operator:'Seqwater',desc:'Services Beaudesert and Scenic Rim growth corridor. Capacity constraints noted for future subdivision growth.'},
-    {name:'Esk Water Treatment Plant',lat:-27.235,lng:152.425,type:'Water',sub:'Treatment Plant',capacity:'5 ML/day',operator:'Seqwater',desc:'Small regional WTP for Somerset. Limited capacity — trunk upgrades needed for any significant development.'},
-    // Sewage Treatment Plants
-    {name:'Luggage Point STP',lat:-27.385,lng:153.120,type:'Sewer',sub:'Treatment Plant',capacity:'215 ML/day',operator:'Urban Utilities',desc:'Largest STP in Brisbane. Discharges to Moreton Bay. Services northern and eastern Brisbane catchments.'},
-    {name:'Oxley Creek STP',lat:-27.582,lng:152.985,type:'Sewer',sub:'Treatment Plant',capacity:'55 ML/day',operator:'Urban Utilities',desc:'Services southern Brisbane, Acacia Ridge, Forest Lake. Key facility for Springfield and Ripley Valley trunk connections.'},
-    {name:'Bundamba Advanced WTP',lat:-27.620,lng:152.800,type:'Sewer',sub:'Treatment Plant',capacity:'66 ML/day',operator:'Urban Utilities',desc:'Serves Ipswich, Springfield, Ripley Valley. Advanced treatment. Critical trunk capacity for western corridor growth.'},
-    {name:'Goodna STP',lat:-27.615,lng:152.885,type:'Sewer',sub:'Treatment Plant',capacity:'25 ML/day',operator:'Urban Utilities',desc:'Services Goodna/Springfield catchment. Supports Ripley Valley PDA sewer infrastructure.'},
-    {name:'Pimpama STP',lat:-27.820,lng:153.305,type:'Sewer',sub:'Treatment Plant',capacity:'50 ML/day',operator:'Gold Coast Water',desc:'Services Coomera, Pimpama, Upper Coomera, Ormeau growth corridor. Recently expanded for northern Gold Coast growth.'},
-    {name:'Coombabah STP',lat:-27.895,lng:153.365,type:'Sewer',sub:'Treatment Plant',capacity:'70 ML/day',operator:'Gold Coast Water',desc:'Major Gold Coast STP. Services Helensvale, Coomera, Hope Island. Trunk sewer capacity supports further northern GC growth.'},
-    {name:'Merrimac STP',lat:-28.035,lng:153.385,type:'Sewer',sub:'Treatment Plant',capacity:'55 ML/day',operator:'Gold Coast Water',desc:'Services central Gold Coast. Broadbeach, Robina, Merrimac catchments.'},
-    {name:'Murrumba Downs STP',lat:-27.283,lng:152.965,type:'Sewer',sub:'Treatment Plant',capacity:'50 ML/day',operator:'Unitywater',desc:'Services Pine Rivers, Murrumba Downs, North Lakes. Key facility for Waraba (Caboolture West) PDA connections.'},
-    {name:'South Caboolture STP',lat:-27.095,lng:152.935,type:'Sewer',sub:'Treatment Plant',capacity:'40 ML/day',operator:'Unitywater',desc:'Services Caboolture, Morayfield. Trunk sewer connections being planned for Waraba PDA 30,000 dwelling growth.'},
-    {name:'Kawana STP',lat:-26.715,lng:153.135,type:'Sewer',sub:'Treatment Plant',capacity:'50 ML/day',operator:'Unitywater',desc:'Sunshine Coast STP services Caloundra, Kawana, Birtinya. Supports Aura (Caloundra South) PDA growth.'},
-    {name:'Brendale STP',lat:-27.320,lng:152.980,type:'Sewer',sub:'Treatment Plant',capacity:'35 ML/day',operator:'Unitywater',desc:'Services Brendale, Strathpine, Bray Park industrial/residential catchment.'},
-    {name:'Beaudesert STP',lat:-27.995,lng:153.000,type:'Sewer',sub:'Treatment Plant',capacity:'8 ML/day',operator:'Scenic Rim Council',desc:'Small regional STP. Major upgrade needed if Beaudesert growth corridor accelerates. Current capacity limits subdivision scale.'},
-    {name:'Flagstone STP (planned)',lat:-27.830,lng:152.960,type:'Sewer',sub:'Planned Facility',capacity:'TBC',operator:'Urban Utilities',desc:'New STP planned for Greater Flagstone PDA. Will service 51,500 dwellings. Currently relying on interim trunk connections.'},
-    // Power Substations (Energex Zone Substations)
-    {name:'Ripley Zone Substation',lat:-27.670,lng:152.760,type:'Power',sub:'Zone Substation',capacity:'100 MVA',operator:'Energex',desc:'New substation built for Ripley Valley PDA. Supports 48,000+ dwelling growth. 33kV distribution.'},
-    {name:'Yarrabilba Zone Substation',lat:-27.785,lng:153.105,type:'Power',sub:'Zone Substation',capacity:'80 MVA',operator:'Energex',desc:'Services Yarrabilba PDA and surrounding growth. 33kV distribution supporting 20,000+ dwellings.'},
-    {name:'Coomera Zone Substation',lat:-27.870,lng:153.310,type:'Power',sub:'Zone Substation',capacity:'120 MVA',operator:'Energex',desc:'Major substation for northern Gold Coast. Services Coomera, Pimpama, Upper Coomera, Ormeau growth corridor.'},
-    {name:'Flagstone Zone Substation',lat:-27.845,lng:152.945,type:'Power',sub:'Zone Substation',capacity:'80 MVA',operator:'Energex',desc:'Services Greater Flagstone PDA. Supports southern Logan growth corridor.'},
-    {name:'Springfield Zone Substation',lat:-27.665,lng:152.900,type:'Power',sub:'Zone Substation',capacity:'100 MVA',operator:'Energex',desc:'Services Springfield Lakes, Brookwater, Augustine Heights. Supports Ripley/Springfield corridor growth.'},
-    {name:'Caboolture Zone Substation',lat:-27.085,lng:152.945,type:'Power',sub:'Zone Substation',capacity:'90 MVA',operator:'Energex',desc:'Services Caboolture, Morayfield. Will need upgrade/augmentation for Waraba PDA 30,000 dwelling growth.'},
-    {name:'Caloundra Zone Substation',lat:-26.800,lng:153.040,type:'Power',sub:'Zone Substation',capacity:'80 MVA',operator:'Energex',desc:'Services Caloundra South (Aura) PDA and Beerwah corridor. Supports Sunshine Coast growth.'},
-    {name:'Highfields Zone Substation',lat:-27.445,lng:151.950,type:'Power',sub:'Zone Substation',capacity:'60 MVA',operator:'Ergon',desc:'Services Toowoomba/Highfields growth corridor. Supports residential subdivision north of Toowoomba.'},
-    {name:'Thornlands Zone Substation',lat:-27.565,lng:153.250,type:'Power',sub:'Zone Substation',capacity:'80 MVA',operator:'Energex',desc:'Services Redlands/Thornlands PDA. Supports bayside growth corridor.'},
-    // Major Water Storage (Dams/Reservoirs)
-    {name:'Wivenhoe Dam',lat:-27.395,lng:152.610,type:'Water',sub:'Dam/Reservoir',capacity:'1,165,000 ML',operator:'Seqwater',desc:'SEQ primary water supply. 100% of Brisbane and Ipswich water. Capacity critical for all western corridor growth.'},
-    {name:'Somerset Dam',lat:-27.120,lng:152.560,type:'Water',sub:'Dam/Reservoir',capacity:'379,849 ML',operator:'Seqwater',desc:'Flood mitigation and water supply. Feeds Wivenhoe. Supports northern growth via North Pine WTP.'},
-    {name:'North Pine Dam',lat:-27.265,lng:152.925,type:'Water',sub:'Dam/Reservoir',capacity:'214,302 ML',operator:'Seqwater',desc:'Primary supply for Moreton Bay. Critical for Waraba, Burpengary, North Lakes growth.'},
-    {name:'Hinze Dam',lat:-28.050,lng:153.285,type:'Water',sub:'Dam/Reservoir',capacity:'310,730 ML',operator:'Seqwater',desc:'Primary Gold Coast water supply. Services all Gold Coast growth corridors via Molendinar WTP.'},
-    {name:'Baroon Pocket Dam',lat:-26.695,lng:152.875,type:'Water',sub:'Dam/Reservoir',capacity:'61,000 ML',operator:'Seqwater',desc:'Sunshine Coast primary supply. Services Caloundra South, Beerwah, Maroochydore growth via Image Flat WTP.'}
+  // ── SERVICES & UTILITIES — SUBURB-LEVEL RADAR SCAN ──
+  // Clean icons per growth area showing which services are available
+  var serviceAreas = [
+    {name:'Flagstone',lat:-27.83,lng:152.96,power:true,water:true,sewer:'planned',nbn:true,
+     note:'Flagstone STP planned (51,500 lots). Energex zone sub 80 MVA. Water via Urban Utilities trunk.'},
+    {name:'Yarrabilba',lat:-27.79,lng:153.11,power:true,water:true,sewer:true,nbn:true,
+     note:'Yarrabilba zone sub 80 MVA. Pimpama STP 50 ML/day. Full NBN FTTP rollout.'},
+    {name:'Ripley Valley',lat:-27.67,lng:152.76,power:true,water:true,sewer:true,nbn:true,
+     note:'New zone sub 100 MVA. Bundamba STP 66 ML/day. Mt Crosby WTP supply. NBN FTTP.'},
+    {name:'Springfield',lat:-27.67,lng:152.90,power:true,water:true,sewer:true,nbn:true,
+     note:'Springfield zone sub 100 MVA. Oxley Creek STP trunk. Full services established.'},
+    {name:'Coomera-Pimpama',lat:-27.86,lng:153.31,power:true,water:true,sewer:true,nbn:true,
+     note:'Coomera zone sub 120 MVA. Pimpama STP 50 ML/day. Molendinar WTP via Hinze Dam.'},
+    {name:'Caboolture West',lat:-27.06,lng:152.87,power:true,water:true,sewer:'planned',nbn:'partial',
+     note:'Caboolture zone sub 90 MVA. Sth Caboolture STP 40 ML/day. Trunk sewer extensions planned for Waraba PDA.'},
+    {name:'Caloundra South',lat:-26.82,lng:153.02,power:true,water:true,sewer:true,nbn:true,
+     note:'Caloundra zone sub 80 MVA. Kawana STP 50 ML/day. Image Flat WTP supply. Aura FTTP.'},
+    {name:'Park Ridge',lat:-27.72,lng:153.07,power:true,water:true,sewer:true,nbn:true,
+     note:'Energex distribution. Urban Utilities sewer trunk. Established service corridor.'},
+    {name:'Beaudesert',lat:-27.99,lng:153.00,power:true,water:true,sewer:'limited',nbn:'partial',
+     note:'Beaudesert STP 8 ML/day (upgrade needed). WTP 12 ML/day. Ergon power. NBN fixed wireless in parts.'},
+    {name:'Highfields',lat:-27.45,lng:151.95,power:true,water:true,sewer:true,nbn:true,
+     note:'Highfields zone sub 60 MVA (Ergon). Toowoomba Council water/sewer. NBN FTTP in newer estates.'},
+    {name:'Beerwah East',lat:-26.86,lng:152.96,power:true,water:true,sewer:'planned',nbn:'partial',
+     note:'Energex distribution. Unitywater connections being extended. Sewer trunk planned for Cat 2 growth.'},
+    {name:'Thornlands',lat:-27.56,lng:153.25,power:true,water:true,sewer:true,nbn:true,
+     note:'Thornlands zone sub 80 MVA. Redland Water/Sewer established. Full NBN.'},
+    {name:'North Lakes',lat:-27.24,lng:153.01,power:true,water:true,sewer:true,nbn:true,
+     note:'Fully serviced established area. Murrumba Downs STP 50 ML/day. NBN FTTP.'},
+    {name:'Ormeau-Jacobs Well',lat:-27.76,lng:153.24,power:true,water:true,sewer:true,nbn:true,
+     note:'Gold Coast Water sewer. Energex power. Full NBN. Coombabah STP 70 ML/day.'},
+    {name:'Wellcamp',lat:-27.57,lng:151.79,power:true,water:'limited',sewer:false,nbn:'partial',
+     note:'Ergon power. No reticulated sewer (on-site systems). Limited town water. Suited to rural-res or industrial.'}
   ];
 
-  var serviceGroup = L.layerGroup();
-  servicesDatabase.forEach(function(svc) {
-    var emoji = svc.type === 'Water' ? '💧' : svc.type === 'Sewer' ? '🟤' : '⚡';
-    var bgColor = svc.type === 'Water' ? '#0ea5e9' : svc.type === 'Sewer' ? '#78716c' : '#eab308';
-    var accentColor = svc.type === 'Water' ? '#0284c7' : svc.type === 'Sewer' ? '#57534e' : '#ca8a04';
-    var bgTint = svc.type === 'Water' ? '#f0f9ff' : svc.type === 'Sewer' ? '#f5f5f4' : '#fefce8';
-    var marker = L.marker([svc.lat, svc.lng], { icon: makeIcon(emoji, bgColor, 26) });
-    marker.bindPopup(
-      '<div style="min-width:260px;font-family:-apple-system,sans-serif">' +
-      '<div style="font-size:14px;font-weight:700;margin-bottom:2px;color:' + accentColor + '">' + svc.name + '</div>' +
-      '<div style="font-size:11px;color:#666;margin-bottom:8px">' + svc.type + ' · ' + svc.sub + ' · ' + svc.operator + '</div>' +
-      '<div style="display:flex;gap:8px;margin-bottom:8px">' +
-        '<div style="background:' + bgTint + ';padding:6px 10px;border-radius:6px;flex:1"><div style="font-size:9px;color:#888;text-transform:uppercase">Capacity</div><div style="font-size:13px;font-weight:700;color:' + accentColor + '">' + svc.capacity + '</div></div>' +
-      '</div>' +
-      '<div style="font-size:11px;color:#333;line-height:1.5">' + svc.desc + '</div>' +
-      '</div>', { maxWidth: 340 }
-    );
-    marker.addTo(serviceGroup);
-  });
-  // NOT added to map by default — user toggles on
-  if (!window.serviceMarkerLayers) window.serviceMarkerLayers = {};
-  window.serviceMarkerLayers[mi._leaflet_id] = serviceGroup;
+  var serviceRadarGroup = L.layerGroup();
+  serviceAreas.forEach(function(area) {
+    // Build service icons row
+    function svcIcon(emoji, status) {
+      if (status === true) return '<span style="opacity:1">' + emoji + '</span>';
+      if (status === 'planned') return '<span style="opacity:0.5" title="Planned">' + emoji + '<sup style="font-size:7px">P</sup></span>';
+      if (status === 'partial') return '<span style="opacity:0.5" title="Partial">' + emoji + '<sup style="font-size:7px">~</sup></span>';
+      if (status === 'limited') return '<span style="opacity:0.35" title="Limited">' + emoji + '<sup style="font-size:7px">L</sup></span>';
+      return '<span style="opacity:0.15">' + emoji + '</span>';
+    }
+    var icons = svcIcon('\u26A1',area.power) + ' ' + svcIcon('\uD83D\uDCA7',area.water) + ' ' + svcIcon('\u26AB',area.sewer) + ' ' + svcIcon('\uD83D\uDCE1',area.nbn);
 
-  console.log('Services layer loaded: ' + servicesDatabase.length + ' facilities (water, sewer, power)');
+    // Count how many are fully connected
+    var fullCount = [area.power, area.water, area.sewer, area.nbn].filter(function(s){ return s === true; }).length;
+    var ringColor = fullCount === 4 ? '#22c55e' : fullCount >= 3 ? '#0ea5e9' : fullCount >= 2 ? '#f59e0b' : '#ef4444';
+
+    // Soft circle on map
+    var circle = L.circle([area.lat, area.lng], {
+      radius: 2500, color: ringColor, weight: 1.5, opacity: 0.6,
+      fillColor: ringColor, fillOpacity: 0.06, interactive: true
+    });
+
+    // DivIcon label in center
+    var label = L.marker([area.lat, area.lng], {
+      interactive: true,
+      icon: L.divIcon({
+        className: '',
+        html: '<div style="text-align:center;pointer-events:auto;cursor:pointer">' +
+              '<div style="font-size:13px;letter-spacing:1px;line-height:1">' + icons + '</div>' +
+              '<div style="font-size:8.5px;font-weight:700;color:' + ringColor + ';margin-top:2px;text-shadow:0 1px 3px rgba(0,0,0,0.8);white-space:nowrap;letter-spacing:.3px">' + area.name.toUpperCase() + '</div>' +
+              '</div>',
+        iconSize: [120, 32],
+        iconAnchor: [60, 16]
+      })
+    });
+
+    // Popup with details
+    var popupHtml = '<div style="min-width:220px;font-family:-apple-system,sans-serif">' +
+      '<div style="font-size:14px;font-weight:800;color:' + ringColor + ';margin-bottom:6px">' + area.name + '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:8px">' +
+        svcRow('\u26A1', 'Power', area.power) +
+        svcRow('\uD83D\uDCA7', 'Water', area.water) +
+        svcRow('\u26AB', 'Sewer', area.sewer) +
+        svcRow('\uD83D\uDCE1', 'NBN', area.nbn) +
+      '</div>' +
+      '<div style="font-size:10.5px;color:#555;line-height:1.5;border-top:1px solid #eee;padding-top:6px">' + area.note + '</div></div>';
+
+    circle.bindPopup(popupHtml, {maxWidth: 300});
+    label.bindPopup(popupHtml, {maxWidth: 300});
+
+    serviceRadarGroup.addLayer(circle);
+    serviceRadarGroup.addLayer(label);
+  });
+
+  function svcRow(emoji, name, status) {
+    var color = status === true ? '#22c55e' : status === 'planned' ? '#f59e0b' : status === 'partial' ? '#f59e0b' : status === 'limited' ? '#ef4444' : '#d1d5db';
+    var label = status === true ? 'Connected' : status === 'planned' ? 'Planned' : status === 'partial' ? 'Partial' : status === 'limited' ? 'Limited' : 'None';
+    return '<div style="display:flex;align-items:center;gap:4px;font-size:11px"><span>' + emoji + '</span><span style="color:#333">' + name + '</span></div>' +
+           '<div style="font-size:11px;font-weight:700;color:' + color + '">' + label + '</div>';
+  }
+
+  if (!window.serviceRadarLayers) window.serviceRadarLayers = {};
+  window.serviceRadarLayers[mi._leaflet_id] = serviceRadarGroup;
+  console.log('Service radar loaded: ' + serviceAreas.length + ' growth areas scanned');
 
   // ── TARGET CORRIDOR OVERLAYS ──
   // Scored acquisition zones with strategy labels — toggle via layer panel
@@ -3246,7 +3272,7 @@ function toggleLayer(layerKey, on) {
     'pfgaMarkers': window.pfgaMarkerLayers,
     'cat1Markers': window.cat1MarkerLayers,
     'targetCorridors': window.targetCorridorLayers,
-    'serviceMarkers': window.serviceMarkerLayers
+    'serviceRadar': window.serviceRadarLayers
   };
   if (intelligenceLayers[layerKey]) {
     var lg = intelligenceLayers[layerKey][mapFull._leaflet_id];
