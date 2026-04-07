@@ -570,18 +570,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('cadastral',this.checked)"><span class="lp-slider"></span></div>
           <div class="lp-dot" style="background:#6b7280"></div><div class="lp-label">Parcel Boundaries<span class="lp-desc">Property boundaries &amp; lot lines</span></div>
         </label>
-        <label class="lp-item" data-layer="contours">
-          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#9ca3af"></div><div class="lp-label">Terrain (Contours)<span class="lp-desc">Contour lines for visualising elevation</span></div>
-        </label>
-        <div class="lp-group" style="color:#3b82f6">Property Tracking <span id="trackedBadge" style="font-size:9px;background:#3b82f6;color:#fff;padding:1px 6px;border-radius:8px;margin-left:6px;display:none">0</span></div>
-        <label class="lp-item" data-layer="trackedProps">
-          <div class="lp-switch"><input type="checkbox" checked onchange="toggleTrackedLayer(this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#3b82f6"></div><div class="lp-label">Tracked Properties<span class="lp-desc">Properties you're monitoring &amp; contacting</span></div>
-        </label>
-        <label class="lp-item" style="padding-left:28px;cursor:pointer" onclick="showTrackedList()">
-          <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label" style="color:#a855f7;font-weight:600">View All Tracked &#8250;<span class="lp-desc">Open full tracking list</span></div>
-        </label>
         <div class="lp-item" style="flex-direction:column;align-items:flex-start;padding:6px 14px 10px">
           <div style="font-size:9px;color:#d4a017;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">&#128270; Land Size Filter</div>
           <div class="size-filter-bar" id="sizeFilterBar">
@@ -600,19 +588,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
           </div>
           <div id="sizeFilterStatus" style="font-size:9px;margin-top:4px;min-height:12px"></div>
         </div>
-        <!-- ═══ PLANNING (collapsible) ═══ -->
-        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('planning')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#a78bfa">
-          <span>Planning</span>
-          <span class="lp-section-chev" id="planningChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
-        </div>
-        <div id="planningSection" style="display:none">
-        <label class="lp-item" data-layer="zoning">
-          <div class="lp-switch"><input type="checkbox" checked onchange="toggleLayer('zoning',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#a78bfa"></div><div class="lp-label">Zoning (Planning Scheme)<span class="lp-desc">Council zone colours — LDR, MDR, EC etc</span></div>
-        </label>
+        <div class="lp-group" style="color:#a78bfa">Planning</div>
         <label class="lp-item" data-layer="landuse">
           <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('landuse',this.checked)"><span class="lp-slider"></span></div>
-          <div class="lp-dot" style="background:#8b5cf6"></div><div class="lp-label">Land Use (ALUMC)<span class="lp-desc">Current land use classification</span></div>
+          <div class="lp-dot" style="background:#8b5cf6"></div><div class="lp-label">Land Use (Current Use)<span class="lp-desc">Planning zones overlay</span></div>
         </label>
         <div class="lp-group flood-expand-header" onclick="toggleZoneRef()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#a78bfa">
           <span>Zone Codes by Council</span>
@@ -628,36 +607,36 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached houses, 400m²+ lots)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses, duplexes)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units, apartments ≤5 storeys)</div>
-              <div><b style="color:#00d4aa">HDR</b> — High density residential (apartments 6+ storeys)</div>
-              <div><b style="color:#00d4aa">CR</b> — Character residential (pre-1947 character housing)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (future urban, broadacre subdivision)</div>
-              <div><b style="color:#00d4aa">TA</b> — Tourist accommodation (short-stay tourist dev)</div>
+              <div>Low density residential — Detached houses, 400m²+ lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes, small lots</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>High density residential — Apartments 6+ storeys (precincts: Up to 8 / Up to 15 storeys)</div>
+              <div>Character residential — Pre-1947 character housing (precincts: Character, Infill housing)</div>
+              <div>Emerging community — Future urban land for broadacre subdivision</div>
+              <div>Tourist accommodation — Short-stay tourist development</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (broadacre farming, grazing, horticulture)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lifestyle lots)</div>
+              <div>Rural — Broadacre farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">PC</b> — Principal centre (CBD &amp; regional centres)</div>
-              <div><b style="color:#3b82f6">MC</b> — Major centre (major suburban hubs)</div>
-              <div><b style="color:#3b82f6">DC</b> — District centre (large suburban centres)</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre (local shops, convenience)</div>
-              <div><b style="color:#3b82f6">SC</b> — Specialised centre (hospitals, unis, airports)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use (residential/commercial combined)</div>
+              <div>Principal centre — CBD &amp; regional centres (precincts: City Centre, Regional centre)</div>
+              <div>Major centre — Major suburban hubs</div>
+              <div>District centre — Large suburban centres (precincts: District, Corridor)</div>
+              <div>Neighbourhood centre — Local shops, convenience retail</div>
+              <div>Specialised centre — Hospitals, universities, airports</div>
+              <div>Mixed use — Residential/commercial/retail combined (precincts: Centre frame, Corridor, Inner city)</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (warehousing, light manufacturing)</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (processing, heavy trade)</div>
-              <div><b style="color:#8b5cf6">HII</b> — High impact industry (heavy manufacturing)</div>
-              <div><b style="color:#8b5cf6">SI</b> — Special industry (noxious/offensive industries)</div>
-              <div><b style="color:#8b5cf6">II</b> — Industry investigation (reserved for future industrial)</div>
-              <div><b style="color:#8b5cf6">EI</b> — Extractive industry (quarries, sand/gravel)</div>
+              <div>Low impact industry — Warehousing, trade services, light manufacturing</div>
+              <div>Medium impact industry — Processing, heavy trade, transport depots</div>
+              <div>High impact industry — Heavy manufacturing, hazardous storage</div>
+              <div>Special industry — Noxious/offensive industries</div>
+              <div>Industry investigation — Reserved for future industrial</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">SR</b> — Sport and recreation</div>
-              <div><b style="color:#22c55e">OS</b> — Open space (parks, passive recreation)</div>
-              <div><b style="color:#22c55e">EM</b> — Environmental management (habitat, wetlands)</div>
-              <div><b style="color:#22c55e">CON</b> — Conservation (protected ecological areas)</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities (schools, hospitals)</div>
+              <div>Sport and recreation — Active sport, showgrounds (precincts: Local, District, Metropolitan)</div>
+              <div>Open space — Parks, passive recreation</div>
+              <div>Environmental management — Habitat, wetlands, riparian corridors</div>
+              <div>Conservation — Protected ecological areas</div>
+              <div>Community facilities — Schools, churches, hospitals, emergency services</div>
             </div>
           </div>
 
@@ -668,34 +647,34 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached housing)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses, duplexes)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units ≤5 storeys)</div>
-              <div><b style="color:#00d4aa">HDR</b> — High density residential (apartments 6+ storeys)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (Coomera, Pimpama, Ormeau)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (Canungra, Tamborine Village)</div>
+              <div>Low density residential — Detached housing, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>High density residential — Apartments 6+ storeys, towers</div>
+              <div>Emerging community — Future growth fronts (Coomera, Pimpama, Ormeau)</div>
+              <div>Township — Small rural towns (Canungra, Tamborine Village)</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (broadacre farming, grazing)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots, hinterland)</div>
+              <div>Rural — Broadacre farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots, hinterland</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">PC</b> — Principal centre (Surfers Paradise, Southport CBD)</div>
-              <div><b style="color:#3b82f6">MC</b> — Major centre (Robina, Helensvale, Coomera)</div>
-              <div><b style="color:#3b82f6">DC</b> — District centre (Nerang, Mudgeeraba)</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre (small suburban shopping)</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre (convenience)</div>
-              <div><b style="color:#3b82f6">SC</b> — Specialised centre (GCUH, airport)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use (residential/commercial)</div>
+              <div>Principal centre — Surfers Paradise, Southport CBD</div>
+              <div>Major centre — Robina, Helensvale, Coomera Town Centre</div>
+              <div>District centre — Nerang, Mudgeeraba, Palm Beach</div>
+              <div>Local centre — Small suburban shopping</div>
+              <div>Neighbourhood centre — Corner shops, convenience</div>
+              <div>Specialised centre — Gold Coast University Hospital, airport</div>
+              <div>Mixed use — Residential/commercial combined</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (warehousing)</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (processing)</div>
-              <div><b style="color:#8b5cf6">HII</b> — High impact industry (heavy manufacturing)</div>
-              <div><b style="color:#8b5cf6">WMI</b> — Waterfront and marine industry</div>
+              <div>Low impact industry — Warehousing, light manufacturing</div>
+              <div>Medium impact industry — Processing, transport depots</div>
+              <div>High impact industry — Heavy manufacturing</div>
+              <div>Waterfront and marine industry — Boat building, marine services</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">SR</b> — Sport and recreation</div>
-              <div><b style="color:#22c55e">OS</b> — Open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
-              <div><b style="color:#22c55e">SP</b> — Special purpose (cemeteries, utilities, rail)</div>
+              <div>Sport and recreation — Active sport, showgrounds</div>
+              <div>Open space — Parks, passive recreation</div>
+              <div>Environmental management and conservation — Koala habitat, wetlands</div>
+              <div>Community facilities — Schools, hospitals, emergency</div>
+              <div>Special purpose — Cemeteries, utilities, rail</div>
             </div>
           </div>
 
@@ -706,25 +685,25 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached houses)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses, duplexes)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units ≤5 storeys)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (Yarrabilba, Flagstone, Park Ridge)</div>
+              <div>Low density residential — Detached houses on standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes, small lots</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>Emerging community — Future growth areas (Yarrabilba, Flagstone, Park Ridge)</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (broadacre farming, grazing)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">CTR</b> — Centre (all centre types, precincts by location)</div>
-              <div><b style="color:#3b82f6">SC</b> — Specialised centre (major facilities)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use (residential/commercial)</div>
+              <div>Centre — All centre types (precincts by location)</div>
+              <div>Specialised centre — Major facilities</div>
+              <div>Mixed use — Residential/commercial</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (light manufacturing)</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (processing, heavy trade)</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, heavy trade</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
-              <div><b style="color:#22c55e">SP</b> — Special purpose (utilities, rail corridors)</div>
+              <div>Recreation and open space — Parks, sports fields</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, churches, hospitals</div>
+              <div>Special purpose — Utilities, rail corridors</div>
             </div>
           </div>
 
@@ -735,22 +714,22 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">GR</b> — General residential (precincts: Coastal, Suburban, Next gen, Urban)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (Waraba, Burpengary East)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (Woodford, Kilcoy, Dayboro)</div>
+              <div>General residential — Standard housing (precincts: Coastal communities, Suburban neighbourhood, Next generation neighbourhood, Urban neighbourhood)</div>
+              <div>Emerging community — Future urban land (Caboolture West/Waraba, Burpengary East)</div>
+              <div>Township — Small rural towns (Woodford, Kilcoy, Dayboro)</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (broadacre farming, grazing)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">CTR</b> — Centre (precincts: Caboolture, Morayfield, Strathpine, District, Local)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use (residential/commercial)</div>
+              <div>Centre — All centres (precincts: Caboolture, Morayfield, Strathpine, District, Local, Specialised)</div>
+              <div>Mixed use — Residential/commercial combined</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">IND</b> — Industry (precincts: Low impact, Medium impact, Investigation, Brendale)</div>
-              <div><b style="color:#8b5cf6">EI</b> — Extractive industry (quarries, sand/gravel)</div>
+              <div>Industry — All industry (precincts: Low impact, Medium impact, Investigation, Brendale/Narangba enterprise)</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities (precincts: Abbey, Airfield, Utilities)</div>
+              <div>Recreation and open space — Parks, sport, passive recreation</div>
+              <div>Environmental management and conservation — Protected habitat, koala corridors</div>
+              <div>Community facilities — Schools, hospitals (precincts: Abbey, Airfield, Utilities, Lakeside, Special use)</div>
             </div>
           </div>
 
@@ -761,33 +740,33 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached houses)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units ≤5 storeys)</div>
-              <div><b style="color:#00d4aa">HDR</b> — High density residential (apartments 6+)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (Palmview, Aura, Beerwah East)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (Maleny, Montville, Mapleton)</div>
+              <div>Low density residential — Detached houses, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments up to 5 storeys</div>
+              <div>High density residential — Apartments 6+ storeys</div>
+              <div>Emerging community — Future growth (Palmview, Caloundra South/Aura, Beerwah East)</div>
+              <div>Township — Hinterland villages (Maleny, Montville, Mapleton)</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, horticulture, grazing)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, horticulture, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">PC</b> — Principal centre (Maroochydore CBD)</div>
-              <div><b style="color:#3b82f6">MC</b> — Major centre (Caloundra, Nambour)</div>
-              <div><b style="color:#3b82f6">DC</b> — District centre (Sippy Downs, Kawana)</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre (neighbourhood shopping)</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre (convenience)</div>
-              <div><b style="color:#3b82f6">SC</b> — Specialised centre (university, hospitals)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use (residential/commercial)</div>
+              <div>Principal centre — Maroochydore CBD</div>
+              <div>Major centre — Caloundra, Nambour</div>
+              <div>District centre — Noosaville, Sippy Downs, Kawana</div>
+              <div>Local centre — Neighbourhood shopping</div>
+              <div>Neighbourhood centre — Corner shops, convenience</div>
+              <div>Specialised centre — University, hospitals</div>
+              <div>Mixed use — Residential/commercial combined</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (warehousing)</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (processing)</div>
-              <div><b style="color:#8b5cf6">HII</b> — High impact industry (heavy manufacturing)</div>
+              <div>Low impact industry — Warehousing, light manufacturing</div>
+              <div>Medium impact industry — Processing, heavy trade</div>
+              <div>High impact industry — Heavy manufacturing</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">SR</b> — Sport and recreation</div>
-              <div><b style="color:#22c55e">OS</b> — Open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
-              <div><b style="color:#22c55e">SP</b> — Special purpose (cemeteries, utilities)</div>
+              <div>Sport and recreation — Active sport, showgrounds</div>
+              <div>Open space — Parks, passive recreation</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, hospitals, emergency</div>
+              <div>Special purpose — Cemeteries, utilities, rail</div>
             </div>
           </div>
 
@@ -798,34 +777,34 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached houses)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units, apartments)</div>
-              <div><b style="color:#00d4aa">HDR</b> — High density residential (apartments, towers)</div>
-              <div><b style="color:#00d4aa">CR</b> — Character residential (heritage/character areas)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (Ripley Valley, Springfield, Walloon)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (small rural towns)</div>
+              <div>Low density residential — Detached houses, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments</div>
+              <div>High density residential — Apartments, towers</div>
+              <div>Character residential — Heritage/character housing areas</div>
+              <div>Emerging community — Future growth (Ripley Valley, Springfield, Walloon, Rosewood)</div>
+              <div>Township — Small rural towns</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, grazing, cropping)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing, cropping</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">PC</b> — Principal centre (Ipswich CBD)</div>
-              <div><b style="color:#3b82f6">MC</b> — Major centre (Springfield Central)</div>
-              <div><b style="color:#3b82f6">DC</b> — District centre (Redbank Plains, Yamanto)</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre</div>
-              <div><b style="color:#3b82f6">SC</b> — Specialised centre (uni, hospital, RAAF Amberley)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use (residential/commercial)</div>
+              <div>Principal centre — Ipswich CBD</div>
+              <div>Major centre — Springfield Central</div>
+              <div>District centre — Redbank Plains, Yamanto, Goodna</div>
+              <div>Local centre — Local shopping</div>
+              <div>Neighbourhood centre — Corner shops</div>
+              <div>Specialised centre — University, hospital, RAAF Amberley</div>
+              <div>Mixed use — Residential/commercial</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (light manufacturing)</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (processing)</div>
-              <div><b style="color:#8b5cf6">II</b> — Industry investigation (future industrial)</div>
-              <div><b style="color:#8b5cf6">EI</b> — Extractive industry (quarries)</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, transport depots</div>
+              <div>Industry investigation — Reserved for future industrial</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
-              <div><b style="color:#22c55e">SP</b> — Special purpose (utilities, defence, rail)</div>
+              <div>Recreation and open space — Parks, sport, passive recreation</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, churches, hospitals</div>
+              <div>Special purpose — Utilities, defence, rail</div>
             </div>
           </div>
 
@@ -836,33 +815,33 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached houses)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units)</div>
-              <div><b style="color:#00d4aa">CR</b> — Character residential (heritage/character)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (Sthn Thornlands PDA)</div>
-              <div><b style="color:#00d4aa">TA</b> — Tourist accommodation</div>
+              <div>Low density residential — Detached houses, standard lots</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments</div>
+              <div>Character residential — Heritage/character housing</div>
+              <div>Emerging community — Future growth (Southern Thornlands PDA, Shoreline)</div>
+              <div>Tourist accommodation — Short-stay visitor accommodation</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, grazing)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
-              <div><b style="color:#f59e0b">PR</b> — Park residential (large lots near urban edge)</div>
+              <div>Rural — Farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
+              <div>Park residential — Large rural-style lots near urban edge</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">PC</b> — Principal centre (Capalaba, Cleveland)</div>
-              <div><b style="color:#3b82f6">MC</b> — Major centre (Victoria Point)</div>
-              <div><b style="color:#3b82f6">DC</b> — District centre (Redland Bay)</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre</div>
-              <div><b style="color:#3b82f6">SC</b> — Specialised centre (Redland Hospital)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use</div>
+              <div>Principal centre — Capalaba, Cleveland</div>
+              <div>Major centre — Victoria Point</div>
+              <div>District centre — Redland Bay</div>
+              <div>Local centre — Neighbourhood retail</div>
+              <div>Neighbourhood centre — Corner shops</div>
+              <div>Specialised centre — Redland Hospital, IndigiScapes</div>
+              <div>Mixed use — Residential/commercial</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry</div>
-              <div><b style="color:#8b5cf6">WMI</b> — Waterfront and marine industry</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, heavy trade</div>
+              <div>Waterfront and marine industry — Boat building, marine services</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
-              <div><b style="color:#22c55e">SP</b> — Special purpose (utilities, SMBI)</div>
+              <div>Recreation and open space — Parks, sport</div>
+              <div>Environmental management and conservation — Koala habitat, wetlands</div>
+              <div>Community facilities — Schools, hospitals</div>
+              <div>Special purpose — Utilities, SMBI infrastructure</div>
             </div>
           </div>
 
@@ -873,23 +852,23 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached houses)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units, townhouses)</div>
-              <div><b style="color:#00d4aa">HDR</b> — High density residential (apartments)</div>
+              <div>Low density residential — Detached houses</div>
+              <div>Medium density residential — Units, townhouses</div>
+              <div>High density residential — Apartments</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, grazing)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">MC</b> — Major centre (Noosa Civic, Noosaville)</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre (local retail)</div>
-              <div><b style="color:#3b82f6">INN</b> — Innovation (Gateway West, Venture Drive)</div>
+              <div>Major centre — Noosa Civic (Noosaville)</div>
+              <div>Neighbourhood centre — Local retail</div>
+              <div>Innovation — Business/technology (Gateway West, Venture Drive)</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry</div>
+              <div>Low impact industry — Light manufacturing</div>
+              <div>Medium impact industry — Processing, depots</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
+              <div>Recreation and open space — Parks, sport</div>
+              <div>Environmental management and conservation — National park buffers</div>
+              <div>Community facilities — Schools, hospitals</div>
             </div>
           </div>
 
@@ -900,34 +879,34 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (detached houses)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses)</div>
-              <div><b style="color:#00d4aa">MDR</b> — Medium density residential (units)</div>
-              <div><b style="color:#00d4aa">CR</b> — Character (heritage/character areas)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (Highfields, Westbrook)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (Pittsworth, Oakey, Crows Nest)</div>
+              <div>Low density residential — Detached houses</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Medium density residential — Units, apartments</div>
+              <div>Character — Heritage/character housing areas</div>
+              <div>Emerging community — Future urban growth (Highfields, Westbrook)</div>
+              <div>Township — Small rural towns (Pittsworth, Oakey, Crows Nest)</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, grazing, Darling Downs cropping)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing, Darling Downs cropping</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">PC</b> — Principal centre (Toowoomba CBD)</div>
-              <div><b style="color:#3b82f6">MC</b> — Major centre (Kearneys Spring, Highfields)</div>
-              <div><b style="color:#3b82f6">DC</b> — District centre (Pittsworth, Oakey)</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre</div>
-              <div><b style="color:#3b82f6">SC</b> — Specialised centre (hospital, uni, airport)</div>
-              <div><b style="color:#3b82f6">MU</b> — Mixed use</div>
+              <div>Principal centre — Toowoomba CBD</div>
+              <div>Major centre — Kearneys Spring, Highfields, Wilsonton</div>
+              <div>District centre — Pittsworth, Oakey centres</div>
+              <div>Local centre — Neighbourhood retail</div>
+              <div>Neighbourhood centre — Corner shops</div>
+              <div>Specialised centre — Hospital, university, airport</div>
+              <div>Mixed use — Residential/commercial</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (light manufacturing)</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (Inland Rail intermodal)</div>
-              <div><b style="color:#8b5cf6">HII</b> — High impact industry (heavy manufacturing)</div>
-              <div><b style="color:#8b5cf6">RI</b> — Rural industry (on-farm processing)</div>
-              <div><b style="color:#8b5cf6">EI</b> — Extractive industry (quarries)</div>
+              <div>Low impact industry — Light manufacturing, warehousing</div>
+              <div>Medium impact industry — Processing, Inland Rail intermodal</div>
+              <div>High impact industry — Heavy manufacturing</div>
+              <div>Rural industry — On-farm processing, rural services</div>
+              <div>Extractive industry — Quarries, sand/gravel</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
-              <div><b style="color:#22c55e">SP</b> — Special purpose (cemeteries, utilities)</div>
+              <div>Recreation and open space — Parks, sport, showgrounds</div>
+              <div>Environmental management and conservation — Protected habitat</div>
+              <div>Community facilities — Schools, hospitals, government</div>
+              <div>Special purpose — Cemeteries, utilities, defence</div>
             </div>
           </div>
 
@@ -938,23 +917,23 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (Beaudesert, Boonah, Canungra)</div>
-              <div><b style="color:#00d4aa">LMR</b> — Low-medium density residential (townhouses)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (future urban growth)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (Kalbar, Harrisville, Rathdowney)</div>
+              <div>Low density residential — Detached houses (Beaudesert, Boonah, Canungra)</div>
+              <div>Low-medium density residential — Townhouses, duplexes</div>
+              <div>Emerging community — Future urban growth</div>
+              <div>Township — Villages (Kalbar, Harrisville, Peak Crossing, Rathdowney)</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, grazing, horticulture)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing, horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre (Beaudesert, Boonah, Tamborine Mtn)</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre (village retail)</div>
+              <div>Local centre — Beaudesert, Boonah, Tamborine Mountain centres</div>
+              <div>Neighbourhood centre — Village retail</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (rural services)</div>
+              <div>Low impact industry — Light manufacturing</div>
+              <div>Medium impact industry — Processing, rural services</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
+              <div>Recreation and open space — Parks, sport</div>
+              <div>Environmental management and conservation — National park buffers, scenic amenity</div>
+              <div>Community facilities — Schools, hospitals</div>
             </div>
           </div>
 
@@ -965,19 +944,19 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">GR</b> — General residential (Esk, Lowood, Fernvale)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (rural villages)</div>
+              <div>General residential — Standard housing (Esk, Lowood, Fernvale)</div>
+              <div>Township — Rural villages</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, grazing — majority of LGA)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing (majority of LGA)</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre (Esk, Lowood, Fernvale, Kilcoy)</div>
+              <div>Local centre — Town centres (Esk, Lowood, Fernvale, Kilcoy)</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (rural services)</div>
+              <div>Low impact industry — Light manufacturing, rural services</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
+              <div>Recreation and open space — Parks, sport, showgrounds</div>
+              <div>Environmental management and conservation — Wivenhoe/Somerset Dam catchments</div>
+              <div>Community facilities — Schools, community halls</div>
             </div>
           </div>
 
@@ -988,22 +967,22 @@ tr:hover td{background:rgba(255,255,255,.015)}
             </div>
             <div style="display:none;padding:4px 8px">
               <div style="color:#00d4aa;font-weight:700;margin-top:3px">Residential</div>
-              <div><b style="color:#00d4aa">LDR</b> — Low density residential (Gatton, Laidley, Plainland)</div>
-              <div><b style="color:#00d4aa">EC</b> — Emerging community (future growth areas)</div>
-              <div><b style="color:#00d4aa">TS</b> — Township (Withcott, Forest Hill, Grantham)</div>
+              <div>Low density residential — Detached houses (Gatton, Laidley, Plainland)</div>
+              <div>Emerging community — Future urban growth areas</div>
+              <div>Township — Rural towns (Withcott, Forest Hill, Grantham)</div>
               <div style="color:#f59e0b;font-weight:700;margin-top:3px">Rural</div>
-              <div><b style="color:#f59e0b">RU</b> — Rural (farming, grazing, horticulture)</div>
-              <div><b style="color:#f59e0b">RR</b> — Rural residential (acreage lots)</div>
+              <div>Rural — Broadacre farming, grazing, Lockyer Valley horticulture</div>
+              <div>Rural residential — Acreage lifestyle lots</div>
               <div style="color:#3b82f6;font-weight:700;margin-top:3px">Centre</div>
-              <div><b style="color:#3b82f6">LC</b> — Local centre (Gatton, Laidley, Plainland)</div>
-              <div><b style="color:#3b82f6">NC</b> — Neighbourhood centre (village retail)</div>
+              <div>Local centre — Gatton, Laidley, Plainland centres</div>
+              <div>Neighbourhood centre — Village retail</div>
               <div style="color:#8b5cf6;font-weight:700;margin-top:3px">Industry</div>
-              <div><b style="color:#8b5cf6">LII</b> — Low impact industry (rural services)</div>
-              <div><b style="color:#8b5cf6">MII</b> — Medium impact industry (Inland Rail corridor)</div>
+              <div>Low impact industry — Light manufacturing, rural services</div>
+              <div>Medium impact industry — Processing, transport (Inland Rail corridor)</div>
               <div style="color:#22c55e;font-weight:700;margin-top:3px">Other</div>
-              <div><b style="color:#22c55e">ROS</b> — Recreation and open space</div>
-              <div><b style="color:#22c55e">EMC</b> — Environmental management and conservation</div>
-              <div><b style="color:#22c55e">CF</b> — Community facilities</div>
+              <div>Recreation and open space — Parks, sport, showgrounds</div>
+              <div>Environmental management and conservation — Riparian corridors</div>
+              <div>Community facilities — Schools, hospitals</div>
             </div>
           </div>
 
@@ -1011,48 +990,11 @@ tr:hover td{background:rgba(255,255,255,.015)}
             Zone codes from each council's current planning scheme. Precincts noted where applicable.
           </div>
         </div>
+        <div class="lp-group flood-expand-header" onclick="toggleFloodDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#60a5fa">
+          <span>Flood Mapping</span>
+          <span id="floodChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
         </div>
-        <!-- Flood Mapping moved into Hazards collapsible section -->
-        <!-- ═══ HAZARDS (collapsible) ═══ -->
-        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('hazards')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#f97316">
-          <span>Hazards</span>
-          <span class="lp-section-chev" id="hazardsChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
-        </div>
-        <div id="hazardsSection" style="display:none">
-          <label class="lp-item" data-layer="bushfire">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#f97316"></div><div class="lp-label">Bushfire Prone Areas<span class="lp-desc">State &amp; council bushfire mapping</span></div>
-          </label>
-          <div style="padding:2px 14px 4px;font-size:9px;color:#22c55e;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Environment &amp; Biodiversity</div>
-          <label class="lp-item" data-layer="mses">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('mses',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#22c55e"></div><div class="lp-label">Environmental (MSES)<span class="lp-desc">Matters of State Environmental Significance</span></div>
-          </label>
-          <label class="lp-item" data-layer="koala">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#16a34a"></div><div class="lp-label">Koala Habitat (SEQ)<span class="lp-desc">Koala priority areas &amp; habitat</span></div>
-          </label>
-          <label class="lp-item" data-layer="bpa">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bpa',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#84cc16"></div><div class="lp-label">Biodiversity Significance<span class="lp-desc">State &amp; council biodiversity assessment</span></div>
-          </label>
-          <label class="lp-item" data-layer="regveg">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('regveg',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#65a30d"></div><div class="lp-label">Regulated Vegetation<span class="lp-desc">Clearing restrictions &amp; approvals</span></div>
-          </label>
-          <label class="lp-item" data-layer="recos">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('recos',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#4d7c0f"></div><div class="lp-label">Regional Ecosystems<span class="lp-desc">Remnant vegetation mapping</span></div>
-          </label>
-          <label class="lp-item" data-layer="wetlands">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('wetlands',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#0d9488"></div><div class="lp-label">Wetlands<span class="lp-desc">Wetland areas &amp; protection zones</span></div>
-          </label>
-          <label class="lp-item" data-layer="biocorridors">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('biocorridors',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#059669"></div><div class="lp-label">Biodiversity Corridors<span class="lp-desc">Terrestrial &amp; riparian corridors</span></div>
-          </label>
-          <div style="padding:2px 14px 4px;font-size:9px;color:#60a5fa;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Flood Mapping</div>
+        <div id="floodDropdown" style="display:none">
           <label class="lp-item" data-layer="flood">
             <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('flood',this.checked)"><span class="lp-slider"></span></div>
             <div class="lp-dot" style="background:#1e40af"></div><div class="lp-label">Comprehensive Studies<span class="lp-desc">Detailed flood modelling</span></div>
@@ -1073,59 +1015,96 @@ tr:hover td{background:rgba(255,255,255,.015)}
             <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('floodInland',this.checked)"><span class="lp-slider"></span></div>
             <div class="lp-dot" style="background:#93c5fd"></div><div class="lp-label">Inland Flood Waters<span class="lp-desc">Broader inland flood extent</span></div>
           </label>
-        </div>
-        <!-- ═══ SERVICES & UTILITIES (collapsible) ═══ -->
-        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('services')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#0ea5e9">
-          <span>Services &amp; Utilities</span>
-          <span class="lp-section-chev" id="servicesChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
-        </div>
-        <div id="servicesSection" style="display:none">
-          <label class="lp-item" data-layer="serviceRadar">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#ff47a3"></div><div class="lp-label">Service Radar<span class="lp-desc">Where services reach from existing housing</span></div>
-          </label>
-          <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
-            <div style="display:flex;gap:10px;margin-bottom:2px">
-              <span><span style="display:inline-block;width:14px;height:0;border-top:3px solid #ff47a3;vertical-align:middle;margin-right:3px"></span> Services edge</span>
-              <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px solid #f59e0b;vertical-align:middle;margin-right:3px"></span> Extension zone</span>
-              <span style="color:#f59e0b">\u2194 km gap</span>
-            </div>
-            Pink = current housing edge. Amber = 1-3km feasible extension. Label shows distance between.
+          <div style="padding:4px 12px 8px;font-size:10px;color:#94a3b8;line-height:1.4">
+            <span style="color:#60a5fa">&#9432;</span> Detailed Cat 1–5 hazard categories available via council mapping links in property panel
           </div>
         </div>
-        <!-- ═══ GROWTH INTELLIGENCE (collapsible) ═══ -->
-        <div class="lp-group lp-collapsible-header" onclick="toggleLpSection('growth')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;color:#ec4899">
-          <span>Growth Intelligence</span>
-          <span class="lp-section-chev" id="growthChevron" style="font-size:10px;transition:transform .2s;transform:rotate(0deg)">&#9660;</span>
+        <div class="lp-group" style="color:#f97316">Hazards</div>
+        <label class="lp-item" data-layer="bushfire">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bushfire',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#f97316"></div><div class="lp-label">Bushfire Prone Areas<span class="lp-desc">State &amp; council bushfire mapping</span></div>
+        </label>
+        <div class="lp-group" style="color:#a78bfa">Terrain</div>
+        <label class="lp-item" data-layer="contours">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('contours',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#a78bfa"></div><div class="lp-label">Contours (Elevation)<span class="lp-desc">Contour lines for visualising elevation</span></div>
+        </label>
+        <div class="lp-group" style="color:#22c55e">Environment &amp; Biodiversity</div>
+        <label class="lp-item" data-layer="mses">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('mses',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#22c55e"></div><div class="lp-label">Environmental (MSES)<span class="lp-desc">Matters of State Environmental Significance</span></div>
+        </label>
+        <label class="lp-item" data-layer="koala">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('koala',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#16a34a"></div><div class="lp-label">Koala Habitat (SEQ)<span class="lp-desc">Koala priority areas &amp; habitat</span></div>
+        </label>
+        <label class="lp-item" data-layer="bpa">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('bpa',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#84cc16"></div><div class="lp-label">Biodiversity Significance<span class="lp-desc">State &amp; council biodiversity assessment</span></div>
+        </label>
+        <label class="lp-item" data-layer="regveg">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('regveg',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#65a30d"></div><div class="lp-label">Regulated Vegetation<span class="lp-desc">Clearing restrictions &amp; approvals</span></div>
+        </label>
+        <label class="lp-item" data-layer="recos">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('recos',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#4d7c0f"></div><div class="lp-label">Regional Ecosystems<span class="lp-desc">Remnant vegetation mapping</span></div>
+        </label>
+        <label class="lp-item" data-layer="wetlands">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('wetlands',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#0d9488"></div><div class="lp-label">Wetlands<span class="lp-desc">Wetland areas &amp; protection zones</span></div>
+        </label>
+        <label class="lp-item" data-layer="biocorridors">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('biocorridors',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#059669"></div><div class="lp-label">Biodiversity Corridors<span class="lp-desc">Terrestrial &amp; riparian corridors</span></div>
+        </label>
+        <div class="lp-group" style="color:#0ea5e9">Services &amp; Utilities</div>
+        <label class="lp-item" data-layer="serviceRadar">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('serviceRadar',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ff47a3"></div><div class="lp-label">Service Radar<span class="lp-desc">Where services reach from existing housing</span></div>
+        </label>
+        <div style="padding:4px 12px 8px;font-size:9px;color:#94a3b8;line-height:1.5">
+          <div style="display:flex;gap:10px;margin-bottom:2px">
+            <span><span style="display:inline-block;width:14px;height:0;border-top:3px solid #ff47a3;vertical-align:middle;margin-right:3px"></span> Services edge</span>
+            <span><span style="display:inline-block;width:14px;height:0;border-top:2.5px solid #f59e0b;vertical-align:middle;margin-right:3px"></span> Extension zone</span>
+            <span style="color:#f59e0b">\u2194 km gap</span>
+          </div>
+          Pink = current housing edge. Amber = 1-3km feasible extension. Label shows distance between.
         </div>
-        <div id="growthSection" style="display:none">
-          <label class="lp-item" data-layer="pdaMarkers">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#ec4899"></div><div class="lp-label">PDA Hotspots<span class="lp-desc">Priority Development Areas</span></div>
-          </label>
-          <label class="lp-item" data-layer="infraMarkers">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('infraMarkers',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#f59e0b"></div><div class="lp-label">Infrastructure Projects<span class="lp-desc">Major roads, rail, utilities</span></div>
-          </label>
-          <label class="lp-item" data-layer="devMarkers">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('devMarkers',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#ef4444"></div><div class="lp-label">Major Dev Estates<span class="lp-desc">Competitor master-planned communities</span></div>
-          </label>
-          <label class="lp-item" data-layer="pfgaMarkers">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pfgaMarkers',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label">Future Growth Areas<span class="lp-desc">Planned future growth frontiers</span></div>
-          </label>
-          <label class="lp-item" data-layer="cat1Markers">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('cat1Markers',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#14b8a6"></div><div class="lp-label">Cat 1 Dev Areas<span class="lp-desc">Category 1 development zones</span></div>
-          </label>
-          <label class="lp-item" data-layer="targetCorridors">
-            <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('targetCorridors',this.checked)"><span class="lp-slider"></span></div>
-            <div class="lp-dot" style="background:#ff006e"></div><div class="lp-label">Target Corridors<span class="lp-desc">Our primary target areas</span></div>
-          </label>
-        </div>
+        <div class="lp-group" style="color:#ec4899">Growth Intelligence</div>
+        <label class="lp-item" data-layer="pdaMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pdaMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ec4899"></div><div class="lp-label">PDA Hotspots<span class="lp-desc">Priority Development Areas</span></div>
+        </label>
+        <label class="lp-item" data-layer="infraMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('infraMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#f59e0b"></div><div class="lp-label">Infrastructure Projects<span class="lp-desc">Major roads, rail, utilities</span></div>
+        </label>
+        <label class="lp-item" data-layer="devMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('devMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ef4444"></div><div class="lp-label">Major Dev Estates<span class="lp-desc">Competitor master-planned communities</span></div>
+        </label>
+        <label class="lp-item" data-layer="pfgaMarkers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('pfgaMarkers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label">Future Growth Areas<span class="lp-desc">Planned future growth frontiers</span></div>
+        </label>
+        <label class="lp-item" data-layer="cat1Markers">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('cat1Markers',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#14b8a6"></div><div class="lp-label">Cat 1 Dev Areas<span class="lp-desc">Category 1 development zones</span></div>
+        </label>
+        <label class="lp-item" data-layer="targetCorridors">
+          <div class="lp-switch"><input type="checkbox" onchange="toggleLayer('targetCorridors',this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#ff006e"></div><div class="lp-label">Target Corridors<span class="lp-desc">Our primary target areas</span></div>
+        </label>
 
-        <!-- Property Tracking moved up below Terrain -->
+        <div class="lp-group" style="color:#3b82f6">Property Tracking <span id="trackedBadge" style="font-size:9px;background:#3b82f6;color:#fff;padding:1px 6px;border-radius:8px;margin-left:6px;display:none">0</span></div>
+        <label class="lp-item" data-layer="trackedProps">
+          <div class="lp-switch"><input type="checkbox" checked onchange="toggleTrackedLayer(this.checked)"><span class="lp-slider"></span></div>
+          <div class="lp-dot" style="background:#3b82f6"></div><div class="lp-label">Tracked Properties<span class="lp-desc">Properties you're monitoring & contacting</span></div>
+        </label>
+        <label class="lp-item" style="padding-left:28px;cursor:pointer" onclick="showTrackedList()">
+          <div class="lp-dot" style="background:#a855f7"></div><div class="lp-label" style="color:#a855f7;font-weight:600">View All Tracked &#8250;<span class="lp-desc">Open full tracking list</span></div>
+        </label>
       </div>
     </div>
     <!-- legend removed — clean map -->
@@ -1581,7 +1560,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <div style="background:linear-gradient(135deg,rgba(0,212,170,.06),rgba(34,197,94,.06));border:1px solid rgba(0,212,170,.2);border-radius:12px;padding:22px 26px;margin-top:20px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px">
       <h3 style="font-size:16px;font-weight:700;margin:0;color:var(--accent)">Subdivision Feasibility Calculator</h3>
-      <div style="display:flex;gap:6px;align-items:center">
+      <div style="display:flex;gap:6px">
         <select id="feas-preset" onchange="applyFeasPreset()" style="background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:4px 8px">
           <option value="">Load Corridor Preset...</option>
           <option value="logan">Logan (Flagstone/Yarrabilba)</option>
@@ -1593,7 +1572,6 @@ tr:hover td{background:rgba(255,255,255,.015)}
           <option value="scenic">Scenic Rim (Beaudesert)</option>
           <option value="redland">Redland (Thornlands)</option>
         </select>
-        <a id="feas-template-dl" download="Feasibility_Template.xlsx" style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;text-decoration:none;cursor:pointer;white-space:nowrap" title="Download editable Excel feasibility template">&#128196; Download Template (.xlsx)</a>
       </div>
     </div>
     <p style="font-size:11px;color:var(--dim);margin:0 0 16px">Enter your site details below to model revenue, costs, and residual land value. Pre-loaded defaults from corridor research — adjust to your deal.</p>
@@ -2426,9 +2404,6 @@ function applyFeasPreset(){
   document.getElementById('feas-target-margin').value = p.margin;
   calcFeasibility();
 }
-
-// Set feasibility template download link
-(function(){var dl=document.getElementById('feas-template-dl');if(dl)dl.href='data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,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';})();
 
 function calcFeasibility(){
   // Read inputs
@@ -3588,7 +3563,6 @@ const qldServices = {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandUse/MapServer',
     layers: [0], opacity: 0.45, minZoom: 10, maxZoom: 19
   },
-  // zoning: loaded per-council from councilZoneServices as vector FeatureLayers (no state-wide service exists)
   pda: {
     url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PriorityDevelopmentAreas/MapServer',
     layers: false, opacity: 0.5, minZoom: 8, maxZoom: 19
@@ -3762,19 +3736,6 @@ function toggleFloodDropdown() {
   }
 }
 
-function toggleLpSection(name) {
-  var section = document.getElementById(name + 'Section');
-  var chev = document.getElementById(name + 'Chevron');
-  if (!section || !chev) return;
-  if (section.style.display === 'none') {
-    section.style.display = 'block';
-    chev.style.transform = 'rotate(180deg)';
-  } else {
-    section.style.display = 'none';
-    chev.style.transform = 'rotate(0deg)';
-  }
-}
-
 function toggleLayer(layerKey, on) {
   if (!mapFull) return;
 
@@ -3873,7 +3834,6 @@ function toggleLayer(layerKey, on) {
       mapFull.removeLayer(activeLayers[layerKey]);
       delete activeLayers[layerKey];
     }
-    // Zoning is a layerGroup — removal is handled above by removeLayer on the group
   }
 }
 
@@ -3909,82 +3869,6 @@ function initFullMapLayers() {
     minZoom: svc.minZoom, maxZoom: svc.maxZoom,
     attribution: '© QLD Govt DCDB'
   }).addTo(mapFull);
-
-  // ══════════════════════════════════════════════════════════════════
-  // ZONING LAYER — PER-COUNCIL VECTOR FeatureLayers
-  // There is NO state-wide zoning tile service from QLD Government.
-  // Zone colours come from each council's own FeatureServer endpoint.
-  // These render client-side as vectors at ALL zoom levels — colours never disappear.
-  // ══════════════════════════════════════════════════════════════════
-  window._zoningFeatureLayer = null; // keep reference for toggle cleanup
-  function zoneColourStyle(feature) {
-    var allFields = feature.properties || {};
-    var zone = (allFields.ZONE_DESCR || allFields.ZONE_NAME || allFields.LVL2_ZONE || allFields.LVL1_ZONE ||
-                allFields.Zone || allFields.NAME || allFields.DESCRIPT || allFields.HEADING ||
-                allFields.New_Noosa_Plan_Zones || allFields.QPP_Description || allFields.TRPS_Zones ||
-                allFields.New_Zone_A || allFields.LABEL || allFields.ZONE_CODE || allFields.CODE || '').toLowerCase();
-    var fill = '#7a8194'; // default grey
-    if (/low density res|ldr/i.test(zone)) fill = '#66d9a0';
-    else if (/low.?medium|lmr/i.test(zone)) fill = '#00d4aa';
-    else if (/medium density|mdr/i.test(zone)) fill = '#00b894';
-    else if (/high density|hdr/i.test(zone)) fill = '#009688';
-    else if (/residential|dwelling|housing|emerging|character|next gen|limited dev/i.test(zone)) fill = '#00d4aa';
-    else if (/rural res/i.test(zone)) fill = '#c8e6c9';
-    else if (/rural/i.test(zone)) fill = '#f59e0b';
-    else if (/industr|manufacturing|enterprise|lii|hii|mii/i.test(zone)) fill = '#8b5cf6';
-    else if (/principal centre|major centre|pcc|mac/i.test(zone)) fill = '#1e40af';
-    else if (/district centre|dc /i.test(zone)) fill = '#2563eb';
-    else if (/local centre|neighbourhood|lc |nc /i.test(zone)) fill = '#60a5fa';
-    else if (/centre|commercial|mixed use|retail|specialised|township/i.test(zone)) fill = '#3b82f6';
-    else if (/recreation|open space|sport/i.test(zone)) fill = '#22c55e';
-    else if (/environmental|conservation|ec /i.test(zone)) fill = '#10b981';
-    else if (/community/i.test(zone)) fill = '#6366f1';
-    else if (/special purpose|sp /i.test(zone)) fill = '#f472b6';
-    return { fillColor: fill, fillOpacity: 0.35, color: fill, weight: 0.8, opacity: 0.6 };
-  }
-  function zoneTooltipBind(feature, layer) {
-    var p = feature.properties;
-    var name = p.ZONE_DESCR || p.ZONE_NAME || p.LVL2_ZONE || p.LVL1_ZONE ||
-               p.Zone || p.NAME || p.DESCRIPT || p.New_Noosa_Plan_Zones ||
-               p.QPP_Description || p.TRPS_Zones || p.New_Zone_A || p.LABEL || 'Unknown zone';
-    var code = p.ZONE_CODE || p.CODE || p.TCC_CODE || p.QPP_Zone ||
-               p.LVL1_ZONE || p.HEADING || '';
-    var tip = code ? (code + ' — ' + name) : name;
-    layer.bindTooltip(tip, {sticky: true, className: 'zone-tooltip', opacity: 0.9});
-  }
-  // ══════════════════════════════════════════════════════════════════
-  // ALL zone layers use L.esri.featureLayer (client-side vector rendering).
-  // This works for BOTH FeatureServer AND MapServer layer URLs.
-  // DO NOT use dynamicMapLayer — it renders server-side and disappears
-  // at high zoom due to server scale limits. featureLayer renders as
-  // vectors on the client so colours NEVER disappear at any zoom level.
-  // ══════════════════════════════════════════════════════════════════
-  (function loadCouncilZoneLayers() {
-    var zoningGroup = L.layerGroup();
-    for (var key in councilZoneServices) {
-      var svc = councilZoneServices[key];
-      var fl = L.esri.featureLayer({
-        url: svc.url,
-        minZoom: 10,
-        style: zoneColourStyle,
-        onEachFeature: zoneTooltipBind,
-        // Ensure features load correctly across all zoom levels
-        simplifyFactor: 0.5,
-        precision: 5
-      });
-      fl._councilName = key;
-      // Log load/error events for debugging
-      fl.on('load', function(){ console.log('Zone layer loaded: ' + this._councilName); }.bind(fl));
-      fl.on('error', function(e){ console.warn('Zone layer error (' + this._councilName + '):', e.error || e); }.bind(fl));
-      fl.on('requeststart', function(){ console.log('Zone layer requesting: ' + this._councilName); }.bind(fl));
-      zoningGroup.addLayer(fl);
-    }
-    zoningGroup.addTo(mapFull);
-    activeLayers.zoning = zoningGroup;
-    // Put zoning behind cadastral so parcel borders show on top
-    zoningGroup.eachLayer(function(l) { if (l.bringToBack) l.bringToBack(); });
-    console.log('Loaded ' + Object.keys(councilZoneServices).length + ' council zone layers as client-side vectors');
-  })();
 
   // Listen for popup opens — means a marker was clicked, not empty space
   mapFull.on('popupopen', function() { _markerClicked = true; });
@@ -4730,29 +4614,22 @@ function arcgisIdentify(serviceUrl, latlng, layerSpec, tolerance, callback) {
 
 // ─── COUNCIL ZONE SERVICES ───
 // Maps LGA name (from cadastral shire_name or address local_authority) to zone FeatureServer
-// ══════════════════════════════════════════════════════════════════
-// COUNCIL ZONE SERVICES — ALL URLs VERIFIED LIVE 2026-04-05
-// Each council publishes zone data on their own ArcGIS service.
-// Old ArcGIS Online org IDs were deleted/migrated — updated to new orgs.
-// MapServer endpoints have isMapServer:true (used for query method selection, NOT rendering).
-// DO NOT change URLs without testing them first via /query endpoint.
-// ══════════════════════════════════════════════════════════════════
 const councilZoneServices = {
   'Brisbane City': {
     url: 'https://services2.arcgis.com/dEKgZETqwmDAh1rP/arcgis/rest/services/Zoning_opendata/FeatureServer/0',
     zoneField: 'LVL2_ZONE', codeField: 'ZONE_CODE', precinctField: 'ZONE_PREC_DESC'
   },
   'Gold Coast City': {
-    url: 'https://services-ap1.arcgis.com/lnVW0dLI3fvST2hd/arcgis/rest/services/City_Plan_Version_13_Open_Data/FeatureServer/4',
+    url: 'https://services-ap1.arcgis.com/lnVW0dLI3fvST2hd/arcgis/rest/services/City_Plan_Version_12_Open_Data/FeatureServer/4',
     zoneField: 'ZONE', codeField: 'LVL1_ZONE', precinctField: 'ZONE_PRECINCT'
+  },
+  'Moreton Bay Regional': {
+    url: 'https://services-ap1.arcgis.com/152ojN3Ts9H3cdtl/arcgis/rest/services/ZM_Zones_Dissolved_WebMercator_OpenData/FeatureServer/0',
+    zoneField: 'LVL1_ZONE', codeField: 'LP_PREC', precinctField: 'ZONE_PREC'
   },
   'Sunshine Coast Regional': {
     url: 'https://services-ap1.arcgis.com/YQyt7djuXN7rQyg4/arcgis/rest/services/PlanningScheme_Zoning_SCC/FeatureServer/5',
-    zoneField: 'LABEL', codeField: 'HEADING', precinctField: 'DESCRIPT'
-  },
-  'Ipswich City': {
-    url: 'https://services3.arcgis.com/bMcI7aKgIy0360Q8/arcgis/rest/services/ICC_Ipswich_Planning_Scheme_Zones_geojson/FeatureServer/0',
-    zoneField: 'NAME', codeField: 'CODE', precinctField: 'LABEL'
+    zoneField: 'DESCRIPT', codeField: 'HEADING', precinctField: 'LABEL'
   },
   'Noosa Shire': {
     url: 'https://services2.arcgis.com/tQg86iShPXJPWQWw/arcgis/rest/services/DSP_Noosa_Plan_Zones/FeatureServer/0',
@@ -4760,27 +4637,36 @@ const councilZoneServices = {
   },
   'Townsville City': {
     url: 'https://services6.arcgis.com/3VCE6mezZtwKJeIR/arcgis/rest/services/TCC_City_Planning_Scheme_Zoning_GDA2020/FeatureServer/0',
-    zoneField: 'LVL2_ZONE', codeField: 'TCC_CODE', precinctField: 'ZONE_PREC'
+    zoneField: 'LVL2_ZONE', codeField: 'LVL1_ZONE', precinctField: 'ZONE_PREC'
   },
-  'Toowoomba Regional': {
-    url: 'https://maps.tr.qld.gov.au/arcgis/rest/services/External/External_PlanningScheme/MapServer/170',
-    zoneField: 'TRPS_Zones', codeField: 'TRPS_Zones', precinctField: 'TRPS_Precinct', isMapServer: true
+  'Ipswich City': {
+    url: 'https://services3.arcgis.com/bMcI7aKgIy0360Q8/arcgis/rest/services/ICC_Ipswich_Planning_Scheme_Zones_geojson/FeatureServer/0',
+    zoneField: 'NAME', codeField: 'CODE', precinctField: 'LABEL'
+  },
+  'Logan City': {
+    url: 'https://arcgis.lcc.wspdigital.com/server/rest/services/LoganHub/Logan_Planning_Scheme_v9_2_TLPI_No_1_2024_20250527/MapServer/368',
+    zoneField: 'Zone', codeField: 'Zone', precinctField: null, isMapServer: true
   },
   'Redland City': {
-    url: 'https://gis.redland.qld.gov.au/arcgis/rest/services/planning/city_plan/MapServer/44',
-    zoneField: 'QPP_Description', codeField: 'QPP_Zone', precinctField: 'QPP_Precinct', isMapServer: true
+    url: 'https://services-ap1.arcgis.com/O0Fmi6M1WkpKLB6C/arcgis/rest/services/City_Plan_Zones_20230928/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
   },
   'Scenic Rim Regional': {
-    url: 'https://esriprod.scenicrim.qld.gov.au/arcgis/rest/services/EPlan_Scenic_Rim_Planning_Scheme/MapServer/22',
-    zoneField: 'New_Zone_A', codeField: 'New_Zone_A', precinctField: 'ZONE_PREC_', isMapServer: true
+    url: 'https://services-ap1.arcgis.com/i6WPzjrFWIq7Z4Nq/arcgis/rest/services/Scenic_Rim_Planning_Scheme_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
+  },
+  'Somerset Regional': {
+    url: 'https://services-ap1.arcgis.com/kSaELiOjBqAbJL73/arcgis/rest/services/Somerset_PS_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
+  },
+  'Lockyer Valley Regional': {
+    url: 'https://services-ap1.arcgis.com/kSaELiOjBqAbJL73/arcgis/rest/services/LV_Planning_Scheme_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
+  },
+  'Toowoomba Regional': {
+    url: 'https://services-ap1.arcgis.com/OBBhNGHEzMAubfAY/arcgis/rest/services/TRC_Planning_Scheme_Zones/FeatureServer/0',
+    zoneField: 'ZONE_NAME', codeField: 'ZONE_CODE', precinctField: 'PRECINCT'
   }
-};
-
-// QLD state-wide Land Use fallback — covers ALL of QLD when no council service matches
-// Returns broad land-use classes (e.g. "Residential", "Services / Commercial services")
-const qldLandUseFallback = {
-  url: 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/LandUse/FeatureServer/0',
-  zoneField: 'secondary', codeField: 'primary_', tertiaryField: 'tertiary'
 };
 
 // Fuzzy match LGA name to council zone service
@@ -4793,161 +4679,57 @@ function findCouncilZoneService(lgaName) {
   return null;
 }
 
-// ══════════════════════════════════════════════════════════════════
-// STATE ZONE QUERY — BRUTE-FORCE ALL COUNCIL ENDPOINTS IN PARALLEL
-// QLD does NOT have a single state-wide zoning service.
-// Each council publishes zone data via their own FeatureServer or MapServer.
-// This function queries ALL council endpoints in parallel.
-// First one to return zone data wins.
-// If no council returns data, falls back to QLD state LandUse service.
-// CRITICAL: Uses POST for MapServer endpoints. Adds inSR=4326 always.
-// CRITICAL: Checks for data.error (ArcGIS returns errors as JSON with HTTP 200).
-// DO NOT simplify or remove this function.
-// ══════════════════════════════════════════════════════════════════
+// State-level QPP zoning fallback (covers all of QLD)
 function queryStateZone(latlng, callback) {
-  var resolved = false;
-  var councilsDone = 0;
-  var totalCouncils = Object.keys(councilZoneServices).length;
-
-  function finish(result) {
-    if (resolved) return;
-    resolved = true;
-    callback(result);
-  }
-
-  // Safety timeout — if nothing returns in 12 seconds, give up
-  setTimeout(function(){ finish(null); }, 12000);
-
-  var geomJson = JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}});
-
-  // Build list of ALL council endpoints
-  var endpoints = [];
-  for (var key in councilZoneServices) {
-    var svc = councilZoneServices[key];
-    endpoints.push({
-      council: key,
-      url: svc.url + '/query',
-      isMapServer: !!svc.isMapServer,
-      zoneField: svc.zoneField,
-      codeField: svc.codeField,
-      precinctField: svc.precinctField
-    });
-  }
-
-  console.log('queryStateZone: firing ' + endpoints.length + ' council queries in parallel');
-
-  // Function to try QLD LandUse fallback if all councils fail
-  function tryLandUseFallback() {
-    if (resolved) return;
-    console.log('queryStateZone: all councils done, trying QLD LandUse fallback');
-    var fbForm = new URLSearchParams({
-      geometryType: 'esriGeometryPoint',
-      geometry: geomJson, inSR: '4326',
-      spatialRel: 'esriSpatialRelIntersects',
-      outFields: '*', returnGeometry: 'false',
-      resultRecordCount: '1', f: 'json'
-    });
-    fetch(qldLandUseFallback.url + '/query', { method: 'POST', body: fbForm })
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        if (resolved) return;
-        if (data.error) { console.log('LandUse fallback error:', data.error.message); finish(null); return; }
-        if (data.features && data.features.length > 0) {
-          var a = data.features[0].attributes;
-          var desc = a.tertiary || a.secondary || a.primary_ || 'Unknown';
-          var primary = a.primary_ || '';
-          console.log('Zone from QLD LandUse fallback:', desc);
-          finish({zone: desc, code: primary, precinct: null, council: 'QLD Land Use', raw: a});
-        } else { finish(null); }
-      })
-      .catch(function(e){ console.log('LandUse fallback fetch error:', e.message); finish(null); });
-  }
-
-  // Track completions — when all councils done without a result, try fallback
-  function councilDone() {
-    councilsDone++;
-    if (councilsDone >= totalCouncils && !resolved) {
-      tryLandUseFallback();
-    }
-  }
-
-  endpoints.forEach(function(ep) {
-    // Use POST for all queries — avoids URL-length issues and works for MapServer+FeatureServer
-    var formData = new URLSearchParams({
-      geometryType: 'esriGeometryPoint',
-      geometry: geomJson, inSR: '4326',
-      spatialRel: 'esriSpatialRelIntersects',
-      outFields: '*', returnGeometry: 'false',
-      resultRecordCount: '1', f: 'json'
-    });
-
-    fetch(ep.url, { method: 'POST', body: formData })
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        if (resolved) { councilDone(); return; }
-        // CRITICAL: ArcGIS returns errors as JSON with HTTP 200!
-        if (data.error) {
-          console.log('Zone query error for ' + ep.council + ': ' + data.error.code + ' ' + data.error.message);
-          councilDone();
+  var qp = new URLSearchParams({
+    geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
+    geometryType: 'esriGeometryPoint',
+    spatialRel: 'esriSpatialRelIntersects',
+    outFields: '*',
+    returnGeometry: 'false',
+    resultRecordCount: '1',
+    f: 'json'
+  });
+  // QLD Planning Framework — state-wide zoning layer
+  var url = 'https://spatial-gis.information.qld.gov.au/arcgis/rest/services/PlanningCadastre/PlanningCadastreFramework/MapServer/73/query';
+  fetch(url + '?' + qp.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.features && data.features.length > 0) {
+        var attrs = data.features[0].attributes;
+        console.log('State zone fallback attrs:', JSON.stringify(attrs));
+        var zone = attrs.ZONE_DESCR || attrs.ZONE_NAME || attrs.LVL2_ZONE || attrs.NAME || attrs.ZONE || null;
+        var precinct = attrs.PRECINCT || attrs.ZONE_PREC || null;
+        if (zone) {
+          callback({zone: zone, precinct: precinct, council: 'QLD State', raw: attrs});
           return;
         }
-        if (data.features && data.features.length > 0) {
-          var attrs = data.features[0].attributes;
-          // Try the configured zone field first
-          var zone = attrs[ep.zoneField] || null;
-          var code = attrs[ep.codeField] || null;
-          var precinct = ep.precinctField ? attrs[ep.precinctField] : null;
-          // Fallback: search common field names
-          if (!zone || (typeof zone === 'string' && zone.trim().length === 0)) {
-            var fallbackFields = ['LVL2_ZONE','LVL1_ZONE','ZONE_NAME','ZONE_DESCR','Zone','NAME','DESCRIPT',
-              'New_Noosa_Plan_Zones','TRPS_Zones','QPP_Description','New_Zone_A','HEADING','LABEL'];
-            for (var fi = 0; fi < fallbackFields.length; fi++) {
-              var v = attrs[fallbackFields[fi]];
-              if (v && typeof v === 'string' && v.trim().length > 0) { zone = v; break; }
-            }
-          }
-          if (!code || (typeof code === 'string' && code.trim().length === 0)) {
-            var codeFields = ['ZONE_CODE','CODE','TCC_CODE','QPP_Zone','LVL1_ZONE','HEADING'];
-            for (var ci = 0; ci < codeFields.length; ci++) {
-              var cv = attrs[codeFields[ci]];
-              if (cv && typeof cv === 'string' && cv.trim().length > 0) { code = cv; break; }
-            }
-          }
-          if (zone && typeof zone === 'string' && zone.trim().length > 0) {
-            console.log('Zone from ' + ep.council + ':', code ? (code + ' — ' + zone) : zone);
-            finish({zone: zone.trim(), code: code, precinct: precinct, council: ep.council, raw: attrs});
-            return;
-          }
-        }
-        councilDone();
-      })
-      .catch(function(err){
-        console.log('Zone fetch error for ' + ep.council + ':', err.message || err);
-        councilDone();
-      });
-  });
+      }
+      callback(null);
+    })
+    .catch(function(err){ console.log('State zone fallback error:', err); callback(null); });
 }
-// ══════════════════════════════════════════════════════════════════
 
-// Query council zone for a point — uses POST and handles ArcGIS error-as-JSON
+// Query council zone for a point
 function queryCouncilZone(latlng, lgaName, callback) {
   var svc = findCouncilZoneService(lgaName);
   if (!svc) { callback(null); return; }
-  var formData = new URLSearchParams({
+  var qp = new URLSearchParams({
     geometry: JSON.stringify({x: latlng.lng, y: latlng.lat, spatialReference:{wkid:4326}}),
-    geometryType: 'esriGeometryPoint', inSR: '4326',
+    geometryType: 'esriGeometryPoint',
     spatialRel: 'esriSpatialRelIntersects',
-    outFields: '*', returnGeometry: 'false',
-    resultRecordCount: '1', f: 'json'
+    outFields: '*',
+    returnGeometry: 'false',
+    resultRecordCount: '1',
+    f: 'json'
   });
-  fetch(svc.url + '/query', { method: 'POST', body: formData })
+  fetch(svc.url + '/query?' + qp.toString())
     .then(function(r){ return r.json(); })
     .then(function(data){
-      if (data.error) { console.log('Council zone error for ' + lgaName + ':', data.error.message); callback(null); return; }
       if (data.features && data.features.length > 0) {
         var attrs = data.features[0].attributes;
         var zone = attrs[svc.zoneField] || attrs[svc.codeField] || null;
-        var precinct = svc.precinctField ? attrs[svc.precinctField] : null;
+        var precinct = attrs[svc.precinctField] || null;
         console.log('Council zone attrs:', JSON.stringify(attrs));
         callback({zone: zone, precinct: precinct, council: lgaName, raw: attrs});
       } else { callback(null); }
@@ -4975,6 +4757,7 @@ function fetchAndHighlightParcel(latlng) {
     spatialRel: 'esriSpatialRelIntersects',
     outFields: 'lotplan',
     returnGeometry: 'true',
+    geometryPrecision: '6',
     outSR: '4326',
     resultRecordCount: '1',
     f: 'geojson'
@@ -5007,22 +4790,10 @@ function fetchAndHighlightParcel(latlng) {
         }
       }).addTo(mapFull);
 
-      // Only zoom/pan if user is at a low zoom (far out). If already zoomed in (>=15),
-      // just draw the outline — don't shift the map. User clicked where they're looking.
-      var currentZoom = mapFull.getZoom();
-      if (currentZoom < 15) {
-        var bounds = selectedParcelLayer.getBounds();
-        if (bounds && bounds.isValid()) {
-          var panelOpen = document.getElementById('propPanel').classList.contains('open');
-          var rightPad = panelOpen ? 400 : 80;
-          mapFull.fitBounds(bounds, {
-            paddingTopLeft: [80, 80],
-            paddingBottomRight: [rightPad, 80],
-            maxZoom: 18,
-            animate: true,
-            duration: 0.5
-          });
-        }
+      // Zoom to parcel
+      var bounds = selectedParcelLayer.getBounds();
+      if (bounds && bounds.isValid()) {
+        mapFull.fitBounds(bounds, {padding: [80, 80], maxZoom: 18, animate: true, duration: 0.5});
       }
       console.log('[Parcel highlight] Drew parcel outline OK');
     })
@@ -5380,65 +5151,11 @@ function renderPropPanel(latlng, r) {
   if (Object.keys(sz).length > 0) console.log('SEQ Zone keys:', Object.keys(sz).join(', '));
   const seqZoneName = findField(sz, ['Name','name','category','cat_desc','zone','zone_name','designation','land_use_category','description','type','sub_category','value']) || null;
 
-  // ══════════════════════════════════════════════════════════════════
-  // ZONE RESOLUTION — BULLETPROOF — DO NOT REMOVE OR REFACTOR
-  // This block determines the planning zone for the clicked property.
-  // It uses ONLY planning zone data (NOT land use / ALUMC).
-  // Fallback: council zone → state zone (brute-force all councils) → SEQ regional zone
-  // NEVER falls back to landUseClass (that's ALUMC, not zoning).
-  // ══════════════════════════════════════════════════════════════════
+  // Council Planning Scheme Zone
   const cz = r.councilZone || {};
-  let _czZone = cz.zone || null;
-  let _czCode = cz.code || null; // zone code e.g. LDR, MDR, EC
-
-  // If council zone query returned data but main .zone field empty, search raw attrs
-  if (!_czZone && cz.raw) {
-    _czZone = findField(cz.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','LVL1_ZONE','NAME','DESCRIPT','HEADING','LABEL','New_Noosa_Plan_Zones','QPP_Description','TRPS_Zones','New_Zone_A','CODE','ZONE_CODE','description','name','category','secondary','tertiary']) || null;
-    if (_czZone) console.log('Zone recovered from council raw attrs:', _czZone);
-  }
-  if (!_czCode && cz.raw) {
-    _czCode = findField(cz.raw, ['ZONE_CODE','CODE','TCC_CODE','QPP_Zone','LVL1_ZONE','HEADING','LP_PREC','primary_']) || null;
-  }
-
-  // State zone fallback (brute-force all council endpoints)
-  if (!_czZone && r.stateZone) {
-    _czZone = r.stateZone.zone || null;
-    _czCode = _czCode || r.stateZone.code || null;
-    if (!_czZone && r.stateZone.raw) {
-      _czZone = findField(r.stateZone.raw, ['ZONE_DESCR','ZONE_NAME','Zone','zone','ZONE','LVL2_ZONE','LVL1_ZONE','NAME','DESCRIPT','HEADING','LABEL','New_Noosa_Plan_Zones','QPP_Description','TRPS_Zones','New_Zone_A','description','name','category','secondary','tertiary']) || null;
-      if (_czZone) console.log('Zone recovered from state raw attrs:', _czZone);
-    }
-    if (!_czCode && r.stateZone.raw) {
-      _czCode = findField(r.stateZone.raw, ['ZONE_CODE','CODE','TCC_CODE','QPP_Zone','LVL1_ZONE','HEADING','LP_PREC','primary_']) || null;
-    }
-  }
-
-  // SEQ Regional zone (ShapingSEQ) — broad category only
-  if (!_czZone && seqZoneName) _czZone = seqZoneName;
-
-  // IMPORTANT: Do NOT fall back to landUseClass here.
-  // landUseClass is ALUMC (e.g. "Residential and farm infrastructure")
-  // which is NOT a planning zone code. Zone must come from planning data only.
-
-  // Build display name: "LDR — Low density residential" or just the zone name
-  let councilZoneName = null;
-  if (_czZone) {
-    // If we have both a short code and a longer description, combine them
-    if (_czCode && _czCode !== _czZone && _czZone.length > _czCode.length) {
-      councilZoneName = _czCode + ' \u2014 ' + _czZone;
-    } else if (_czCode && _czCode === _czZone) {
-      councilZoneName = _czZone; // code IS the zone (e.g. Logan)
-    } else {
-      councilZoneName = _czZone;
-    }
-  }
+  const councilZoneName = cz.zone || null;
   const councilZonePrecinct = cz.precinct || null;
-  const councilZoneSource = cz.zone ? ('Council: ' + (cz.council || '')) : (r.stateZone && _czZone ? ('Council: ' + (r.stateZone.council || '')) : (seqZoneName && _czZone === seqZoneName ? 'SEQ Regional' : ''));
-  console.log('ZONE RESULT:', councilZoneName, '| Source:', councilZoneSource);
-  console.log('  councilZone:', JSON.stringify(cz));
-  console.log('  stateZone:', JSON.stringify(r.stateZone || {}));
-  console.log('  seqZone:', seqZoneName);
-  // ══════════════════════════════════════════════════════════════════
+  if (councilZoneName) console.log('Council Zone:', councilZoneName, '| Precinct:', councilZonePrecinct);
 
   // Zone categorization — highlight residential, rural, industrial
   // ── ShapingSEQ 2023 Growth Data by LGA ──
@@ -5596,33 +5313,72 @@ function renderPropPanel(latlng, r) {
     ${fullAddress && locality !== '—' ? '<div style="font-size:11px;color:var(--dim);margin-top:2px">' + locality + (lga !== '—' ? ' — ' + lga : '') + '</div>' : ''}
   </div>`;
 
-  // Zone badge (first after address) — always show, with fallback chain
+  // Council mapping links (right after address)
+  var councilLinks = getCouncilMappingLinks(lga, latlng, lot, plan, lotPlan);
+  if (councilLinks.length > 0) {
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">';
+    councilLinks.forEach(function(cl) {
+      html += '<a href="' + cl.url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);color:#00d4aa;font-size:11px;font-weight:600;text-decoration:none;transition:all .15s;cursor:pointer" onmouseover="this.style.background=\'rgba(0,212,170,.2)\'" onmouseout="this.style.background=\'rgba(0,212,170,.1)\'">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
+        cl.label + '</a>';
+    });
+    html += '</div>';
+  }
+
+  // Utility provider links (water, sewer, power, stormwater)
+  var utilLinks = getUtilityProviderLinks(lga);
+  if (utilLinks.length > 0) {
+    html += '<div style="margin-bottom:12px"><div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;margin-bottom:5px">Service Connections</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:5px">';
+    utilLinks.forEach(function(ul) {
+      html += '<a href="' + ul.url + '" target="_blank" rel="noopener" title="' + ul.desc + '" style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:5px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);color:#0ea5e9;font-size:10px;font-weight:600;text-decoration:none;transition:all .15s;cursor:pointer" onmouseover="this.style.background=\'rgba(14,165,233,.2)\'" onmouseout="this.style.background=\'rgba(14,165,233,.1)\'">' +
+        '<span style="font-size:11px">' + ul.icon + '</span>' + ul.label + '</a>';
+    });
+    html += '</div></div>';
+  }
+
+  // ── Per-Property Service Assessment (Distance-Based) ──
+  var svcAssess = assessPropertyServices(councilZoneName, lga, r.cadastral, latlng);
+  html += '<div class="pp-section"><div class="pp-section-title">Services &amp; Utilities</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:5px">';
+  svcAssess.forEach(function(s) {
+    var rt = s.rating;
+    html += '<div style="padding:7px 10px;border-radius:6px;background:' + rt.bg + ';border:1px solid ' + rt.color + '22">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:6px">' +
+          '<span style="font-size:13px">' + s.icon + '</span>' +
+          '<div><div style="font-size:11px;font-weight:700;color:var(--text)">' + s.name + '</div>' +
+          '<div style="font-size:9px;color:var(--dim)">' + s.dist + '</div></div>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<div style="font-size:9px;font-weight:700;color:' + rt.color + ';letter-spacing:.4px">' + rt.label + '</div>' +
+          '<div style="font-size:8px;color:var(--dim)">' + rt.cost + '</div>' +
+        '</div>' +
+      '</div>' +
+      (s.nearest && s.cap ? '<div style="font-size:8.5px;color:var(--dim);margin-top:3px;border-top:1px solid ' + rt.color + '15;padding-top:3px">Nearest: ' + s.nearest + (s.cap ? ' (' + s.cap + ')' : '') + (s.op ? ' — ' + s.op : '') + '</div>' : '') +
+    '</div>';
+  });
+  html += '</div></div>';
+
+  // Prominent zone badge (right after address)
   if (councilZoneName) {
     html += `<div style="margin-bottom:12px;padding:8px 12px;background:${zoneCat.bg};border:1px solid ${zoneCat.color}33;border-radius:8px;display:flex;align-items:center;gap:8px">
       ${zoneCat.icon ? '<span style="font-size:18px">' + zoneCat.icon + '</span>' : ''}
       <div style="flex:1">
-        <div style="font-size:10px;color:${zoneCat.color};font-weight:700;letter-spacing:.5px">ZONE${councilZoneSource && councilZoneSource !== 'Council' ? ' <span style="font-weight:500;opacity:.7">(' + councilZoneSource + ')</span>' : ''}</div>
+        <div style="font-size:10px;color:${zoneCat.color};font-weight:700;letter-spacing:.5px">ZONE</div>
         <div style="font-size:13px;font-weight:600;color:var(--text)">${councilZoneName}</div>
       </div>
       <span style="background:${zoneCat.color};color:#0f1419;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700">${zoneCat.label}</span>
     </div>`;
-  } else {
-    html += `<div style="margin-bottom:12px;padding:8px 12px;background:rgba(107,114,128,.12);border:1px solid rgba(107,114,128,.2);border-radius:8px;display:flex;align-items:center;gap:8px">
-      <div style="flex:1">
-        <div style="font-size:10px;color:#7a8194;font-weight:700;letter-spacing:.5px">ZONE</div>
-        <div style="font-size:13px;font-weight:600;color:var(--dim)">Zone data loading — check layer panel</div>
-      </div>
-    </div>`;
   }
 
-  // Property Details section (Zone → Land Size → LGA → Lot/Plan)
+  // Property Details section
   html += `<div class="pp-section">
     <div class="pp-section-title">Property Details</div>
     <div class="pp-grid">
-      <div class="pp-field" style="grid-column:1/-1"><div class="pp-field-label">Zone</div><div class="pp-field-val" style="color:${zoneCat.color};font-weight:600">${councilZoneName || 'Querying...'}</div></div>
       <div class="pp-field"><div class="pp-field-label">Land Size</div><div class="pp-field-val">${areaDisplay}</div></div>
-      <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
       <div class="pp-field"><div class="pp-field-label">Lot/Plan</div><div class="pp-field-val" style="font-family:'SF Mono',Consolas,monospace;font-size:11px">${lotPlan !== '—' ? lotPlan : lot + '/' + plan}</div></div>
+      <div class="pp-field"><div class="pp-field-label">LGA / Council</div><div class="pp-field-val">${lga}</div></div>
     </div>
   </div>`;
 
@@ -5855,56 +5611,6 @@ function renderPropPanel(latlng, r) {
       ${bigEnough ? '<span style="color:#22c55e">&#10003;</span>' : '<span style="color:#f59e0b">&#10007;</span>'} ${area ? 'Land area: ' + areaDisplay : 'Area data unavailable'}
     </div>
   </div>`;
-
-  // ── Services & Utilities (distance-based assessment) ──
-  var svcAssess = assessPropertyServices(councilZoneName, lga, c, latlng);
-  if (svcAssess && svcAssess.length > 0) {
-    html += '<div class="pp-section">';
-    html += '<div class="pp-section-title">Services &amp; Utilities</div>';
-    svcAssess.forEach(function(s) {
-      html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
-      html += '<span style="font-size:16px;width:24px;text-align:center">' + s.icon + '</span>';
-      html += '<div style="flex:1">';
-      html += '<div style="font-size:12px;font-weight:600;color:var(--text)">' + s.name + '</div>';
-      html += '<div style="font-size:10px;color:var(--dim)">' + s.dist + (s.nearest ? ' — ' + s.nearest : '') + '</div>';
-      if (s.cap) html += '<div style="font-size:9px;color:var(--dim)">Capacity: ' + s.cap + (s.op ? ' (' + s.op + ')' : '') + '</div>';
-      html += '</div>';
-      html += '<div style="text-align:right">';
-      html += '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.5px;background:' + s.rating.bg + ';color:' + s.rating.color + '">' + s.rating.label + '</span>';
-      html += '<div style="font-size:9px;color:var(--dim);margin-top:2px">' + s.rating.cost + '</div>';
-      html += '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // ── Utility Provider Links ──
-  var utilLinks = getUtilityProviderLinks(lga);
-  if (utilLinks && utilLinks.length > 0) {
-    html += '<div class="pp-section">';
-    html += '<div class="pp-section-title">Utility Providers</div>';
-    html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
-    utilLinks.forEach(function(l) {
-      html += '<a href="' + l.url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.15);text-decoration:none;font-size:11px;color:#0ea5e9;font-weight:600">';
-      if (l.icon) html += '<span style="font-size:13px">' + l.icon + '</span>';
-      html += l.label + ' &#8599;</a>';
-    });
-    html += '</div>';
-    html += '</div>';
-  }
-
-  // ── Council Mapping Links ──
-  var councilLinks = getCouncilMappingLinks(lga, latlng, lot, plan, lotPlan);
-  if (councilLinks && councilLinks.length > 0) {
-    html += '<div class="pp-section">';
-    html += '<div class="pp-section-title">Council &amp; Mapping Links</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:2px">';
-    councilLinks.forEach(function(l) {
-      html += '<a href="' + l.url + '" target="_blank" rel="noopener" class="council-link">' + l.label + ' &#8599;</a>';
-    });
-    html += '</div>';
-    html += '</div>';
-  }
 
   // Actions
   var _trackBtn = getTrackedProp(lotPlan) ?
